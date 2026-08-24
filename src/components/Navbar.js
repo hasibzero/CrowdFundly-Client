@@ -4,7 +4,7 @@ import { useAuth } from '@/context/AuthContext';
 import { UserCircle, LogOut } from 'lucide-react';
 
 export default function Navbar() {
-  const { user, logout } = useAuth();
+  const { user, loading, logout } = useAuth();
 
   return (
     <nav className="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-4 md:px-8 h-16 bg-white border-b border-gray-100 transition-all duration-300">
@@ -21,18 +21,22 @@ export default function Navbar() {
           >
             Explore Campaigns
           </Link>
-          <Link 
-            href="/dashboard" 
-            className="text-sm font-medium text-gray-500 hover:text-black transition-colors"
-          >
-            Dashboard
-          </Link>
+          {user && !loading && (
+            <Link 
+              href="/dashboard" 
+              className="text-sm font-medium text-gray-500 hover:text-black transition-colors"
+            >
+              Dashboard
+            </Link>
+          )}
         </div>
       </div>
 
       {/* Right side: Auth Links or Profile Icons */}
       <div className="flex items-center gap-3">
-        {!user ? (
+        {loading ? (
+          <div className="w-20 h-6 bg-gray-200 animate-pulse rounded-full"></div>
+        ) : !user ? (
           <>
             <Link 
               href="/register" 
@@ -49,6 +53,7 @@ export default function Navbar() {
           </>
         ) : (
           <div className="flex items-center gap-2 text-gray-700 ml-2">
+            <span className="text-sm font-medium mr-2">{user.name}</span>
             <button 
               type="button"
               className="p-1 hover:text-black transition-colors"
