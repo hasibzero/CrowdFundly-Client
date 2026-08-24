@@ -1,0 +1,462 @@
+<!DOCTYPE html><html class="light" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Crowdfundly - Home</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Plus+Jakarta+Sans:wght@700;800&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary": "#006c49",
+                    "on-primary": "#ffffff",
+                    "secondary-container": "#645efb",
+                    "on-tertiary-container": "#523200",
+                    "on-secondary-fixed": "#0f0069",
+                    "on-surface-variant": "#3c4a42",
+                    "outline": "#6c7a71",
+                    "on-error-container": "#93000a",
+                    "primary-fixed-dim": "#4edea3",
+                    "surface-container-high": "#dce9ff",
+                    "secondary-fixed-dim": "#c3c0ff",
+                    "on-background": "#0b1c30",
+                    "on-error": "#ffffff",
+                    "on-primary-fixed": "#002113",
+                    "secondary-fixed": "#e2dfff",
+                    "tertiary-fixed-dim": "#ffb95f",
+                    "tertiary": "#855300",
+                    "on-secondary": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "primary-container": "#10b981",
+                    "secondary": "#4b41e1",
+                    "outline-variant": "#bbcabf",
+                    "on-secondary-fixed-variant": "#3323cc",
+                    "surface-container-lowest": "#ffffff",
+                    "tertiary-fixed": "#ffddb8",
+                    "on-surface": "#0b1c30",
+                    "primary-fixed": "#6ffbbe",
+                    "inverse-primary": "#4edea3",
+                    "surface": "#f8f9ff",
+                    "on-primary-container": "#00422b",
+                    "surface-bright": "#f8f9ff",
+                    "inverse-surface": "#213145",
+                    "surface-tint": "#006c49",
+                    "tertiary-container": "#e29100",
+                    "on-tertiary-fixed-variant": "#653e00",
+                    "on-secondary-container": "#fffbff",
+                    "surface-container-highest": "#d3e4fe",
+                    "surface-variant": "#d3e4fe",
+                    "surface-container-low": "#eff4ff",
+                    "background": "#f8f9ff",
+                    "surface-container": "#e5eeff",
+                    "on-tertiary": "#ffffff",
+                    "surface-dim": "#cbdbf5",
+                    "error": "#ba1a1a",
+                    "inverse-on-surface": "#eaf1ff",
+                    "on-primary-fixed-variant": "#005236",
+                    "on-tertiary-fixed": "#2a1700"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "base": "4px",
+                    "xs": "8px",
+                    "gutter": "24px",
+                    "margin-mobile": "16px",
+                    "lg": "40px",
+                    "container-max": "1280px",
+                    "md": "24px",
+                    "xl": "64px",
+                    "sm": "16px"
+            },
+            "fontFamily": {
+                    "label-sm": ["Inter"],
+                    "body-md": ["Inter"],
+                    "display-lg": ["Plus Jakarta Sans"],
+                    "headline-lg": ["Plus Jakarta Sans"],
+                    "body-lg": ["Inter"],
+                    "headline-md": ["Plus Jakarta Sans"],
+                    "headline-lg-mobile": ["Plus Jakarta Sans"],
+                    "label-md": ["Inter"]
+            },
+            "fontSize": {
+                    "label-sm": ["12px", {"lineHeight": "1.4", "fontWeight": "500"}],
+                    "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                    "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "700"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                    "label-md": ["14px", {"lineHeight": "1.4", "letterSpacing": "0.05em", "fontWeight": "600"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        .animate-fade-up {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .animate-fade-up.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md pt-16">
+<!-- TopNavBar -->
+<nav class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-margin-mobile md:px-gutter lg:px-lg h-16 max-w-container-max mx-auto bg-surface dark:bg-inverse-surface shadow-sm dark:bg-surface-container-low transition-all duration-300">
+<div class="flex items-center gap-md">
+<a class="text-headline-md font-headline-md font-extrabold text-primary dark:text-primary-fixed-dim" href="#">Crowdfundly</a>
+<div class="hidden md:flex items-center gap-sm">
+<a class="text-secondary font-bold pb-1 text-label-md font-label-md hover:text-primary transition-colors duration-200" href="#">Explore Campaigns</a>
+<a class="text-on-surface-variant text-label-md font-label-md hover:text-primary transition-colors duration-200" href="#">Dashboard</a>
+</div>
+</div>
+<div class="flex items-center gap-sm">
+<div class="relative hidden lg:block">
+
+
+</div>
+<button class="hidden md:block bg-surface text-secondary border border-secondary px-4 py-2 rounded-full font-label-md text-label-md hover:bg-secondary hover:text-on-secondary transition-colors">Register</button>
+<button class="bg-primary text-on-primary px-4 py-2 rounded-full font-label-md text-label-md font-bold hover:bg-primary-fixed-dim hover:text-on-primary-fixed transition-colors">Join as Developer</button>
+<div class="flex items-center gap-xs ml-xs">
+<button class="text-on-surface-variant hover:text-primary transition-colors p-2"><span class="material-symbols-outlined">account_circle</span></button>
+<button class="text-on-surface-variant hover:text-primary transition-colors p-2"><span class="material-symbols-outlined">logout</span></button>
+</div>
+</div>
+</nav>
+<!-- Hero Section -->
+<section class="relative h-[819px] min-h-[600px] w-full overflow-hidden flex items-center justify-center">
+
+
+<div class="swiper hero-swiper w-full max-w-container-max px-margin-mobile md:px-gutter lg:px-lg swiper-fade swiper-initialized swiper-horizontal swiper-watch-progress swiper-backface-hidden">
+<div class="swiper-wrapper" id="swiper-wrapper-9828e9e8513ea10f6" aria-live="off" style="transition-duration: 0ms; transition-delay: 0ms;"><div class="swiper-slide flex flex-col items-center justify-center text-center relative min-h-[600px] h-[819px] swiper-slide-next" role="group" aria-label="2 / 3" data-swiper-slide-index="1" style="width: 1200px; opacity: 0; transform: translate3d(0px, 0px, 0px); transition-duration: 0ms;"><img src="https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&amp;fit=crop&amp;q=80&amp;w=2070" class="absolute inset-0 w-full h-full object-cover -z-20" alt="Community Impact"><div class="absolute inset-0 bg-on-surface/40 -z-10"></div><h1 class="text-display-lg font-display-lg text-on-primary mb-md max-w-4xl drop-shadow-lg">Impact Your Community</h1><p class="text-body-lg font-body-lg text-on-primary/90 mb-lg max-w-2xl">Back local initiatives that matter. From urban gardens to community centers, your support builds stronger neighborhoods.</p><div class="flex gap-sm"><button class="bg-primary text-on-primary px-8 py-4 rounded-full font-label-md text-label-md font-bold hover:bg-primary-container transition-colors shadow-sm">Explore Campaigns</button></div></div><div class="swiper-slide flex flex-col items-center justify-center text-center relative min-h-[600px] h-[819px] swiper-slide-prev" role="group" aria-label="3 / 3" data-swiper-slide-index="2" style="width: 1200px; opacity: 0; transform: translate3d(-1200px, 0px, 0px); transition-duration: 0ms;"><img src="https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&amp;fit=crop&amp;q=80&amp;w=2074" class="absolute inset-0 w-full h-full object-cover -z-20" alt="Launch Dream"><div class="absolute inset-0 bg-on-surface/40 -z-10"></div><h1 class="text-display-lg font-display-lg text-on-primary mb-md max-w-4xl drop-shadow-lg">Launch Your Dream</h1><p class="text-body-lg font-body-lg text-on-primary/90 mb-lg max-w-2xl">Get the funding you need to grow. Join thousands of successful creators who brought their vision to life on Crowdfundly.</p><div class="flex gap-sm"><button class="bg-surface text-secondary border border-secondary px-8 py-4 rounded-full font-label-md text-label-md font-bold hover:bg-secondary-fixed transition-colors">Start Your Project</button></div></div><div class="swiper-slide flex flex-col items-center justify-center text-center relative min-h-[600px] h-[819px] swiper-slide-visible swiper-slide-fully-visible swiper-slide-active" role="group" aria-label="1 / 3" data-swiper-slide-index="0" style="width: 1200px; opacity: 1; transform: translate3d(-2400px, 0px, 0px); transition-duration: 0ms;"><img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&amp;fit=crop&amp;q=80&amp;w=2070" class="absolute inset-0 w-full h-full object-cover -z-20" alt="Innovative Tech"><div class="absolute inset-0 bg-on-surface/40 -z-10"></div><h1 class="text-display-lg font-display-lg text-on-primary mb-md max-w-4xl drop-shadow-lg">Fuel the Future</h1><p class="text-body-lg font-body-lg text-on-primary/90 mb-lg max-w-2xl">Support innovative tech projects that are changing the world. Be an early adopter of tomorrow's breakthroughs.</p><div class="flex gap-sm"><button class="bg-primary text-on-primary px-8 py-4 rounded-full font-label-md text-label-md font-bold hover:bg-primary-container transition-colors shadow-sm">Explore Campaigns</button></div></div></div>
+<div class="swiper-pagination swiper-pagination-clickable swiper-pagination-bullets swiper-pagination-horizontal"><span class="swiper-pagination-bullet swiper-pagination-bullet-active" tabindex="0" role="button" aria-label="Go to slide 1" aria-current="true"></span><span class="swiper-pagination-bullet" tabindex="0" role="button" aria-label="Go to slide 2"></span><span class="swiper-pagination-bullet" tabindex="0" role="button" aria-label="Go to slide 3"></span></div>
+<span class="swiper-notification" aria-live="assertive" aria-atomic="true"></span><span class="swiper-notification" aria-live="assertive" aria-atomic="true"></span></div>
+</section>
+<!-- Platform Impact Stats -->
+<section class="py-xl bg-surface-container-low border-b border-outline-variant/30">
+<div class="max-w-container-max mx-auto px-margin-mobile md:px-gutter lg:px-lg">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-lg text-center animate-fade-up is-visible">
+<div>
+<h3 class="text-display-lg font-display-lg text-primary mb-xs">$45M+</h3>
+<p class="text-body-lg font-body-lg text-on-surface-variant">Total Funded</p>
+</div>
+<div>
+<h3 class="text-display-lg font-display-lg text-secondary mb-xs">1,200+</h3>
+<p class="text-body-lg font-body-lg text-on-surface-variant">Active Campaigns</p>
+</div>
+<div>
+<h3 class="text-display-lg font-display-lg text-tertiary-container mb-xs">850K</h3>
+<p class="text-body-lg font-body-lg text-on-surface-variant">Supporters Worldwide</p>
+</div>
+</div>
+</div>
+</section>
+<!-- How It Works -->
+<section class="py-xl max-w-container-max mx-auto px-margin-mobile md:px-gutter lg:px-lg animate-fade-up is-visible">
+<div class="text-center mb-xl">
+<h2 class="text-headline-lg font-headline-lg mb-sm">How Crowdfundly Works</h2>
+<p class="text-body-lg font-body-lg text-on-surface-variant max-w-2xl mx-auto">Three simple steps to bring ideas to life.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-lg">
+<div class="bg-surface rounded-xl p-lg shadow-[0px_4px_20px_rgba(0,0,0,0.05)] text-center border border-outline-variant/20 hover:shadow-[0px_10px_30px_rgba(0,0,0,0.08)] transition-shadow">
+<div class="w-16 h-16 rounded-full bg-surface-container-highest flex items-center justify-center mx-auto mb-md">
+<span class="material-symbols-outlined text-secondary text-[32px]">search</span>
+</div>
+<h3 class="text-headline-md font-headline-md mb-xs">1. Discover</h3>
+<p class="text-body-md font-body-md text-on-surface-variant">Explore thousands of verified campaigns across diverse categories that match your interests.</p>
+</div>
+<div class="bg-surface rounded-xl p-lg shadow-[0px_4px_20px_rgba(0,0,0,0.05)] text-center border border-outline-variant/20 hover:shadow-[0px_10px_30px_rgba(0,0,0,0.08)] transition-shadow">
+<div class="w-16 h-16 rounded-full bg-primary-container/20 flex items-center justify-center mx-auto mb-md">
+<span class="material-symbols-outlined text-primary text-[32px]">payments</span>
+</div>
+<h3 class="text-headline-md font-headline-md mb-xs">2. Contribute</h3>
+<p class="text-body-md font-body-md text-on-surface-variant">Back projects securely. Choose reward tiers or simply donate to fuel their passion.</p>
+</div>
+<div class="bg-surface rounded-xl p-lg shadow-[0px_4px_20px_rgba(0,0,0,0.05)] text-center border border-outline-variant/20 hover:shadow-[0px_10px_30px_rgba(0,0,0,0.08)] transition-shadow">
+<div class="w-16 h-16 rounded-full bg-tertiary-container/20 flex items-center justify-center mx-auto mb-md">
+<span class="material-symbols-outlined text-tertiary-container text-[32px]">rocket_launch</span>
+</div>
+<h3 class="text-headline-md font-headline-md mb-xs">3. Impact</h3>
+<p class="text-body-md font-body-md text-on-surface-variant">Watch ideas become reality. Get updates directly from creators and see your impact grow.</p>
+</div>
+</div>
+</section>
+<!-- Top Funded Campaigns Grid -->
+<section class="py-xl bg-surface-container-low">
+<div class="max-w-container-max mx-auto px-margin-mobile md:px-gutter lg:px-lg animate-fade-up is-visible">
+<div class="flex justify-between items-end mb-lg">
+<div>
+<h2 class="text-headline-lg font-headline-lg mb-xs">Top Funded Campaigns</h2>
+<p class="text-body-md font-body-md text-on-surface-variant">Projects currently leading the charge on Crowdfundly.</p>
+</div>
+<button class="hidden md:flex text-secondary font-label-md text-label-md items-center gap-xs hover:text-secondary-container transition-colors">
+                    View All <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-md">
+<!-- Card 1 -->
+<div class="bg-surface rounded-xl overflow-hidden shadow-[0px_4px_20px_rgba(0,0,0,0.05)] border border-outline-variant/20 hover:shadow-[0px_10px_30px_rgba(0,0,0,0.08)] transition-all group cursor-pointer flex flex-col h-full">
+<div class="relative h-48 w-full overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A sleek, modern electric bicycle prototype positioned in a brightly lit, minimalist design studio. The lighting is high-key and professional, highlighting the bicycle's metallic finish and clean lines. The overall aesthetic is clean, corporate modern, and forward-thinking, embodying sustainable technology innovation." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDCBDpiAnTAPxY5MHopAJ1GYPXpHTWSuhAKW8bRrQhX-NCD81gSX1nOJ51Rtppt6j6c1njIYCAYkJ7_9EB70gHBKOptgxpZcOOdIpVW4uL4_8Uaqo8m5Kg_bp4yxVsNem1WwvSfN-zv2qrCTb7JavHvM0ZVI3ID6v92TQYUXrct7IbRKl6b02W0Ih91p6-MjRLvmatDiRbn-nOhPCuwutMu4CUdxN6TC6R_eYXjHp-soteu9VwLVDU0fw">
+<div class="absolute top-sm right-sm bg-surface/90 backdrop-blur-sm px-3 py-1 rounded-full flex items-center gap-1 shadow-sm">
+<span class="material-symbols-outlined text-secondary text-[16px]">verified</span>
+<span class="text-label-sm font-label-sm text-on-surface">Verified</span>
+</div>
+<div class="absolute top-sm left-sm bg-secondary-fixed/90 backdrop-blur-sm px-3 py-1 rounded-full">
+<span class="text-label-sm font-label-sm text-on-secondary-fixed">Tech</span>
+</div>
+</div>
+<div class="p-md flex flex-col flex-grow">
+<h3 class="text-body-lg font-body-lg font-bold mb-xs line-clamp-2 text-on-surface group-hover:text-secondary transition-colors">AeroBike: The Smart Commuter EV</h3>
+<p class="text-body-md font-body-md text-on-surface-variant mb-md line-clamp-2">Revolutionizing urban transport with an AI-assisted electric bike designed for seamless city commuting.</p>
+<div class="mt-auto">
+<div class="flex justify-between items-end mb-xs">
+<span class="text-headline-md font-headline-md text-primary">$124,500</span>
+<span class="text-label-sm font-label-sm text-on-surface-variant">Total Raised</span>
+</div>
+<div class="w-full h-2 bg-primary/10 rounded-full overflow-hidden mb-xs">
+<div class="h-full bg-primary rounded-full w-[85%]"></div>
+</div>
+<div class="flex justify-between text-label-sm font-label-sm text-on-surface-variant">
+<span class="">85% Funded</span>
+<span class="">12 Days Left</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="bg-surface rounded-xl overflow-hidden shadow-[0px_4px_20px_rgba(0,0,0,0.05)] border border-outline-variant/20 hover:shadow-[0px_10px_30px_rgba(0,0,0,0.08)] transition-all group cursor-pointer flex flex-col h-full">
+<div class="relative h-48 w-full overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="An expansive, lush community garden space in an urban setting, featuring modular wooden planters filled with vibrant green vegetables and flowers. The scene is lit by warm, golden hour sunlight, creating a trusting and organic atmosphere. The aesthetic blends modern urban design with nature, emphasizing community growth." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD17l24u-g9ziHfsFRac80zRBwDAJWr_xdJx1DuXK4EYvgMVsQrUhGdtijAeu_-9A7QhrXqhpJQ0gzF86jOZUmOSDlf0K0GL1rnVkir4ontcjq6qEKgb9LsJUW_sQhwMKM6Kzfw3jedMvYDO_-QBQ5EAfyjLa-aaGHg4CcFcg6ADu7yfFzfsi3Xct6AKdA-Mz584il3wHy8mtjs8fDNlAVOPrFztEybR8u0eiRL62gER6w6-TU3xrZfKw">
+<div class="absolute top-sm left-sm bg-secondary-fixed/90 backdrop-blur-sm px-3 py-1 rounded-full">
+<span class="text-label-sm font-label-sm text-on-secondary-fixed">Community</span>
+</div>
+</div>
+<div class="p-md flex flex-col flex-grow">
+<h3 class="text-body-lg font-body-lg font-bold mb-xs line-clamp-2 text-on-surface group-hover:text-secondary transition-colors">Urban Oasis: Modular City Gardens</h3>
+<p class="text-body-md font-body-md text-on-surface-variant mb-md line-clamp-2">Empowering neighborhoods to grow their own food with easily deployable, self-watering garden pods.</p>
+<div class="mt-auto">
+<div class="flex justify-between items-end mb-xs">
+<span class="text-headline-md font-headline-md text-primary">$45,200</span>
+<span class="text-label-sm font-label-sm text-on-surface-variant">Total Raised</span>
+</div>
+<div class="w-full h-2 bg-primary/10 rounded-full overflow-hidden mb-xs">
+<div class="h-full bg-primary rounded-full w-[110%]"></div>
+</div>
+<div class="flex justify-between text-label-sm font-label-sm text-on-surface-variant">
+<span class="text-primary font-bold">110% Funded</span>
+<span class="">3 Days Left</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="bg-surface rounded-xl overflow-hidden shadow-[0px_4px_20px_rgba(0,0,0,0.05)] border border-outline-variant/20 hover:shadow-[0px_10px_30px_rgba(0,0,0,0.08)] transition-all group cursor-pointer flex flex-col h-full">
+<div class="relative h-48 w-full overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A beautiful, minimalist indie video game environment displaying a serene forest landscape at twilight, rendered in a distinct, stylized low-poly art style. Soft, magical glowing lights dot the scene. The image feels creative, high-quality, and visually engaging, representing a passionate art and design project." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB6PSWirvqMlhHovlc98bR4gO0on6tsF8kcIqwKoT-y8Eu9Ms5toLahKoErvnGjo3Wbmk91xNeL1QVccDk14NTHt63IsWvqDCRUTrCgVzSx8XRI3nGuwb05rdmJ6mUJVc3tLRHZyfazyNgsHBM11p3uRhvr49S_4yJsV2JiIJTuK9zyHJQYV2a_q0jyXaGcuK4PpTxubEpzJ59nwEOfs7IMA2QQqf5hsHrScNBPm_-Gw4RLnYgnLXqnhA">
+<div class="absolute top-sm right-sm bg-surface/90 backdrop-blur-sm px-3 py-1 rounded-full flex items-center gap-1 shadow-sm">
+<span class="material-symbols-outlined text-secondary text-[16px]">verified</span>
+<span class="text-label-sm font-label-sm text-on-surface">Verified</span>
+</div>
+<div class="absolute top-sm left-sm bg-secondary-fixed/90 backdrop-blur-sm px-3 py-1 rounded-full">
+<span class="text-label-sm font-label-sm text-on-secondary-fixed">Art &amp; Gaming</span>
+</div>
+</div>
+<div class="p-md flex flex-col flex-grow">
+<h3 class="text-body-lg font-body-lg font-bold mb-xs line-clamp-2 text-on-surface group-hover:text-secondary transition-colors">Wanderer's Tale: An Indie RPG</h3>
+<p class="text-body-md font-body-md text-on-surface-variant mb-md line-clamp-2">A narrative-driven adventure game with stunning handcrafted visuals and an orchestral soundtrack.</p>
+<div class="mt-auto">
+<div class="flex justify-between items-end mb-xs">
+<span class="text-headline-md font-headline-md text-primary">$210,000</span>
+<span class="text-label-sm font-label-sm text-on-surface-variant">Total Raised</span>
+</div>
+<div class="w-full h-2 bg-primary/10 rounded-full overflow-hidden mb-xs">
+<div class="h-full bg-primary rounded-full w-[45%]"></div>
+</div>
+<div class="flex justify-between text-label-sm font-label-sm text-on-surface-variant">
+<span class="">45% Funded</span>
+<span class="">28 Days Left</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-md text-center md:hidden">
+<button class="bg-surface text-secondary border border-secondary px-6 py-3 rounded-full font-label-md text-label-md w-full">View All Campaigns</button>
+</div>
+</div>
+</section>
+<!-- Testimonial Section -->
+<section class="py-xl max-w-container-max mx-auto px-margin-mobile md:px-gutter lg:px-lg animate-fade-up overflow-hidden is-visible">
+<div class="text-center mb-lg">
+<h2 class="text-headline-lg font-headline-lg mb-sm">Community Voices</h2>
+</div>
+<div class="swiper testimonial-swiper pb-xl swiper-initialized swiper-horizontal swiper-backface-hidden">
+<div class="swiper-wrapper" id="swiper-wrapper-73610bb3e66f8b804" aria-live="polite">
+<div class="swiper-slide h-auto swiper-slide-active" role="group" aria-label="1 / 3" style="width: 384px; margin-right: 24px;">
+<div class="bg-surface rounded-xl p-lg shadow-[0px_4px_20px_rgba(0,0,0,0.05)] border border-outline-variant/20 h-full flex flex-col">
+<div class="text-tertiary-container mb-md text-display-lg leading-none">"</div>
+<p class="text-body-lg font-body-lg italic text-on-surface-variant flex-grow mb-md">Crowdfundly provided the exact launchpad we needed. The community here is incredibly supportive and genuinely cares about sustainable tech. We hit our goal in just 48 hours!</p>
+<div class="flex items-center gap-sm mt-auto">
+<img class="w-12 h-12 rounded-full object-cover shadow-sm" data-alt="A professional headshot of a smiling woman in her 30s with short hair, wearing a casual blazer, standing in a brightly lit modern office setting. The lighting is soft and flattering, conveying trust and approachability." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBs3AX-gXEl6SPaqWQOJhhuVPOasoWsuWz2nAYk58EdQiICp20d474aWoqhzaUWv5QBDnzXH9pTLZiUG3IrAIMRfMnDRhty-llYsmhu_xLLX0OK1ObxmgggtqaqLWRRMEoLO43bUiOYyEdAIt_4__E4FzNDgth_NmBAWYhnQkg86cHEX3T9DxicMh8UklQMqhcxJooG9QYlEvvO4Xdibg-7awmcTaM3h-FQB0SWmGyMJP7aHcAg_AkLMA">
+<div>
+<h4 class="font-label-md text-label-md text-on-surface font-bold">Sarah Jenkins</h4>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Creator, EcoPod</p>
+</div>
+</div>
+</div>
+</div>
+<div class="swiper-slide h-auto swiper-slide-next" role="group" aria-label="2 / 3" style="width: 384px; margin-right: 24px;">
+<div class="bg-surface rounded-xl p-lg shadow-[0px_4px_20px_rgba(0,0,0,0.05)] border border-outline-variant/20 h-full flex flex-col">
+<div class="text-tertiary-container mb-md text-display-lg leading-none">"</div>
+<p class="text-body-lg font-body-lg italic text-on-surface-variant flex-grow mb-md">As a backer, I love the transparency. The platform makes it easy to track the progress of the hardware projects I've invested in. It feels safe, professional, and exciting.</p>
+<div class="flex items-center gap-sm mt-auto">
+<img class="w-12 h-12 rounded-full object-cover shadow-sm" data-alt="A candid, warm portrait of a man in his 40s wearing glasses and a neat button-down shirt, sitting at a clean, minimalist desk with a laptop. The atmosphere is calm and professional, highlighting a trustworthy investor persona." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD3zNFMmj5mbgv3MY69M95PAtS1BUAeDB6xwxJTNhezwjAUWzSX1yz2BcWMa-tqfSOw6gtg52AowJD6KbPDLanUHBebHLgts2LwMQdzEx4jTTzBdsANgILJ-Fsib0DOPLfACoCp-RTbX7wxCnWWYNE1iBQDqTTfwft0bdwG6AMXB_yzMjUDGcPnJ4j6HKeA43hNKRoyEJ4ZCgsIpozzwdmJA2rXq1bQNqSLwa-b4w4Bl_zD-nQreK14_g">
+<div>
+<h4 class="font-label-md text-label-md text-on-surface font-bold">Michael Chen</h4>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Super Backer</p>
+</div>
+</div>
+</div>
+</div>
+<div class="swiper-slide h-auto" role="group" aria-label="3 / 3" style="width: 384px; margin-right: 24px;">
+<div class="bg-surface rounded-xl p-lg shadow-[0px_4px_20px_rgba(0,0,0,0.05)] border border-outline-variant/20 h-full flex flex-col">
+<div class="text-tertiary-container mb-md text-display-lg leading-none">"</div>
+<p class="text-body-lg font-body-lg italic text-on-surface-variant flex-grow mb-md">The tools provided for creators are top-notch. Managing updates and communicating with my supporters was seamless. Highly recommend this platform to any indie artist.</p>
+<div class="flex items-center gap-sm mt-auto">
+<img class="w-12 h-12 rounded-full object-cover shadow-sm" data-alt="A vibrant, engaging portrait of a young artist in a brightly lit studio surrounded by abstract canvases. They are smiling warmly at the camera. The lighting is natural and inviting, conveying creativity and momentum." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD26900U56APz_3sTcVUoKclwxvolp_gkldIaJX8vRo3pB6FKWt9o3l_jhfJIOHNy6lcNFxUkXeYbesSky3uZ-sx4yltFW5LHsm9OSrl7l3FA1SpyhpYctFul-hcQzjBRLtKOfrttM_GoddHI3VGaAHqAFtkqJcB8-TBVxPga5pIYPfxyw38XThyMSsT-CWAxTu8lMhyPArBN1cOGRnbLPjay2sKS148C0loOG-3eI36D7KorrIxDrZfA">
+<div>
+<h4 class="font-label-md text-label-md text-on-surface font-bold">Elena Rodriguez</h4>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Artist &amp; Creator</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="swiper-pagination swiper-pagination-clickable swiper-pagination-bullets swiper-pagination-horizontal swiper-pagination-lock"><span class="swiper-pagination-bullet swiper-pagination-bullet-active" tabindex="0" role="button" aria-label="Go to slide 1" aria-current="true"></span></div>
+<span class="swiper-notification" aria-live="assertive" aria-atomic="true"></span><span class="swiper-notification" aria-live="assertive" aria-atomic="true"></span></div>
+</section>
+<!-- Footer -->
+<footer class="bg-surface-container-low dark:bg-surface-container-lowest w-full py-xl px-margin-mobile md:px-lg border-t border-outline-variant dark:border-outline"><div class="max-w-container-max mx-auto">
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-xl mb-xl">
+    <!-- Column 1: Brand -->
+    <div class="flex flex-col gap-sm">
+      <a class="text-headline-md font-headline-md font-extrabold text-primary dark:text-primary-fixed-dim" href="#">Crowdfundly</a>
+      <p class="text-body-md font-body-md text-on-surface-variant dark:text-outline">
+        Empowering creators and supporters to build a better future together through transparent, community-driven funding.
+      </p>
+    </div>
+    <!-- Column 2: Explore -->
+    <div class="flex flex-col gap-sm">
+      <h4 class="font-label-md text-label-md text-on-surface font-bold uppercase tracking-wider">Explore</h4>
+      <nav class="flex flex-col gap-xs">
+        <a href="#" class="text-body-md text-on-surface-variant hover:text-primary transition-colors">All Campaigns</a>
+        <a href="#" class="text-body-md text-on-surface-variant hover:text-primary transition-colors">Technology</a>
+        <a href="#" class="text-body-md text-on-surface-variant hover:text-primary transition-colors">Art &amp; Design</a>
+        <a href="#" class="text-body-md text-on-surface-variant hover:text-primary transition-colors">Community</a>
+      </nav>
+    </div>
+    <!-- Column 3: Resources -->
+    <div class="flex flex-col gap-sm">
+      <h4 class="font-label-md text-label-md text-on-surface font-bold uppercase tracking-wider">Resources</h4>
+      <nav class="flex flex-col gap-xs">
+        <a href="#" class="text-body-md text-on-surface-variant hover:text-primary transition-colors">How it Works</a>
+        <a href="#" class="text-body-md text-on-surface-variant hover:text-primary transition-colors">Pricing</a>
+        <a href="#" class="text-body-md text-on-surface-variant hover:text-primary transition-colors">Help Center</a>
+        <a href="#" class="text-body-md text-on-surface-variant hover:text-primary transition-colors">Terms of Service</a>
+      </nav>
+    </div>
+    <!-- Column 4: Connect -->
+    <div class="flex flex-col gap-sm">
+      <h4 class="font-label-md text-label-md text-on-surface font-bold uppercase tracking-wider">Connect</h4>
+      <nav class="flex flex-col gap-xs">
+        <a href="#" class="text-body-md text-on-surface-variant hover:text-primary transition-colors">LinkedIn</a>
+        <a href="#" class="text-body-md text-on-surface-variant hover:text-primary transition-colors">Facebook</a>
+        <a href="#" class="text-body-md text-on-surface-variant hover:text-primary transition-colors">GitHub</a>
+        <a href="#" class="text-body-md text-on-surface-variant hover:text-primary transition-colors">Twitter</a>
+      </nav>
+    </div>
+  </div>
+  <div class="pt-md border-t border-outline-variant/30 flex flex-col md:flex-row justify-between items-center gap-sm">
+    <p class="text-label-sm font-label-sm text-on-surface-variant dark:text-outline">© 2024 Crowdfundly. Built for creators.</p>
+    <div class="flex gap-md">
+      <span class="text-label-sm font-label-sm text-on-surface-variant">Privacy Policy</span>
+      <span class="text-label-sm font-label-sm text-on-surface-variant">Cookie Policy</span>
+    </div>
+  </div>
+</div></footer>
+<script>
+        // Intersection Observer for scroll animations
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.animate-fade-up').forEach(element => {
+            observer.observe(element);
+        });
+
+        // Initialize Swipers
+        const heroSwiper = new Swiper('.hero-swiper', {
+            loop: true,
+            autoplay: {
+                delay: 5000,
+                disableOnInteraction: false,
+            },
+            pagination: {
+                el: '.swiper-pagination',
+                clickable: true,
+            },
+            effect: 'fade',
+            fadeEffect: {
+                crossFade: true
+            }
+        });
+
+        const testimonialSwiper = new Swiper('.testimonial-swiper', {
+            slidesPerView: 1,
+            spaceBetween: 24,
+            pagination: {
+                el: '.swiper-pagination',
+                clickable: true,
+            },
+            breakpoints: {
+                640: {
+                    slidesPerView: 2,
+                },
+                1024: {
+                    slidesPerView: 3,
+                },
+            }
+        });
+    </script>
+
+
+
+
+</body></html>
