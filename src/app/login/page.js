@@ -32,8 +32,8 @@ export default function LoginPage() {
     <div className="flex min-h-screen w-full flex-col bg-slate-50">
       <Navbar />
       
-      <div className="flex flex-1 flex-col justify-center items-center px-4 py-12 pt-24">
-        <div className="bg-white p-8 sm:p-10 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 w-full max-w-md">
+      <div className="flex flex-1 flex-col justify-center items-center px-4 py-12 pt-24 w-full">
+        <div className="bg-white p-8 sm:p-10 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 w-full max-w-[448px]">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold text-slate-900 tracking-tight mb-2">
               Welcome back

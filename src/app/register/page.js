@@ -56,7 +56,7 @@ export default function RegisterPage() {
       <Navbar />
       
       <div className="flex flex-1 pt-16">
-        <div className="flex w-full max-w-7xl mx-auto my-8 md:my-12 bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 overflow-hidden mx-4">
+        <div className="flex w-full max-w-[1280px] mx-auto my-8 md:my-12 bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 overflow-hidden mx-4 lg:mx-auto">
           
           {/* Left Form Section */}
           <div className="w-full lg:w-1/2 p-8 md:p-12 flex flex-col justify-center">
@@ -230,13 +230,13 @@ export default function RegisterPage() {
           {/* Right Image Section */}
           <div className="hidden lg:block w-1/2 relative bg-zinc-900">
             <img 
-              src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=1400" 
+              src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=1400" 
               alt="People collaborating" 
-              className="absolute inset-0 w-full h-full object-cover opacity-80"
+              className="absolute inset-0 w-full h-full object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-12 text-white">
-              <h3 className="text-2xl font-bold mb-3 tracking-tight">Launch your dreams.</h3>
-              <p className="text-zinc-200 text-sm leading-relaxed max-w-sm">
+            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end p-12 text-white">
+              <h3 className="text-3xl font-bold mb-3 tracking-tight">Launch your dreams.</h3>
+              <p className="text-zinc-200 text-base leading-relaxed max-w-sm">
                 Join thousands of creators and backers building the future together on Crowdfundly.
               </p>
             </div>
