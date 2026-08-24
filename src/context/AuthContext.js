@@ -19,16 +19,6 @@ export const AuthProvider = ({ children }) => {
     console.log("[AuthContext] Session updated:", { session, loading, user, error });
   }, [session, loading, user, error]);
 
-  useEffect(() => {
-    // Sync the token with Axios for the Express backend
-    const token = typeof window !== 'undefined' ? localStorage.getItem('access-token') : null;
-    if (token) {
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    } else {
-      delete axios.defaults.headers.common['Authorization'];
-    }
-  }, [session]);
-
   const login = async (email, password) => {
     try {
       const { data, error } = await authClient.signIn.email({
@@ -40,11 +30,6 @@ export const AuthProvider = ({ children }) => {
         return false;
       }
       
-      if (data?.token) {
-        localStorage.setItem('access-token', data.token);
-        axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
-      }
-
       router.push('/dashboard');
       return true;
     } catch (error) {
@@ -69,11 +54,6 @@ export const AuthProvider = ({ children }) => {
         throw new Error(error.message); // throw to be caught by the component toast
       }
       
-      if (data?.token) {
-        localStorage.setItem('access-token', data.token);
-        axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
-      }
-
       router.push('/dashboard');
       return true;
     } catch (error) {
@@ -84,8 +64,6 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     await authClient.signOut();
-    localStorage.removeItem('access-token');
-    delete axios.defaults.headers.common['Authorization'];
     router.push('/');
   };
 
