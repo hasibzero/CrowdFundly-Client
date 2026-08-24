@@ -61,9 +61,9 @@ export const AuthProvider = ({ children }) => {
         email: userData.email,
         password: userData.password,
         name: userData.name,
-        // In Better Auth, extra fields need to be handled by custom plugins or schema.
-        // Assuming we extended the user schema or just use basic fields for now.
         image: userData.photoURL,
+        role: userData.role,
+        credits: userData.credits,
       });
 
       if (error) {
