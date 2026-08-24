@@ -27,22 +27,12 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (email, password) => {
-    // This will normally contact your backend to verify credentials and get the JWT token.
-    // For this demonstration, we'll assume the backend sends back a user object and token.
     try {
-      const response = await axios.post('http://localhost:5000/jwt', { email });
+      const response = await axios.post('http://localhost:5000/api/auth/login', { email, password });
       if (response.data.token) {
         localStorage.setItem('access-token', response.data.token);
-        
-        // Mock user fetching - you should fetch the user from your database here using the token
-        const mockUser = {
-          email,
-          name: "User Name", // placeholder
-          role: "Supporter", // placeholder
-          credits: 50
-        };
-        localStorage.setItem('user-info', JSON.stringify(mockUser));
-        setUser(mockUser);
+        localStorage.setItem('user-info', JSON.stringify(response.data.user));
+        setUser(response.data.user);
         router.push('/dashboard');
         return true;
       }
@@ -55,11 +45,11 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (userData) => {
     try {
-      const response = await axios.post('http://localhost:5000/jwt', { email: userData.email });
+      const response = await axios.post('http://localhost:5000/api/auth/register', userData);
       if (response.data.token) {
         localStorage.setItem('access-token', response.data.token);
-        localStorage.setItem('user-info', JSON.stringify(userData));
-        setUser(userData);
+        localStorage.setItem('user-info', JSON.stringify(response.data.user));
+        setUser(response.data.user);
         router.push('/dashboard');
         return true;
       }
