@@ -11,6 +11,8 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
   useEffect(() => {
     // Check if token exists on load
@@ -28,7 +30,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/login', { email, password });
+      const response = await axios.post(`${apiUrl}/api/auth/login`, { email, password });
       if (response.data.token) {
         localStorage.setItem('access-token', response.data.token);
         localStorage.setItem('user-info', JSON.stringify(response.data.user));
@@ -45,7 +47,7 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (userData) => {
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/register', userData);
+      const response = await axios.post(`${apiUrl}/api/auth/register`, userData);
       if (response.data.token) {
         localStorage.setItem('access-token', response.data.token);
         localStorage.setItem('user-info', JSON.stringify(response.data.user));

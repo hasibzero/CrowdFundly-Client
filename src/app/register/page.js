@@ -52,7 +52,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-slate-50">
+    <div className="flex min-h-screen w-full flex-col bg-slate-50">
       <Navbar />
       
       <div className="flex flex-1 pt-16">

@@ -29,7 +29,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-slate-50">
+    <div className="flex min-h-screen w-full flex-col bg-slate-50">
       <Navbar />
       
       <div className="flex flex-1 flex-col justify-center items-center px-4 py-12 pt-24">
