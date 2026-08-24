@@ -140,51 +140,17 @@ export default function PurchaseCreditPage() {
               </div>
             </div>
 
-            {/* Payment Form */}
-            <div className="space-y-5">
-              <div>
-                <label className="block text-xs font-bold text-[#0f172a] mb-1.5">Name on Card</label>
-                <input 
-                  type="text" 
-                  placeholder="Jane Doe" 
-                  className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:border-[#0f766e] focus:ring-1 focus:ring-[#0f766e] text-sm text-gray-900 placeholder-gray-400"
-                />
+            {/* Payment Action */}
+            <div className="space-y-6">
+              <div className="bg-[#f8fafc] p-4 rounded-xl border border-gray-200">
+                <p className="text-sm text-gray-600 leading-relaxed text-center">
+                  You will be securely redirected to Stripe to complete your purchase of <span className="font-bold text-[#0f172a]">{currentPackage.credits} credits</span>.
+                </p>
               </div>
 
-              <div>
-                <label className="block text-xs font-bold text-[#0f172a] mb-1.5">Card Number</label>
-                <div className="relative">
-                  <CreditCard className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                  <input 
-                    type="text" 
-                    placeholder="0000 0000 0000 0000" 
-                    className="w-full pl-11 pr-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:border-[#0f766e] focus:ring-1 focus:ring-[#0f766e] text-sm text-gray-900 placeholder-gray-400 tracking-wide"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-[#0f172a] mb-1.5">Expiry</label>
-                  <input 
-                    type="text" 
-                    placeholder="MM/YY" 
-                    className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:border-[#0f766e] focus:ring-1 focus:ring-[#0f766e] text-sm text-gray-900 placeholder-gray-400"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-[#0f172a] mb-1.5">CVC</label>
-                  <input 
-                    type="text" 
-                    placeholder="123" 
-                    className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:border-[#0f766e] focus:ring-1 focus:ring-[#0f766e] text-sm text-gray-900 placeholder-gray-400"
-                  />
-                </div>
-              </div>
-
-              <button className="w-full bg-[#12643E] hover:bg-[#0e4f31] text-white py-3.5 rounded-lg font-bold text-sm flex items-center justify-center transition-colors mt-4">
+              <button className="w-full bg-[#0f766e] hover:bg-[#0d655e] text-white py-4 rounded-xl font-bold text-[15px] flex items-center justify-center transition-colors shadow-md shadow-teal-900/10">
                 <Lock className="w-4 h-4 mr-2" />
-                Pay Now
+                Proceed to Checkout
               </button>
             </div>
           </div>
