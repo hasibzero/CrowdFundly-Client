@@ -17,7 +17,7 @@ export default function Sidebar({ mobileMenuOpen, setMobileMenuOpen }) {
   ];
 
   if (user?.role === 'creator' || user?.role === 'admin') {
-    navItems.splice(2, 0, { name: 'My Campaigns', href: '/dashboard/campaigns', icon: Compass });
+    navItems.splice(2, 0, { name: 'My Campaigns', href: '/dashboard/my-campaigns', icon: Compass });
   }
 
   return (
@@ -79,12 +79,21 @@ export default function Sidebar({ mobileMenuOpen, setMobileMenuOpen }) {
 
         {/* Bottom Button */}
         <div className="p-6 mt-auto mb-10 md:mb-0">
-          <Link 
-            href="/campaigns"
-            className="w-full bg-[#12643E] hover:bg-[#0e4f31] text-white py-3.5 rounded-lg flex justify-center items-center text-sm font-bold shadow-md transition-colors"
-          >
-            Discover Projects
-          </Link>
+          {(user?.role === 'creator' || user?.role === 'admin') ? (
+            <Link 
+              href="/dashboard/create"
+              className="w-full bg-[#12643E] hover:bg-[#0e4f31] text-white py-3.5 rounded-lg flex justify-center items-center text-sm font-bold shadow-md transition-colors"
+            >
+              Launch Campaign
+            </Link>
+          ) : (
+            <Link 
+              href="/dashboard/campaigns"
+              className="w-full bg-[#12643E] hover:bg-[#0e4f31] text-white py-3.5 rounded-lg flex justify-center items-center text-sm font-bold shadow-md transition-colors"
+            >
+              Discover Projects
+            </Link>
+          )}
         </div>
       </nav>
     </>
