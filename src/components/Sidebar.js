@@ -27,7 +27,7 @@ export default function Sidebar({ mobileMenuOpen, setMobileMenuOpen }) {
     { name: 'Add New Campaign', href: '/dashboard/create', icon: PlusCircle },
     { name: 'My Campaigns', href: '/dashboard/my-campaigns', icon: Layers },
     { name: 'Withdrawals', href: '/dashboard/withdrawals', icon: Wallet },
-    { name: 'Payment History', href: '/dashboard/history', icon: History },
+    { name: 'Withdrawal Requests', href: '/dashboard/withdrawal-requests', icon: History },
   ];
 
   const navItems = isCreator ? creatorNavItems : backerNavItems;
