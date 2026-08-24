@@ -4,18 +4,47 @@ import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
-import { Mail, Lock, EyeOff, Link as LinkIcon } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, Link as LinkIcon } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 
 export default function RegisterPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [role, setRole] = useState('Supporter');
   const [photoURL, setPhotoURL] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const { register } = useAuth();
   const router = useRouter();
+
+  const getPasswordStrength = (pass) => {
+    let score = 0;
+    if (!pass) return score;
+    if (pass.length > 0) score += 1;
+    if (pass.length >= 6) score += 1;
+    if (pass.length >= 8 && /[0-9]/.test(pass)) score += 1;
+    if (pass.length >= 8 && /[A-Z]/.test(pass) && /[^A-Za-z0-9]/.test(pass)) score += 1;
+    return score;
+  };
+
+  const strength = getPasswordStrength(password);
+
+  const getBarColor = (index) => {
+    if (index >= strength) return 'bg-slate-200';
+    if (strength === 1) return 'bg-red-500';
+    if (strength === 2) return 'bg-amber-500';
+    if (strength === 3) return 'bg-blue-500';
+    if (strength === 4) return 'bg-[#10B981]';
+  };
+
+  const getStrengthLabel = () => {
+    if (strength === 0) return 'Min 8 chars';
+    if (strength === 1) return 'Weak';
+    if (strength === 2) return 'Fair';
+    if (strength === 3) return 'Good';
+    if (strength === 4) return 'Strong';
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -160,7 +189,7 @@ export default function RegisterPage() {
                   <input
                     id="password"
                     name="password"
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     autoComplete="new-password"
                     required
                     disabled={isUploading}
@@ -169,25 +198,39 @@ export default function RegisterPage() {
                     onChange={(e) => setPassword(e.target.value)}
                     className="block w-full pl-10 pr-10 py-2.5 border border-slate-200 rounded-lg text-slate-900 focus:ring-2 focus:ring-[#12643E] focus:border-[#12643E] sm:text-sm transition-colors outline-none disabled:bg-slate-50"
                   />
-                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer">
-                    <EyeOff className="h-4 w-4 text-slate-400 hover:text-slate-600" />
+                  <div 
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? (
+                      <Eye className="h-4 w-4 text-slate-400 hover:text-slate-600" />
+                    ) : (
+                      <EyeOff className="h-4 w-4 text-slate-400 hover:text-slate-600" />
+                    )}
                   </div>
                 </div>
-                <div className="mt-2 flex items-center justify-between text-[10px] text-slate-500">
+                <div className="mt-2 flex items-center justify-between text-[10px] font-medium text-slate-500">
                   <div className="flex gap-1 w-full max-w-[200px]">
-                    <div className="h-1 flex-1 bg-slate-200 rounded-full" />
-                    <div className="h-1 flex-1 bg-slate-200 rounded-full" />
-                    <div className="h-1 flex-1 bg-slate-200 rounded-full" />
-                    <div className="h-1 flex-1 bg-slate-200 rounded-full" />
+                    <div className={`h-1.5 flex-1 rounded-full transition-colors ${getBarColor(0)}`} />
+                    <div className={`h-1.5 flex-1 rounded-full transition-colors ${getBarColor(1)}`} />
+                    <div className={`h-1.5 flex-1 rounded-full transition-colors ${getBarColor(2)}`} />
+                    <div className={`h-1.5 flex-1 rounded-full transition-colors ${getBarColor(3)}`} />
                   </div>
-                  <span>Min 8 chars</span>
+                  <span className={
+                    strength === 1 ? 'text-red-500' : 
+                    strength === 2 ? 'text-amber-500' : 
+                    strength === 3 ? 'text-blue-500' : 
+                    strength === 4 ? 'text-[#10B981]' : ''
+                  }>
+                    {getStrengthLabel()}
+                  </span>
                 </div>
               </div>
 
               <button
                 type="submit"
-                disabled={isUploading}
-                className="w-full flex justify-center items-center bg-[#065f46] hover:bg-[#044e39] text-white py-2.5 px-4 rounded-lg text-sm font-semibold transition-colors mt-4 shadow-sm disabled:opacity-70"
+                disabled={isUploading || !password}
+                className="w-full flex justify-center items-center bg-[#065f46] hover:bg-[#044e39] text-white py-2.5 px-4 rounded-lg text-sm font-semibold transition-colors mt-4 shadow-sm disabled:opacity-70 disabled:cursor-not-allowed"
               >
                 {isUploading ? "Registering..." : "Register"}
               </button>

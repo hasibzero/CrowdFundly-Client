@@ -4,12 +4,14 @@ import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
-import { Mail, Lock, ArrowRight } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
   const { login } = useAuth();
   const router = useRouter();
 
@@ -20,11 +22,15 @@ export default function LoginPage() {
       return;
     }
 
+    setIsLoggingIn(true);
+    const toastId = toast.loading("Logging in...");
+
     const success = await login(email, password);
     if (success) {
-      toast.success("Successfully logged in!");
+      toast.success("Successfully logged in!", { id: toastId });
     } else {
-      toast.error("Login failed. Please check your credentials.");
+      toast.error("Login failed. Please check your credentials.", { id: toastId });
+      setIsLoggingIn(false);
     }
   };
 
@@ -58,9 +64,10 @@ export default function LoginPage() {
                   type="email"
                   autoComplete="email"
                   required
+                  disabled={isLoggingIn}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-2.5 border border-slate-200 rounded-lg text-slate-900 focus:ring-2 focus:ring-[#12643E] focus:border-[#12643E] sm:text-sm transition-colors outline-none"
+                  className="block w-full pl-10 pr-3 py-2.5 border border-slate-200 rounded-lg text-slate-900 focus:ring-2 focus:ring-[#12643E] focus:border-[#12643E] sm:text-sm transition-colors outline-none disabled:bg-slate-50"
                 />
               </div>
             </div>
@@ -81,21 +88,35 @@ export default function LoginPage() {
                 <input
                   id="password"
                   name="password"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   autoComplete="current-password"
                   required
+                  disabled={isLoggingIn}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-2.5 border border-slate-200 rounded-lg text-slate-900 focus:ring-2 focus:ring-[#12643E] focus:border-[#12643E] sm:text-sm transition-colors outline-none"
+                  className="block w-full pl-10 pr-10 py-2.5 border border-slate-200 rounded-lg text-slate-900 focus:ring-2 focus:ring-[#12643E] focus:border-[#12643E] sm:text-sm transition-colors outline-none disabled:bg-slate-50"
                 />
+                <div 
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? (
+                    <Eye className="h-4 w-4 text-slate-400 hover:text-slate-600" />
+                  ) : (
+                    <EyeOff className="h-4 w-4 text-slate-400 hover:text-slate-600" />
+                  )}
+                </div>
               </div>
             </div>
 
             <button
               type="submit"
-              className="w-full flex justify-center items-center gap-2 bg-[#065f46] hover:bg-[#044e39] text-white py-2.5 px-4 rounded-lg text-sm font-semibold transition-colors mt-2 shadow-sm"
+              disabled={isLoggingIn || !email || !password}
+              className="w-full flex justify-center items-center gap-2 bg-[#065f46] hover:bg-[#044e39] text-white py-2.5 px-4 rounded-lg text-sm font-semibold transition-colors mt-2 shadow-sm disabled:opacity-70 disabled:cursor-not-allowed"
             >
-              Login <ArrowRight className="w-4 h-4" />
+              {isLoggingIn ? "Logging in..." : (
+                <>Login <ArrowRight className="w-4 h-4" /></>
+              )}
             </button>
           </form>
 
