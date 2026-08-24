@@ -1,181 +1,156 @@
 "use client";
+import { useState, useEffect } from 'react';
+import { useAuth } from '@/context/AuthContext';
 import { motion } from 'framer-motion';
-import { Plus, MoreHorizontal, Edit, Eye, Trash2 } from 'lucide-react';
+import { Plus, Eye, Edit, Trash2, Loader2 } from 'lucide-react';
 import Link from 'next/link';
+import axios from 'axios';
+import toast from 'react-hot-toast';
+import { API_URL } from '@/lib/api';
+
+const API = API_URL;
 
 export default function MyCampaignsPage() {
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
-  };
+  const { user } = useAuth();
+  const [campaigns, setCampaigns] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 }
-  };
-
-  const campaigns = [
-    {
-      id: 1,
-      title: "EcoSmart Thermostat",
-      category: "Tech & Gadgets",
-      image: "https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&q=80&w=300",
-      deadline: "Dec 15, 2023",
-      status: "Approved",
-      raised: 24500,
-      goal: 50000,
-      progress: 49
-    },
-    {
-      id: 2,
-      title: "Realms of Aethelgard",
-      category: "Tabletop Games",
-      image: "https://images.unsplash.com/photo-1622979135225-d2ba269cf1ac?auto=format&fit=crop&q=80&w=300",
-      deadline: "Jan 22, 2024",
-      status: "Pending",
-      raised: 0,
-      goal: 15000,
-      progress: 0
-    },
-    {
-      id: 3,
-      title: "Urban Harvest Kit",
-      category: "Design & Food",
-      image: "https://images.unsplash.com/photo-1530836369250-ef71a3f5e48d?auto=format&fit=crop&q=80&w=300",
-      deadline: "Oct 05, 2023",
-      status: "Ended",
-      raised: 12000,
-      goal: 10000,
-      progress: 100
+  const fetchCampaigns = async () => {
+    if (!user) return;
+    try {
+      const token = localStorage.getItem('crowdfundly_token');
+      const res = await axios.get(`${API}/api/creator/campaigns`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setCampaigns(res.data);
+    } catch (err) {
+      console.error('Failed to fetch campaigns:', err);
+      toast.error('Failed to load campaigns');
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
+
+  useEffect(() => { fetchCampaigns(); }, [user]);
+
+  const handleDelete = async (id) => {
+    if (!confirm('Are you sure you want to delete this campaign?')) return;
+    try {
+      const token = localStorage.getItem('crowdfundly_token');
+      await axios.delete(`${API}/api/campaigns/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+      toast.success('Campaign deleted');
+      fetchCampaigns();
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to delete');
+    }
+  };
 
   const getStatusBadge = (status) => {
-    switch (status) {
-      case 'Approved':
-        return <span className="px-3 py-1 bg-[#d1fae5] text-[#059669] text-xs font-bold rounded-full">Approved</span>;
-      case 'Pending':
-        return <span className="px-3 py-1 bg-[#ffedd5] text-[#ea580c] text-xs font-bold rounded-full">Pending</span>;
-      case 'Ended':
-        return <span className="px-3 py-1 bg-[#e0e7ff] text-[#4f46e5] text-xs font-bold rounded-full">Ended</span>;
-      default:
-        return null;
-    }
+    const styles = {
+      Approved: 'bg-green-100 text-green-700',
+      Pending: 'bg-amber-100 text-amber-700',
+      Rejected: 'bg-red-100 text-red-700',
+    };
+    return <span className={`px-3 py-1 text-xs font-bold rounded-full ${styles[status] || 'bg-gray-100 text-gray-700'}`}>{status}</span>;
   };
 
+  const getDeadline = (createdAt, duration) => {
+    if (!createdAt || !duration) return '—';
+    const end = new Date(new Date(createdAt).getTime() + duration * 24 * 60 * 60 * 1000);
+    return end.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  };
+
+  const containerVariants = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.1 } } };
+  const itemVariants = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } };
+
   return (
-    <motion.section 
-      className="w-full max-w-6xl mx-auto pt-4"
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-    >
-      {/* Header Section */}
+    <motion.section className="w-full max-w-6xl mx-auto pt-4" variants={containerVariants} initial="hidden" animate="visible">
       <motion.div variants={itemVariants} className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
         <div>
-          <h1 className="text-[28px] md:text-[32px] font-bold text-[#0f172a] mb-1 tracking-tight">
-            My Campaigns
-          </h1>
-          <p className="text-[14px] text-gray-500">
-            Manage and track the progress of your launched projects.
-          </p>
+          <h1 className="text-[28px] md:text-[32px] font-bold text-[#0f172a] mb-1 tracking-tight">My Campaigns</h1>
+          <p className="text-[14px] text-gray-500">Manage and track the progress of your launched projects.</p>
         </div>
-        
-        <Link 
-          href="/dashboard/create"
-          className="bg-[#12643E] hover:bg-[#0e4f31] text-white px-5 py-2.5 rounded-full font-bold text-[14px] flex items-center transition-colors shadow-sm"
-        >
+        <Link href="/dashboard/create" className="bg-[#12643E] hover:bg-[#0e4f31] text-white px-5 py-2.5 rounded-full font-bold text-[14px] flex items-center transition-colors shadow-sm">
           <Plus className="w-4 h-4 mr-1.5 stroke-[3]" />
           New Campaign
         </Link>
       </motion.div>
 
-      {/* Campaigns Table Card */}
       <motion.div variants={itemVariants} className="bg-white rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse min-w-[800px]">
-            <thead className="bg-white border-b border-gray-200">
-              <tr>
-                <th className="px-6 py-5 text-[13px] font-bold text-gray-600">Campaign</th>
-                <th className="px-6 py-5 text-[13px] font-bold text-gray-600">Deadline</th>
-                <th className="px-6 py-5 text-[13px] font-bold text-gray-600">Status</th>
-                <th className="px-6 py-5 text-[13px] font-bold text-gray-600">Raised Amount</th>
-                <th className="px-6 py-5 text-[13px] font-bold text-gray-600 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {campaigns.map((campaign) => (
-                <tr key={campaign.id} className="hover:bg-gray-50/50 transition-colors">
-                  {/* Campaign Info */}
-                  <td className="px-6 py-5">
-                    <div className="flex items-center space-x-4">
-                      <div className="w-16 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100 border border-gray-200">
-                        <img 
-                          src={campaign.image} 
-                          alt={campaign.title} 
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <div>
-                        <p className="text-[14px] font-bold text-[#0f172a] leading-tight mb-1">{campaign.title}</p>
-                        <p className="text-[12px] text-gray-500 font-medium">{campaign.category}</p>
-                      </div>
-                    </div>
-                  </td>
-
-                  {/* Deadline */}
-                  <td className="px-6 py-5 text-[13px] font-bold text-gray-700">
-                    {campaign.deadline}
-                  </td>
-
-                  {/* Status */}
-                  <td className="px-6 py-5">
-                    {getStatusBadge(campaign.status)}
-                  </td>
-
-                  {/* Raised Amount & Progress */}
-                  <td className="px-6 py-5">
-                    <div className="mb-2 text-[13px]">
-                      <span className="font-bold text-[#0f172a]">${campaign.raised.toLocaleString()}</span>
-                      <span className="text-gray-400 font-medium"> / ${campaign.goal >= 1000 ? (campaign.goal / 1000) + 'k' : campaign.goal}</span>
-                    </div>
-                    {/* Progress bar */}
-                    <div className="w-32 h-1.5 bg-[#eef2f6] rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-[#12643E] rounded-full" 
-                        style={{ width: `${Math.min(campaign.progress, 100)}%` }}
-                      ></div>
-                    </div>
-                  </td>
-
-                  {/* Actions */}
-                  <td className="px-6 py-5 text-right">
-                    <div className="flex items-center justify-end space-x-2 text-gray-400">
-                      <button className="p-1.5 hover:bg-gray-100 hover:text-gray-700 rounded-md transition-colors" title="View">
-                        <Eye className="w-4 h-4" />
-                      </button>
-                      <button className="p-1.5 hover:bg-gray-100 hover:text-gray-700 rounded-md transition-colors" title="Edit">
-                        <Edit className="w-4 h-4" />
-                      </button>
-                      <button className="p-1.5 hover:bg-red-50 hover:text-red-600 rounded-md transition-colors" title="Delete">
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </td>
+        {loading ? (
+          <div className="flex justify-center items-center py-20">
+            <Loader2 className="w-8 h-8 text-[#12643E] animate-spin" />
+          </div>
+        ) : campaigns.length === 0 ? (
+          <div className="py-20 flex flex-col items-center justify-center text-center">
+            <p className="text-sm text-gray-500 max-w-sm mb-4">You haven't launched any campaigns yet.</p>
+            <Link href="/dashboard/create" className="bg-[#12643E] text-white px-5 py-2 rounded-full font-bold text-sm hover:bg-[#0e4f31] transition-colors">
+              Create Your First Campaign
+            </Link>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse min-w-[800px]">
+              <thead className="bg-white border-b border-gray-200">
+                <tr>
+                  <th className="px-6 py-5 text-[13px] font-bold text-gray-600">Campaign</th>
+                  <th className="px-6 py-5 text-[13px] font-bold text-gray-600">Deadline</th>
+                  <th className="px-6 py-5 text-[13px] font-bold text-gray-600">Status</th>
+                  <th className="px-6 py-5 text-[13px] font-bold text-gray-600">Raised</th>
+                  <th className="px-6 py-5 text-[13px] font-bold text-gray-600 text-right">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-          
-          {/* Empty State Fallback (if no campaigns exist) */}
-          {campaigns.length === 0 && (
-            <div className="py-16 flex flex-col items-center justify-center text-center">
-              <p className="text-sm text-gray-500 max-w-sm mb-6">
-                You haven't launched any campaigns yet. Click "New Campaign" to get started!
-              </p>
-            </div>
-          )}
-        </div>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {campaigns.map((c) => {
+                  const progress = Math.min(Math.round(((c.raised || 0) / (c.targetAmount || 1)) * 100), 100);
+                  return (
+                    <tr key={c._id} className="hover:bg-gray-50/50 transition-colors">
+                      <td className="px-6 py-5">
+                        <div className="flex items-center space-x-4">
+                          <div className="w-16 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100 border border-gray-200">
+                            <img
+                              src={c.coverImage || `https://ui-avatars.com/api/?name=${encodeURIComponent(c.title)}&background=e0e7ff&color=4f46e5`}
+                              alt={c.title}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <div>
+                            <p className="text-[14px] font-bold text-[#0f172a] leading-tight mb-1">{c.title}</p>
+                            <p className="text-[12px] text-gray-500 font-medium">{c.category}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-5 text-[13px] font-bold text-gray-700">{getDeadline(c.createdAt, c.duration)}</td>
+                      <td className="px-6 py-5">{getStatusBadge(c.status)}</td>
+                      <td className="px-6 py-5">
+                        <div className="mb-2 text-[13px]">
+                          <span className="font-bold text-[#0f172a]">${(c.raised || 0).toLocaleString()}</span>
+                          <span className="text-gray-400 font-medium"> / ${(c.targetAmount || 0).toLocaleString()}</span>
+                        </div>
+                        <div className="w-32 h-1.5 bg-[#eef2f6] rounded-full overflow-hidden">
+                          <div className="h-full bg-[#12643E] rounded-full" style={{ width: `${progress}%` }}></div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-5 text-right">
+                        <div className="flex items-center justify-end space-x-2 text-gray-400">
+                          <Link href={`/campaigns/${c._id}`} className="p-1.5 hover:bg-gray-100 hover:text-gray-700 rounded-md transition-colors" title="View">
+                            <Eye className="w-4 h-4" />
+                          </Link>
+                          <button className="p-1.5 hover:bg-gray-100 hover:text-gray-700 rounded-md transition-colors" title="Edit">
+                            <Edit className="w-4 h-4" />
+                          </button>
+                          <button onClick={() => handleDelete(c._id)} className="p-1.5 hover:bg-red-50 hover:text-red-600 rounded-md transition-colors" title="Delete">
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
       </motion.div>
     </motion.section>
   );

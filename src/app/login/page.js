@@ -152,6 +152,32 @@ export default function LoginPage() {
               Register
             </Link>
           </p>
+
+          {/* Dev Test Credentials */}
+          <div className="mt-6 p-4 bg-slate-50 border border-slate-200 rounded-xl text-left">
+            <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wide mb-3">Test Accounts</p>
+            <div className="space-y-2">
+              {[
+                { role: 'Admin', email: 'admin@crowdfundly.com', pw: 'admin123', color: 'text-purple-700 bg-purple-100' },
+                { role: 'Creator', email: 'creator@crowdfundly.com', pw: 'creator123', color: 'text-blue-700 bg-blue-100' },
+                { role: 'Supporter', email: 'supporter@crowdfundly.com', pw: 'supporter123', color: 'text-green-700 bg-green-100' },
+              ].map(acc => (
+                <div key={acc.role} className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${acc.color}`}>{acc.role}</span>
+                    <span className="text-[12px] text-slate-600">{acc.email}</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => { setEmail(acc.email); setPassword(acc.pw); }}
+                    className="text-[11px] font-semibold text-indigo-600 hover:underline"
+                  >
+                    Use
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>

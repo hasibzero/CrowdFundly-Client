@@ -2,7 +2,7 @@
 import { createContext, useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
-import { authClient } from '@/lib/auth-client';
+import { API_URL } from '@/lib/api';
 
 export const AuthContext = createContext();
 
@@ -11,64 +11,78 @@ export const useAuth = () => useContext(AuthContext);
 export const AuthProvider = ({ children }) => {
   const router = useRouter();
   
-  // Use Better Auth's reactive session hook
-  const { data: session, isPending: loading, error } = authClient.useSession();
-  const user = session?.user || null;
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
+  // Initialize from localStorage
   useEffect(() => {
-    console.log("[AuthContext] Session updated:", { session, loading, user, error });
-  }, [session, loading, user, error]);
+    const storedToken = localStorage.getItem('crowdfundly_token');
+    const storedUser = localStorage.getItem('crowdfundly_user');
+    
+    if (storedToken && storedUser) {
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (e) {
+        console.error("Failed to parse stored user", e);
+      }
+    }
+    setLoading(false);
+  }, []);
 
   const login = async (email, password) => {
     try {
-      const { data, error } = await authClient.signIn.email({
+      const response = await axios.post(`${API_URL}/api/auth/login`, {
         email,
         password,
       });
-      if (error) {
-        console.error("Login failed:", error.message);
-        return false;
-      }
+      
+      const { token, user: userData } = response.data;
+      
+      localStorage.setItem('crowdfundly_token', token);
+      localStorage.setItem('crowdfundly_user', JSON.stringify(userData));
+      setUser(userData);
       
       router.push('/dashboard');
       return true;
     } catch (error) {
-      console.error("Login exception:", error);
+      console.error("Login exception:", error.response?.data?.message || error.message);
       return false;
     }
   };
 
   const register = async (userData) => {
     try {
-      const { data, error } = await authClient.signUp.email({
+      const response = await axios.post(`${API_URL}/api/auth/register`, {
         email: userData.email,
         password: userData.password,
         name: userData.name,
-        image: userData.photoURL,
-        role: userData.role,
-        credits: userData.credits,
+        photoURL: userData.photoURL,
+        role: userData.role || 'Supporter',
       });
 
-      if (error) {
-        console.error("Registration failed:", error.message);
-        throw new Error(error.message); // throw to be caught by the component toast
-      }
+      const { token, user: newUserData } = response.data;
+      
+      localStorage.setItem('crowdfundly_token', token);
+      localStorage.setItem('crowdfundly_user', JSON.stringify(newUserData));
+      setUser(newUserData);
       
       router.push('/dashboard');
       return true;
     } catch (error) {
-      console.error("Registration exception:", error);
-      throw error;
+      console.error("Registration exception:", error.response?.data?.message || error.message);
+      throw new Error(error.response?.data?.message || error.message);
     }
   };
 
   const logout = async () => {
-    await authClient.signOut();
+    localStorage.removeItem('crowdfundly_token');
+    localStorage.removeItem('crowdfundly_user');
+    setUser(null);
     router.push('/');
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, setUser: () => {} }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, setUser }}>
       {children}
     </AuthContext.Provider>
   );

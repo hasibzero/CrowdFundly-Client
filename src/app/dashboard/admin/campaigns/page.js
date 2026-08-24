@@ -1,9 +1,46 @@
 "use client";
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Filter, Check, X, Eye, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
+import axios from 'axios';
+import toast from 'react-hot-toast';
+import { API_URL, authHeaders } from '@/lib/api';
 
 export default function AdminCampaignsPage() {
+  const [campaigns, setCampaigns] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchCampaigns = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/api/admin/campaigns`, { headers: authHeaders() });
+      setCampaigns(response.data);
+    } catch (error) {
+      console.error('Failed to fetch campaigns', error);
+      toast.error('Failed to load campaigns');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchCampaigns();
+  }, []);
+
+  const handleUpdateStatus = async (id, status) => {
+    try {
+      const token = localStorage.getItem('crowdfundly_token');
+      await axios.patch(`${API_URL}/api/campaigns/${id}/status`, { status }, { headers: { Authorization: `Bearer ${token}` } });
+      toast.success(`Campaign ${status.toLowerCase()} successfully!`);
+      fetchCampaigns();
+    } catch (error) {
+      console.error(`Failed to ${status.toLowerCase()} campaign`, error);
+      toast.error(error.response?.data?.message || `Failed to update status`);
+    }
+  };
+
+  const pendingCampaigns = campaigns.filter(c => c.status === 'Pending');
+  const approvedCampaigns = campaigns.filter(c => c.status === 'Approved');
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
@@ -14,61 +51,7 @@ export default function AdminCampaignsPage() {
     visible: { opacity: 1, y: 0 }
   };
 
-  const pendingCampaigns = [
-    {
-      id: 1,
-      title: "OceanClean Bottle Co.",
-      image: "https://images.unsplash.com/photo-1523362628745-0c100150b504?auto=format&fit=crop&q=80&w=300",
-      creatorName: "Sarah Jenkins",
-      creatorAvatar: "https://ui-avatars.com/api/?name=Sarah+Jenkins&background=f3f4f6&color=1f2937",
-      goal: "$150,000",
-      category: "Product Design",
-      status: "Pending"
-    },
-    {
-      id: 2,
-      title: "Neon Knights Game",
-      image: "https://images.unsplash.com/photo-1552820728-8b83bb6b773f?auto=format&fit=crop&q=80&w=300",
-      creatorName: "David Chen",
-      creatorAvatar: "https://ui-avatars.com/api/?name=David+Chen&background=f3f4f6&color=1f2937",
-      goal: "$75,000",
-      category: "Technology",
-      status: "Pending"
-    },
-    {
-      id: 3,
-      title: "Urban Oasis Garden",
-      image: "https://images.unsplash.com/photo-1530836369250-ef71a3f5e48d?auto=format&fit=crop&q=80&w=300",
-      creatorName: "Maria Rossi",
-      creatorAvatar: "https://ui-avatars.com/api/?name=Maria+Rossi&background=10b981&color=fff",
-      goal: "$12,500",
-      category: "Community",
-      status: "Pending"
-    }
-  ];
 
-  const approvedCampaigns = [
-    {
-      id: 4,
-      title: "EcoSmart Thermostat",
-      image: "https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&q=80&w=300",
-      creatorName: "James Wilson",
-      creatorAvatar: "https://ui-avatars.com/api/?name=James+Wilson&background=f3f4f6&color=1f2937",
-      goal: "$50,000",
-      category: "Technology",
-      status: "Approved"
-    },
-    {
-      id: 5,
-      title: "Artisan Sketchbook Pro",
-      image: "https://images.unsplash.com/photo-1622979135225-d2ba269cf1ac?auto=format&fit=crop&q=80&w=300",
-      creatorName: "Elena Rodriguez",
-      creatorAvatar: "https://ui-avatars.com/api/?name=Elena+Rodriguez&background=8b5cf6&color=fff",
-      goal: "$25,000",
-      category: "Art",
-      status: "Approved"
-    }
-  ];
 
   return (
     <div className="w-full flex flex-col -mt-8 -mx-6 md:-mx-8">
@@ -118,18 +101,18 @@ export default function AdminCampaignsPage() {
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   {pendingCampaigns.map((campaign) => (
-                    <tr key={campaign.id} className="hover:bg-gray-50/50 transition-colors">
+                    <tr key={campaign._id?.toString()} className="hover:bg-gray-50/50 transition-colors">
                       {/* Campaign Title */}
                       <td className="px-6 py-5">
                         <div className="flex items-center space-x-4">
                           <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100 border border-gray-200">
-                            <img src={campaign.image} alt={campaign.title} className="w-full h-full object-cover" />
+                            <img src={campaign.coverImage || `https://ui-avatars.com/api/?name=${encodeURIComponent(campaign.title || 'C')}&background=e0e7ff&color=4f46e5`} alt={campaign.title} className="w-full h-full object-cover" />
                           </div>
                           <div>
                             <p className="text-[14px] font-bold text-[#0f172a] mb-1 leading-tight">{campaign.title}</p>
-                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#e0e7ff] text-[#3b2de6]">
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#e0e7ff] text-[#3b2de6] uppercase">
                               <span className="w-1 h-1 rounded-full bg-[#3b2de6] mr-1"></span>
-                              PENDING
+                              {campaign.status}
                             </span>
                           </div>
                         </div>
@@ -139,7 +122,7 @@ export default function AdminCampaignsPage() {
                       <td className="px-6 py-5">
                         <div className="flex items-center space-x-3">
                           <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-100 border border-gray-200">
-                            <img src={campaign.creatorAvatar} alt={campaign.creatorName} className="w-full h-full object-cover" />
+                            <img src={campaign.creatorAvatar || `https://ui-avatars.com/api/?name=${campaign.creatorName}&background=f3f4f6&color=1f2937`} alt={campaign.creatorName} className="w-full h-full object-cover" />
                           </div>
                           <span className="text-[14px] font-medium text-[#475569]">{campaign.creatorName}</span>
                         </div>
@@ -147,7 +130,7 @@ export default function AdminCampaignsPage() {
 
                       {/* Funding Goal */}
                       <td className="px-6 py-5 text-[15px] font-bold text-[#0f172a]">
-                        {campaign.goal}
+                        ${campaign.targetAmount?.toLocaleString()}
                       </td>
 
                       {/* Category */}
@@ -163,10 +146,10 @@ export default function AdminCampaignsPage() {
                           <button className="p-1.5 text-gray-400 hover:text-[#0f766e] hover:bg-[#e6f7ef] rounded-md transition-colors" title="View Details">
                             <Eye className="w-4 h-4" />
                           </button>
-                          <button className="p-1.5 text-gray-400 hover:text-[#059669] hover:bg-[#d1fae5] rounded-md transition-colors" title="Approve">
+                          <button onClick={() => handleUpdateStatus(campaign._id, 'Approved')} className="p-1.5 text-gray-400 hover:text-[#059669] hover:bg-[#d1fae5] rounded-md transition-colors" title="Approve">
                             <Check className="w-4 h-4" />
                           </button>
-                          <button className="p-1.5 text-gray-400 hover:text-[#dc2626] hover:bg-[#fee2e2] rounded-md transition-colors" title="Reject">
+                          <button onClick={() => handleUpdateStatus(campaign._id, 'Rejected')} className="p-1.5 text-gray-400 hover:text-[#dc2626] hover:bg-[#fee2e2] rounded-md transition-colors" title="Reject">
                             <X className="w-4 h-4" />
                           </button>
                         </div>
@@ -203,18 +186,18 @@ export default function AdminCampaignsPage() {
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   {approvedCampaigns.map((campaign) => (
-                    <tr key={campaign.id} className="hover:bg-gray-50/50 transition-colors">
+                    <tr key={campaign._id?.toString()} className="hover:bg-gray-50/50 transition-colors">
                       {/* Campaign Title */}
                       <td className="px-6 py-5">
                         <div className="flex items-center space-x-4">
                           <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100 border border-gray-200">
-                            <img src={campaign.image} alt={campaign.title} className="w-full h-full object-cover" />
+                            <img src={campaign.coverImage || "https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&q=80&w=300"} alt={campaign.title} className="w-full h-full object-cover" />
                           </div>
                           <div>
                             <p className="text-[14px] font-bold text-[#0f172a] mb-1 leading-tight">{campaign.title}</p>
-                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#d1fae5] text-[#059669]">
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#d1fae5] text-[#059669] uppercase">
                               <span className="w-1 h-1 rounded-full bg-[#059669] mr-1"></span>
-                              APPROVED
+                              {campaign.status}
                             </span>
                           </div>
                         </div>
@@ -224,7 +207,7 @@ export default function AdminCampaignsPage() {
                       <td className="px-6 py-5">
                         <div className="flex items-center space-x-3">
                           <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-100 border border-gray-200">
-                            <img src={campaign.creatorAvatar} alt={campaign.creatorName} className="w-full h-full object-cover" />
+                            <img src={campaign.creatorAvatar || `https://ui-avatars.com/api/?name=${campaign.creatorName}&background=f3f4f6&color=1f2937`} alt={campaign.creatorName} className="w-full h-full object-cover" />
                           </div>
                           <span className="text-[14px] font-medium text-[#475569]">{campaign.creatorName}</span>
                         </div>
@@ -232,7 +215,7 @@ export default function AdminCampaignsPage() {
 
                       {/* Funding Goal */}
                       <td className="px-6 py-5 text-[15px] font-bold text-[#0f172a]">
-                        {campaign.goal}
+                        ${campaign.targetAmount?.toLocaleString()}
                       </td>
 
                       {/* Category */}
@@ -245,7 +228,7 @@ export default function AdminCampaignsPage() {
                       {/* Actions */}
                       <td className="px-6 py-5 text-right">
                         <div className="flex items-center justify-end space-x-2">
-                          <Link href={`/dashboard/admin/campaigns/${campaign.id}`} className="text-[13px] font-bold text-[#3b2de6] hover:text-indigo-800 transition-colors flex items-center">
+                          <Link href={`/dashboard/admin/campaigns/${campaign._id}`} className="text-[13px] font-bold text-[#3b2de6] hover:text-indigo-800 transition-colors flex items-center">
                             Manage <ArrowRight className="w-3.5 h-3.5 ml-1" />
                           </Link>
                         </div>

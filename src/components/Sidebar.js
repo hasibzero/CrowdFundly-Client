@@ -1,19 +1,15 @@
 "use client";
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
-import { Home, Compass, Heart, CreditCard, History, PlusCircle, Layers, Wallet, Settings, LogOut, LayoutGrid, RefreshCw, Users, BarChart, ClipboardList } from 'lucide-react';
+import { Home, Compass, Heart, CreditCard, History, PlusCircle, Layers, Wallet, Settings, LogOut, LayoutGrid, Users, BarChart, ClipboardList } from 'lucide-react';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
 
 export default function Sidebar({ mobileMenuOpen, setMobileMenuOpen }) {
   const { logout, user } = useAuth();
   const pathname = usePathname();
   
-  // Temporary state to allow easy toggling during development
-  const [testRole, setTestRole] = useState(user?.role?.toLowerCase() || 'supporter');
-  
-  const isCreator = testRole === 'creator';
-  const isAdmin = testRole === 'admin';
+  const isCreator = user?.role === 'Creator';
+  const isAdmin = user?.role === 'Admin';
   const isSupporter = !isCreator && !isAdmin;
 
   const backerNavItems = [
@@ -41,12 +37,6 @@ export default function Sidebar({ mobileMenuOpen, setMobileMenuOpen }) {
   ];
 
   const navItems = isAdmin ? adminNavItems : (isCreator ? creatorNavItems : backerNavItems);
-
-  const cycleRole = () => {
-    if (testRole === 'supporter') setTestRole('creator');
-    else if (testRole === 'creator') setTestRole('admin');
-    else setTestRole('supporter');
-  };
 
   return (
     <>
@@ -195,16 +185,6 @@ export default function Sidebar({ mobileMenuOpen, setMobileMenuOpen }) {
             </Link>
           )}
 
-          {/* View Toggle for Development */}
-          <div className="pt-6">
-            <button
-              onClick={cycleRole}
-              className="w-full text-xs font-bold text-gray-400 hover:text-[#0f766e] flex items-center justify-center transition-colors"
-            >
-              <RefreshCw className="w-3 h-3 mr-1" />
-              Switch to {testRole === 'supporter' ? 'Creator' : testRole === 'creator' ? 'Admin' : 'Supporter'} View
-            </button>
-          </div>
         </div>
       </nav>
     </>

@@ -1,11 +1,44 @@
 "use client";
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Lock, Wallet, ShieldCheck, CheckCircle2, DollarSign, Banknote, Gem, Star, Circle, CheckCircle } from 'lucide-react';
+import axios from 'axios';
+import toast from 'react-hot-toast';
+import { API_URL, authHeaders } from '@/lib/api';
 
 export default function PurchaseCreditPage() {
   const [selectedPackage, setSelectedPackage] = useState(1000);
   const [customAmount, setCustomAmount] = useState('');
+  const [balance, setBalance] = useState(0);
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
+
+  useEffect(() => {
+    const loadBalance = async () => {
+      try {
+        const response = await axios.get(`${API_URL}/api/users/me`, { headers: authHeaders() });
+        setBalance(response.data.credits || 0);
+      } catch {
+        setBalance(0);
+      }
+    };
+    const confirmPurchase = async () => {
+      const params = new URLSearchParams(window.location.search);
+      const sessionId = params.get('session_id');
+      if (params.get('checkout') === 'success' && sessionId) {
+        try {
+          const response = await axios.post(`${API_URL}/api/credits/confirm-checkout`, { sessionId }, { headers: authHeaders() });
+          setBalance(response.data.credits || 0);
+          toast.success(response.data.granted ? `${response.data.granted.toLocaleString()} credits added.` : 'Your payment was already processed.');
+        } catch (error) {
+          toast.error(error.response?.data?.message || 'We could not verify that payment.');
+        }
+      } else if (params.get('checkout') === 'cancelled') {
+        toast('Checkout was cancelled. No credits were added.');
+      }
+    };
+    loadBalance();
+    confirmPurchase();
+  }, []);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -63,6 +96,18 @@ export default function PurchaseCreditPage() {
     }
   };
 
+  const startCheckout = async () => {
+    if (!Number.isInteger(activeCredits) || activeCredits < 100) return;
+    setIsCheckingOut(true);
+    try {
+      const response = await axios.post(`${API_URL}/api/credits/checkout-session`, { credits: activeCredits }, { headers: authHeaders() });
+      window.location.assign(response.data.url);
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Unable to start secure checkout.');
+      setIsCheckingOut(false);
+    }
+  };
+
   return (
     <motion.section 
       className="w-full max-w-6xl mx-auto pt-4"
@@ -88,7 +133,7 @@ export default function PurchaseCreditPage() {
           <div>
             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">Current Balance</p>
             <p className="text-[20px] font-bold text-[#0f172a] leading-none">
-              1,250 <span className="text-[#2ea673] font-medium text-[16px]">Credits</span>
+              {balance.toLocaleString()} <span className="text-[#2ea673] font-medium text-[16px]">Credits</span>
             </p>
           </div>
         </div>
@@ -207,8 +252,8 @@ export default function PurchaseCreditPage() {
             </div>
 
             {/* Action */}
-            <button 
-              disabled={!activeCredits || activeCredits < 100}
+            <button onClick={startCheckout}
+              disabled={isCheckingOut || !activeCredits || activeCredits < 100}
               className={`w-full py-3.5 rounded-lg font-bold text-[15px] flex items-center justify-center transition-colors shadow-sm ${
                 (!activeCredits || activeCredits < 100)
                   ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
@@ -216,7 +261,7 @@ export default function PurchaseCreditPage() {
               }`}
             >
               <Lock className="w-4 h-4 mr-2" />
-              Pay ${activePrice}
+              {isCheckingOut ? 'Redirecting to checkout…' : `Pay $${activePrice}`}
             </button>
 
             <div className="mt-4 flex items-center justify-center text-gray-500">

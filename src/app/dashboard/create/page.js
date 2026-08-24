@@ -1,9 +1,89 @@
 "use client";
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAuth } from '@/context/AuthContext';
+import { useRouter } from 'next/navigation';
+import axios from 'axios';
+import toast from 'react-hot-toast';
+import { API_URL } from '@/lib/api';
 
 export default function CreateCampaignPage() {
+  const { user } = useAuth();
+  const router = useRouter();
+  
   const [step, setStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Form State
+  const [formData, setFormData] = useState({
+    title: '',
+    category: '',
+    subCategory: '',
+    location: '',
+    shortDescription: '',
+    story: '',
+    targetAmount: '',
+    duration: '',
+    coverImage: '',
+    teamName: '',
+    teamRole: ''
+  });
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmitCampaign = async () => {
+    if (!formData.title || !formData.category || !formData.targetAmount || !formData.duration) {
+      toast.error('Please fill in all required fields.');
+      return;
+    }
+
+    setIsSubmitting(true);
+    const toastId = toast.loading('Submitting campaign...');
+
+    try {
+      const token = localStorage.getItem('crowdfundly_token');
+      await axios.post(`${API_URL}/api/campaigns`, {
+        ...formData,
+        targetAmount: Number(formData.targetAmount),
+        duration: Number(formData.duration),
+        creatorEmail: user?.email,
+        creatorName: user?.name,
+        creatorAvatar: user?.photoURL,
+        team: formData.teamName ? [{ name: formData.teamName, role: formData.teamRole, initials: formData.teamName.substring(0, 2).toUpperCase() }] : [],
+        rewards: [
+          {
+            title: "Supporter",
+            amount: 25,
+            description: "Show your support for sustainable agriculture! Get exclusive behind-the-scenes updates.",
+            items: ["Exclusive Updates", "Digital Backer Wall"],
+            estimatedDelivery: "Aug 2024",
+            backers: 0
+          },
+          {
+            title: "Early Bird",
+            amount: 249,
+            description: "Get the complete system at a significant discount off retail price. Everything you need.",
+            items: ["1x Smart Farm", "Starter Seed Pod Kit", "Nutrient Solution", "App Access"],
+            estimatedDelivery: "Nov 2024",
+            backers: 0,
+            popular: true
+          }
+        ]
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      toast.success('Campaign created successfully! Awaiting Admin approval.', { id: toastId });
+      router.push('/dashboard/my-campaigns');
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to create campaign.', { id: toastId });
+      setIsSubmitting(false);
+    }
+  };
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -30,7 +110,7 @@ export default function CreateCampaignPage() {
     })
   };
 
-  const nextStep = () => setStep(prev => Math.min(prev + 1, 3));
+  const nextStep = () => setStep(prev => Math.min(prev + 1, 4));
   const prevStep = () => setStep(prev => Math.max(prev - 1, 1));
 
   return (
@@ -68,8 +148,9 @@ export default function CreateCampaignPage() {
             {/* Steps */}
             {[
               { num: 1, label: 'Basics' },
-              { num: 2, label: 'Funding' },
-              { num: 3, label: 'Media' }
+              { num: 2, label: 'Details' },
+              { num: 3, label: 'Funding' },
+              { num: 4, label: 'Media' }
             ].map((s) => (
               <div key={s.num} className="flex flex-col items-center bg-white px-4">
                 <div 
@@ -107,28 +188,51 @@ export default function CreateCampaignPage() {
                   <label className="block text-[13px] text-gray-700 mb-1.5">Campaign Title</label>
                   <input 
                     type="text" 
+                    name="title"
+                    value={formData.title}
+                    onChange={handleChange}
                     placeholder="e.g., The Next Generation Smart Watch" 
                     className="w-full px-4 py-2.5 rounded-md border border-gray-200 focus:outline-none focus:border-[#0f766e] focus:ring-1 focus:ring-[#0f766e] text-[14px] text-gray-900 placeholder-gray-400"
                   />
                 </div>
-                
-                <div>
-                  <label className="block text-[13px] text-gray-700 mb-1.5">Category</label>
-                  <select className="w-full px-4 py-2.5 rounded-md border border-gray-200 focus:outline-none focus:border-[#0f766e] focus:ring-1 focus:ring-[#0f766e] text-[14px] text-gray-500 bg-white appearance-none">
-                    <option value="">Select a category</option>
-                    <option value="technology">Technology</option>
-                    <option value="art">Art & Design</option>
-                    <option value="community">Community</option>
-                  </select>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[13px] text-gray-700 mb-1.5">Category</label>
+                    <select 
+                      name="category"
+                      value={formData.category}
+                      onChange={handleChange}
+                      className="w-full px-4 py-2.5 rounded-md border border-gray-200 focus:outline-none focus:border-[#0f766e] focus:ring-1 focus:ring-[#0f766e] text-[14px] text-gray-500 bg-white appearance-none"
+                    >
+                      <option value="">Select a category</option>
+                      <option value="Technology">Technology</option>
+                      <option value="Environment">Environment</option>
+                      <option value="Design">Design</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[13px] text-gray-700 mb-1.5">Sub-Category (Optional)</label>
+                    <input 
+                      type="text" 
+                      name="subCategory"
+                      value={formData.subCategory}
+                      onChange={handleChange}
+                      placeholder="e.g., Solar, AI, Hardware" 
+                      className="w-full px-4 py-2.5 rounded-md border border-gray-200 focus:outline-none focus:border-[#0f766e] focus:ring-1 focus:ring-[#0f766e] text-[14px] text-gray-900 placeholder-gray-400"
+                    />
+                  </div>
                 </div>
 
                 <div>
-                  <label className="block text-[13px] text-gray-700 mb-1.5">Campaign Story</label>
-                  <textarea 
-                    rows="4"
-                    placeholder="Tell your backers why they should support this project..."
-                    className="w-full px-4 py-3 rounded-md border border-gray-200 focus:outline-none focus:border-[#0f766e] focus:ring-1 focus:ring-[#0f766e] text-[14px] text-gray-900 placeholder-gray-400 resize-none"
-                  ></textarea>
+                  <label className="block text-[13px] text-gray-700 mb-1.5">Location</label>
+                  <input 
+                    type="text" 
+                    name="location"
+                    value={formData.location}
+                    onChange={handleChange}
+                    placeholder="e.g., Seattle, WA" 
+                    className="w-full px-4 py-2.5 rounded-md border border-gray-200 focus:outline-none focus:border-[#0f766e] focus:ring-1 focus:ring-[#0f766e] text-[14px] text-gray-900 placeholder-gray-400"
+                  />
                 </div>
               </motion.div>
             )}
@@ -145,21 +249,52 @@ export default function CreateCampaignPage() {
                 className="space-y-6"
               >
                 <div>
-                  <label className="block text-[13px] text-gray-700 mb-1.5">Target Amount (Credits)</label>
+                  <label className="block text-[13px] text-gray-700 mb-1.5">Short Description (Subtitle)</label>
                   <input 
-                    type="number" 
-                    placeholder="e.g., 50000" 
+                    type="text" 
+                    name="shortDescription"
+                    value={formData.shortDescription}
+                    onChange={handleChange}
+                    placeholder="Bring the future of sustainable agriculture into your home..." 
                     className="w-full px-4 py-2.5 rounded-md border border-gray-200 focus:outline-none focus:border-[#0f766e] focus:ring-1 focus:ring-[#0f766e] text-[14px] text-gray-900 placeholder-gray-400"
                   />
                 </div>
-                
+
                 <div>
-                  <label className="block text-[13px] text-gray-700 mb-1.5">Campaign Duration (Days)</label>
-                  <input 
-                    type="number" 
-                    placeholder="e.g., 30" 
-                    className="w-full px-4 py-2.5 rounded-md border border-gray-200 focus:outline-none focus:border-[#0f766e] focus:ring-1 focus:ring-[#0f766e] text-[14px] text-gray-900 placeholder-gray-400"
-                  />
+                  <label className="block text-[13px] text-gray-700 mb-1.5">The Vision (Full Story)</label>
+                  <textarea 
+                    name="story"
+                    value={formData.story}
+                    onChange={handleChange}
+                    rows="4"
+                    placeholder="We believe that everyone deserves access to fresh produce..."
+                    className="w-full px-4 py-3 rounded-md border border-gray-200 focus:outline-none focus:border-[#0f766e] focus:ring-1 focus:ring-[#0f766e] text-[14px] text-gray-900 placeholder-gray-400 resize-none"
+                  ></textarea>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[13px] text-gray-700 mb-1.5">Core Team Member Name</label>
+                    <input 
+                      type="text" 
+                      name="teamName"
+                      value={formData.teamName}
+                      onChange={handleChange}
+                      placeholder="e.g., Sarah Jenkins" 
+                      className="w-full px-4 py-2.5 rounded-md border border-gray-200 focus:outline-none focus:border-[#0f766e] focus:ring-1 focus:ring-[#0f766e] text-[14px] text-gray-900 placeholder-gray-400"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[13px] text-gray-700 mb-1.5">Team Member Role</label>
+                    <input 
+                      type="text" 
+                      name="teamRole"
+                      value={formData.teamRole}
+                      onChange={handleChange}
+                      placeholder="e.g., CEO & Lead Engineer" 
+                      className="w-full px-4 py-2.5 rounded-md border border-gray-200 focus:outline-none focus:border-[#0f766e] focus:ring-1 focus:ring-[#0f766e] text-[14px] text-gray-900 placeholder-gray-400"
+                    />
+                  </div>
                 </div>
               </motion.div>
             )}
@@ -176,11 +311,52 @@ export default function CreateCampaignPage() {
                 className="space-y-6"
               >
                 <div>
-                  <label className="block text-[13px] text-gray-700 mb-1.5">Campaign Cover Image</label>
-                  <div className="border-2 border-dashed border-gray-200 rounded-lg p-10 flex flex-col items-center justify-center bg-gray-50/50 hover:bg-gray-50 transition-colors cursor-pointer">
-                    <p className="text-[14px] text-gray-600 mb-1">Drag and drop an image, or <span className="text-[#3b2de6] font-bold">browse</span></p>
-                    <p className="text-[12px] text-gray-400">High resolution JPG or PNG</p>
-                  </div>
+                  <label className="block text-[13px] text-gray-700 mb-1.5">Target Amount (Credits)</label>
+                  <input 
+                    type="number" 
+                    name="targetAmount"
+                    value={formData.targetAmount}
+                    onChange={handleChange}
+                    placeholder="e.g., 50000" 
+                    className="w-full px-4 py-2.5 rounded-md border border-gray-200 focus:outline-none focus:border-[#0f766e] focus:ring-1 focus:ring-[#0f766e] text-[14px] text-gray-900 placeholder-gray-400"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-[13px] text-gray-700 mb-1.5">Campaign Duration (Days)</label>
+                  <input 
+                    type="number" 
+                    name="duration"
+                    value={formData.duration}
+                    onChange={handleChange}
+                    placeholder="e.g., 30" 
+                    className="w-full px-4 py-2.5 rounded-md border border-gray-200 focus:outline-none focus:border-[#0f766e] focus:ring-1 focus:ring-[#0f766e] text-[14px] text-gray-900 placeholder-gray-400"
+                  />
+                </div>
+              </motion.div>
+            )}
+
+            {step === 4 && (
+              <motion.div
+                key="step3"
+                custom={1}
+                variants={slideVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{ duration: 0.2 }}
+                className="space-y-6"
+              >
+                <div>
+                  <label className="block text-[13px] text-gray-700 mb-1.5">Campaign Cover Image URL</label>
+                  <input 
+                    type="text" 
+                    name="coverImage"
+                    value={formData.coverImage}
+                    onChange={handleChange}
+                    placeholder="https://example.com/image.jpg" 
+                    className="w-full px-4 py-2.5 rounded-md border border-gray-200 focus:outline-none focus:border-[#0f766e] focus:ring-1 focus:ring-[#0f766e] text-[14px] text-gray-900 placeholder-gray-400"
+                  />
                 </div>
               </motion.div>
             )}
@@ -205,10 +381,11 @@ export default function CreateCampaignPage() {
               Save Draft
             </button>
             <button 
-              onClick={step < 3 ? nextStep : () => {}}
-              className="bg-[#12643E] hover:bg-[#0e4f31] text-white px-6 py-2 rounded-md font-bold text-[13px] transition-colors shadow-sm"
+              onClick={step < 4 ? nextStep : handleSubmitCampaign}
+              disabled={isSubmitting}
+              className="bg-[#12643E] hover:bg-[#0e4f31] text-white px-6 py-2 rounded-md font-bold text-[13px] transition-colors shadow-sm disabled:opacity-50"
             >
-              {step < 3 ? 'Continue' : 'Submit Campaign'}
+              {isSubmitting ? 'Submitting...' : (step < 4 ? 'Continue' : 'Submit Campaign')}
             </button>
           </div>
         </div>

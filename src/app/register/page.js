@@ -12,8 +12,8 @@ export default function RegisterPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [role, setRole] = useState('Supporter');
   const [photoURL, setPhotoURL] = useState('');
+  const [role, setRole] = useState('Supporter');
   const [isUploading, setIsUploading] = useState(false);
   const { register } = useAuth();
   const router = useRouter();
@@ -48,7 +48,7 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!name || !email || !password || !role) {
+    if (!name || !email || !password) {
       toast.error("Please fill in all required fields.");
       return;
     }
@@ -61,9 +61,8 @@ export default function RegisterPage() {
         name,
         email,
         password,
-        role,
         photoURL,
-        credits: role === 'Supporter' ? 50 : 20,
+        role,
       };
 
       const success = await register(userData);
@@ -93,7 +92,7 @@ export default function RegisterPage() {
               Join Crowdfundly
             </h2>
             <p className="text-slate-600 text-sm mb-8 leading-relaxed pr-4">
-              Start your journey. <span className="text-[#065f46] font-medium">Get 50 credits as a Supporter or 20 as a Creator upon registration.</span>
+              Create your supporter account to discover and back real projects. Creator access is approved by the platform team.
             </p>
 
             <form className="space-y-5" onSubmit={handleSubmit}>
@@ -160,21 +159,19 @@ export default function RegisterPage() {
                 </div>
               </div>
 
-              <div>
+              <div> 
                 <label htmlFor="role" className="block text-xs font-semibold text-slate-700 mb-1.5">
-                  I want to join as a:
+                  Account Type
                 </label>
                 <select
                   id="role"
-                  name="role"
-                  required
-                  disabled={isUploading}
                   value={role}
                   onChange={(e) => setRole(e.target.value)}
-                  className="block w-full px-3 py-2.5 border border-slate-200 rounded-lg text-slate-900 focus:ring-2 focus:ring-[#12643E] focus:border-[#12643E] sm:text-sm transition-colors outline-none disabled:bg-slate-50"
+                  disabled={isUploading}
+                  className="block w-full px-3 py-2.5 border border-slate-200 rounded-lg text-slate-900 focus:ring-2 focus:ring-[#12643E] focus:border-[#12643E] sm:text-sm transition-colors outline-none disabled:bg-slate-50 cursor-pointer"
                 >
-                  <option value="Supporter">Supporter (Back projects, earn rewards)</option>
-                  <option value="Creator">Creator (Launch projects)</option>
+                  <option value="Supporter">Supporter (Starts with 50 credits)</option>
+                  <option value="Creator">Creator (Starts with 20 credits)</option>
                 </select>
               </div>
 
