@@ -12,21 +12,16 @@ export const AuthProvider = ({ children }) => {
   const router = useRouter();
   
   // Use Better Auth's reactive session hook
-  const { data: session, isPending: loading } = authClient.useSession();
+  const { data: session, isPending: loading, error } = authClient.useSession();
   const user = session?.user || null;
 
   useEffect(() => {
-    // Better Auth stores the JWT in a cookie when the jwt plugin is used.
-    // Read the cookie to set the Axios Authorization header for the Express backend.
-    const getCookie = (name) => {
-      const value = `; ${document.cookie}`;
-      const parts = value.split(`; ${name}=`);
-      if (parts.length === 2) return parts.pop().split(';').shift();
-      return null;
-    };
-    
-    // Check for the better auth session token
-    const token = getCookie("better-auth.session_token");
+    console.log("[AuthContext] Session updated:", { session, loading, user, error });
+  }, [session, loading, user, error]);
+
+  useEffect(() => {
+    // Sync the token with Axios for the Express backend
+    const token = typeof window !== 'undefined' ? localStorage.getItem('access-token') : null;
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     } else {
@@ -44,6 +39,12 @@ export const AuthProvider = ({ children }) => {
         console.error("Login failed:", error.message);
         return false;
       }
+      
+      if (data?.token) {
+        localStorage.setItem('access-token', data.token);
+        axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
+      }
+
       router.push('/dashboard');
       return true;
     } catch (error) {
@@ -54,9 +55,6 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (userData) => {
     try {
-      // Better Auth signUp requires email, password, and name.
-      // We can pass additional data like role and photoURL in the generic options if schema allows it,
-      // but for now, we'll just pass them to the basic sign up.
       const { data, error } = await authClient.signUp.email({
         email: userData.email,
         password: userData.password,
@@ -71,6 +69,11 @@ export const AuthProvider = ({ children }) => {
         throw new Error(error.message); // throw to be caught by the component toast
       }
       
+      if (data?.token) {
+        localStorage.setItem('access-token', data.token);
+        axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
+      }
+
       router.push('/dashboard');
       return true;
     } catch (error) {
@@ -81,6 +84,8 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     await authClient.signOut();
+    localStorage.removeItem('access-token');
+    delete axios.defaults.headers.common['Authorization'];
     router.push('/');
   };
 
