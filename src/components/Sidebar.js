@@ -1,13 +1,18 @@
 "use client";
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
-import { Home, Compass, Heart, CreditCard, History, PlusCircle, Layers, Wallet, Settings, LogOut, LayoutGrid } from 'lucide-react';
+import { Home, Compass, Heart, CreditCard, History, PlusCircle, Layers, Wallet, Settings, LogOut, LayoutGrid, RefreshCw } from 'lucide-react';
 import { usePathname } from 'next/navigation';
+import { useState } from 'react';
 
 export default function Sidebar({ mobileMenuOpen, setMobileMenuOpen }) {
   const { logout, user } = useAuth();
   const pathname = usePathname();
-  const isCreator = user?.role === 'creator' || user?.role === 'admin';
+  
+  // Temporary state to allow easy toggling during development
+  const [testRole, setTestRole] = useState(user?.role?.toLowerCase() === 'creator' ? 'creator' : 'supporter');
+  
+  const isCreator = testRole === 'creator' || user?.role === 'admin';
 
   const backerNavItems = [
     { name: 'Home', href: '/dashboard', icon: Home },
@@ -119,6 +124,16 @@ export default function Sidebar({ mobileMenuOpen, setMobileMenuOpen }) {
               Discover Projects
             </Link>
           )}
+          {/* View Toggle for Development */}
+          <div className="pt-6">
+            <button
+              onClick={() => setTestRole(prev => prev === 'creator' ? 'supporter' : 'creator')}
+              className="w-full text-xs font-bold text-gray-400 hover:text-[#0f766e] flex items-center justify-center transition-colors"
+            >
+              <RefreshCw className="w-3 h-3 mr-1" />
+              Switch to {isCreator ? 'Supporter' : 'Creator'} View
+            </button>
+          </div>
         </div>
       </nav>
     </>
