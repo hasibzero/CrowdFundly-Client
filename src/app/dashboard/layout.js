@@ -2,38 +2,62 @@
 import Sidebar from '@/components/Sidebar';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter, usePathname } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { Menu, X } from 'lucide-react';
 
 export default function DashboardLayout({ children }) {
- const { user, loading } = useAuth();
- const router = useRouter();
+  const { user, loading } = useAuth();
+  const router = useRouter();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
 
- useEffect(() => {
- if (!loading && !user) {
- router.push('/login');
- }
- }, [user, loading, router]);
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/login');
+    }
+  }, [user, loading, router]);
 
- if (loading || !user) {
- return (
- <div className="flex min-h-screen items-center justify-center bg-[#f8f9fc] ">
- <div className="flex flex-col items-center space-y-4">
- <div className="w-12 h-12 border-4 border-emerald-500/20 border-t-emerald-600 rounded-full animate-spin"></div>
- <p className="text-gray-500 font-medium animate-pulse">Loading Workspace...</p>
- </div>
- </div>
- );
- }
+  // Close mobile menu on route change
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [pathname]);
 
- return (
- <div className="bg-[#f8f9fc] text-gray-900 font-body-md min-h-screen flex">
- <Sidebar />
- <main className="flex-1 md:ml-64 flex flex-col min-h-screen transition-all duration-300">
- 
- <div className="p-8 md:p-12 max-w-[1400px] mx-auto w-full flex-1">
- {children}
- </div>
- </main>
- </div>
- );
+  if (loading || !user) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#f8f9fc] ">
+        <div className="flex flex-col items-center space-y-4">
+          <div className="w-12 h-12 border-4 border-emerald-500/20 border-t-emerald-600 rounded-full animate-spin"></div>
+          <p className="text-gray-500 font-medium animate-pulse">Loading Workspace...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-[#f8f9fc] text-gray-900 font-body-md min-h-screen flex flex-col md:flex-row">
+      {/* Mobile Top Bar */}
+      <div className="md:hidden bg-white border-b border-gray-200 p-4 flex justify-between items-center sticky top-0 z-40 shadow-sm">
+        <div className="flex items-center space-x-2">
+          <div className="w-8 h-8 bg-[#0f766e] rounded-lg flex items-center justify-center text-white font-bold text-xs shadow-sm">
+            FF
+          </div>
+          <span className="font-bold text-[#0f766e]">FundForward</span>
+        </div>
+        <button 
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          className="text-gray-600 hover:text-gray-900 focus:outline-none p-1"
+        >
+          {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+        </button>
+      </div>
+
+      <Sidebar mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} />
+      
+      <main className="flex-1 md:ml-64 flex flex-col min-h-screen transition-all duration-300 w-full overflow-x-hidden">
+        <div className="p-4 sm:p-6 md:p-8 lg:p-12 max-w-[1400px] mx-auto w-full flex-1">
+          {children}
+        </div>
+      </main>
+    </div>
+  );
 }

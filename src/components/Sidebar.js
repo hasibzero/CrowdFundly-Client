@@ -4,7 +4,7 @@ import { useAuth } from '@/context/AuthContext';
 import { Home, Compass, Heart, CreditCard, History } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
-export default function Sidebar() {
+export default function Sidebar({ mobileMenuOpen, setMobileMenuOpen }) {
   const { logout, user } = useAuth();
   const pathname = usePathname();
 
@@ -21,59 +21,72 @@ export default function Sidebar() {
   }
 
   return (
-    <nav className="bg-[#f8f9fc] border-r border-gray-200 h-screen w-64 fixed left-0 top-0 flex flex-col overflow-y-auto hidden md:flex z-50">
+    <>
+      {/* Mobile overlay */}
+      {mobileMenuOpen && (
+        <div 
+          className="md:hidden fixed inset-0 bg-gray-900/50 z-40 backdrop-blur-sm transition-opacity" 
+          onClick={() => setMobileMenuOpen(false)} 
+        />
+      )}
       
-      {/* Profile Header */}
-      <div className="flex flex-col items-center pt-10 pb-6 border-b border-gray-200">
-        <div className="w-20 h-20 rounded-full p-1 bg-[#f4fbf8] mb-4 flex items-center justify-center">
-          <img 
-            src={user?.avatar || "https://ui-avatars.com/api/?name=" + (user?.name || "U") + "&background=0f766e&color=fff"} 
-            alt="Profile"
-            className="w-full h-full rounded-full object-cover border-2 border-white shadow-sm"
-          />
+      <nav className={`bg-[#f8f9fc] border-r border-gray-200 h-screen w-64 fixed left-0 top-0 flex flex-col overflow-y-auto z-50 transition-transform duration-300 ease-in-out ${
+        mobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
+      }`}>
+        
+        {/* Profile Header */}
+        <div className="flex flex-col items-center pt-10 pb-6 border-b border-gray-200">
+          <div className="w-20 h-20 rounded-full p-1 bg-[#f4fbf8] mb-4 flex items-center justify-center">
+            <img 
+              src={user?.avatar || "https://ui-avatars.com/api/?name=" + (user?.name || "U") + "&background=0f766e&color=fff"} 
+              alt="Profile"
+              className="w-full h-full rounded-full object-cover border-2 border-white shadow-sm"
+            />
+          </div>
+          <h2 className="text-xl font-bold text-[#0f766e] capitalize text-center leading-tight">
+            {user?.role || 'Supporter'}<br/>Dashboard
+          </h2>
+          <p className="text-xs text-gray-500 mt-2 font-medium">Community Backer</p>
         </div>
-        <h2 className="text-xl font-bold text-[#0f766e] capitalize text-center leading-tight">
-          {user?.role || 'Supporter'}<br/>Dashboard
-        </h2>
-        <p className="text-xs text-gray-500 mt-2 font-medium">Community Backer</p>
-      </div>
 
-      {/* Navigation Links */}
-      <div className="flex-1 flex flex-col py-6">
-        {navItems.map((item) => {
-          const isActive = pathname === item.href;
-          const Icon = item.icon;
-          return (
-            <Link
-              key={item.name}
-              href={item.href}
-              className={`px-6 py-3.5 flex items-center space-x-4 transition-colors relative ${
-                isActive
-                  ? 'bg-[#f4fbf8] text-[#0f766e] font-bold'
-                  : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
-              }`}
-            >
-              <Icon className={`w-5 h-5 ${isActive ? 'text-[#0f766e]' : 'text-gray-500'}`} strokeWidth={isActive ? 2.5 : 2} />
-              <span className="text-[14px]">{item.name}</span>
-              
-              {/* Active Indicator Border */}
-              {isActive && (
-                <div className="absolute right-0 top-0 bottom-0 w-1 bg-[#0f766e] rounded-l-md"></div>
-              )}
-            </Link>
-          );
-        })}
-      </div>
+        {/* Navigation Links */}
+        <div className="flex-1 flex flex-col py-6">
+          {navItems.map((item) => {
+            const isActive = pathname === item.href;
+            const Icon = item.icon;
+            return (
+              <Link
+                key={item.name}
+                href={item.href}
+                onClick={() => setMobileMenuOpen && setMobileMenuOpen(false)}
+                className={`px-6 py-3.5 flex items-center space-x-4 transition-colors relative ${
+                  isActive
+                    ? 'bg-[#f4fbf8] text-[#0f766e] font-bold'
+                    : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                }`}
+              >
+                <Icon className={`w-5 h-5 ${isActive ? 'text-[#0f766e]' : 'text-gray-500'}`} strokeWidth={isActive ? 2.5 : 2} />
+                <span className="text-[14px]">{item.name}</span>
+                
+                {/* Active Indicator Border */}
+                {isActive && (
+                  <div className="absolute right-0 top-0 bottom-0 w-1 bg-[#0f766e] rounded-l-md"></div>
+                )}
+              </Link>
+            );
+          })}
+        </div>
 
-      {/* Bottom Button */}
-      <div className="p-6 mt-auto">
-        <Link 
-          href="/campaigns"
-          className="w-full bg-[#12643E] hover:bg-[#0e4f31] text-white py-3.5 rounded-lg flex justify-center items-center text-sm font-bold shadow-md transition-colors"
-        >
-          Discover Projects
-        </Link>
-      </div>
-    </nav>
+        {/* Bottom Button */}
+        <div className="p-6 mt-auto mb-10 md:mb-0">
+          <Link 
+            href="/campaigns"
+            className="w-full bg-[#12643E] hover:bg-[#0e4f31] text-white py-3.5 rounded-lg flex justify-center items-center text-sm font-bold shadow-md transition-colors"
+          >
+            Discover Projects
+          </Link>
+        </div>
+      </nav>
+    </>
   );
 }
