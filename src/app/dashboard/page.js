@@ -1,53 +1,71 @@
 "use client";
 import { useAuth } from '@/context/AuthContext';
-import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { LayoutDashboard, Coins } from 'lucide-react';
 
 export default function DashboardPage() {
-  const { user, loading, logout } = useAuth();
-  const router = useRouter();
+  const { user } = useAuth();
 
-  useEffect(() => {
-    if (!loading && !user) {
-      router.push('/login');
-    }
-  }, [user, loading, router]);
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
+  };
 
-  if (loading) {
-    return <div className="flex h-screen items-center justify-center">Loading...</div>;
-  }
-
-  if (!user) {
-    return null;
-  }
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 }
+  };
 
   return (
-    <div className="min-h-screen bg-surface p-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-on-surface">Dashboard</h1>
-          <button 
-            onClick={logout}
-            className="rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-          >
-            Logout
-          </button>
-        </div>
-        
-        <div className="bg-surface-container-lowest rounded-lg shadow-sm border border-outline-variant p-6">
-          <h2 className="text-xl font-semibold mb-4">Welcome, {user.name || user.email}!</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-            <div className="p-4 bg-gray-50 rounded-lg border border-gray-100">
-              <p className="text-sm text-gray-500">Role</p>
-              <p className="text-lg font-medium">{user.role}</p>
-            </div>
-            <div className="p-4 bg-gray-50 rounded-lg border border-gray-100">
-              <p className="text-sm text-gray-500">Available Credits</p>
-              <p className="text-lg font-medium">{user.credits}</p>
-            </div>
+    <motion.section 
+      className="grid grid-cols-1 lg:grid-cols-12 gap-6"
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+    >
+      {/* Welcome Card */}
+      <motion.div 
+        variants={itemVariants}
+        className="lg:col-span-8 bg-white dark:bg-gray-800 rounded-xl p-10 shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col justify-center relative overflow-hidden"
+      >
+        <div className="absolute -right-10 -top-10 w-64 h-64 bg-primary/10 rounded-full blur-3xl pointer-events-none"></div>
+        <h1 className="text-4xl font-extrabold text-gray-900 dark:text-white mb-4 relative z-10">
+          Welcome back, {user?.name || user?.email?.split('@')[0]}!
+        </h1>
+        <p className="text-lg text-gray-600 dark:text-gray-300 max-w-lg relative z-10">
+          Your support is fueling innovation. Check out the latest updates from the projects you back and discover new opportunities to make an impact.
+        </p>
+      </motion.div>
+
+      {/* Summary Cards */}
+      <motion.div 
+        variants={itemVariants}
+        className="lg:col-span-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-6"
+      >
+        {/* Total Projects */}
+        <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 flex items-center justify-between hover:-translate-y-1 transition-transform duration-300">
+          <div>
+            <p className="text-xs text-gray-500 uppercase tracking-wider mb-1 font-semibold">Role</p>
+            <p className="text-2xl text-primary font-bold capitalize">{user?.role}</p>
+          </div>
+          <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+            <LayoutDashboard className="w-6 h-6" />
           </div>
         </div>
-      </div>
-    </div>
+
+        {/* Total Credits */}
+        <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 flex items-center justify-between hover:-translate-y-1 transition-transform duration-300">
+          <div>
+            <p className="text-xs text-gray-500 uppercase tracking-wider mb-1 font-semibold">Available Credits</p>
+            <p className="text-2xl text-indigo-600 font-bold">
+              {user?.credits} <span className="text-base font-normal text-gray-500">Credits</span>
+            </p>
+          </div>
+          <div className="w-12 h-12 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600">
+            <Coins className="w-6 h-6" />
+          </div>
+        </div>
+      </motion.div>
+    </motion.section>
   );
 }
