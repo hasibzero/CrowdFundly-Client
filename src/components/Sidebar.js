@@ -1,7 +1,7 @@
 "use client";
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
-import { LayoutDashboard, Compass, Heart, CreditCard, History, Settings, LogOut, ChevronRight } from 'lucide-react';
+import { Home, Compass, Heart, CreditCard, History } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
 export default function Sidebar() {
@@ -9,7 +9,7 @@ export default function Sidebar() {
   const pathname = usePathname();
 
   const navItems = [
-    { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+    { name: 'Home', href: '/dashboard', icon: Home },
     { name: 'Explore Campaigns', href: '/campaigns', icon: Compass },
     { name: 'My Contributions', href: '/dashboard/contributions', icon: Heart },
     { name: 'Purchase Credit', href: '/dashboard/credits', icon: CreditCard },
@@ -21,20 +21,25 @@ export default function Sidebar() {
   }
 
   return (
-    <nav className="bg-white dark:bg-[#0f172a] border-r border-gray-100 dark:border-gray-800 shadow-[2px_0_24px_rgba(0,0,0,0.02)] h-screen w-72 fixed left-0 top-0 flex flex-col p-6 space-y-4 overflow-y-auto hidden md:flex z-50 transition-colors duration-300">
-      {/* Brand Header */}
-      <div className="mb-8 flex items-center px-2">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary-container flex items-center justify-center shadow-lg shadow-primary/20 mr-3">
-          <span className="text-white font-black text-xl leading-none">C</span>
+    <nav className="bg-[#f8f9fc] dark:bg-[#0f172a] border-r border-gray-200 dark:border-gray-800 h-screen w-64 fixed left-0 top-0 flex flex-col overflow-y-auto hidden md:flex z-50">
+      
+      {/* Profile Header */}
+      <div className="flex flex-col items-center pt-10 pb-6 border-b border-gray-200 dark:border-gray-800">
+        <div className="w-20 h-20 rounded-full p-1 bg-emerald-100 dark:bg-emerald-900/30 mb-4 flex items-center justify-center">
+          <img 
+            src={user?.avatar || "https://ui-avatars.com/api/?name=" + (user?.name || "U") + "&background=0f766e&color=fff"} 
+            alt="Profile"
+            className="w-full h-full rounded-full object-cover border-2 border-white dark:border-gray-800 shadow-sm"
+          />
         </div>
-        <Link href="/">
-          <span className="text-2xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 tracking-tight">Crowdfundly</span>
-        </Link>
+        <h2 className="text-xl font-bold text-[#0f766e] dark:text-emerald-400 capitalize text-center leading-tight">
+          {user?.role || 'Supporter'}<br/>Dashboard
+        </h2>
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 font-medium">Community Backer</p>
       </div>
 
       {/* Navigation Links */}
-      <div className="flex-1 flex flex-col space-y-1.5">
-        <p className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2 px-2">Menu</p>
+      <div className="flex-1 flex flex-col py-6">
         {navItems.map((item) => {
           const isActive = pathname === item.href;
           const Icon = item.icon;
@@ -42,39 +47,32 @@ export default function Sidebar() {
             <Link
               key={item.name}
               href={item.href}
-              className={`group rounded-xl px-3 py-3 flex items-center justify-between transition-all duration-300 cursor-pointer active:scale-[0.98] ${
+              className={`px-6 py-3.5 flex items-center space-x-4 transition-colors relative ${
                 isActive
-                  ? 'bg-primary/10 dark:bg-primary/20 text-primary font-bold'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800/50 dark:hover:text-white'
+                  ? 'bg-emerald-50/50 dark:bg-emerald-900/10 text-[#0f766e] dark:text-emerald-400 font-bold'
+                  : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800'
               }`}
             >
-              <div className="flex items-center space-x-3.5">
-                <Icon className={`w-5 h-5 transition-colors duration-300 ${isActive ? 'text-primary' : 'text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300'}`} />
-                <span className="text-[15px]">{item.name}</span>
-              </div>
-              {isActive && <ChevronRight className="w-4 h-4 text-primary opacity-70" />}
+              <Icon className={`w-5 h-5 ${isActive ? 'text-[#0f766e] dark:text-emerald-400' : 'text-gray-500 dark:text-gray-400'}`} strokeWidth={isActive ? 2.5 : 2} />
+              <span className="text-[14px]">{item.name}</span>
+              
+              {/* Active Indicator Border */}
+              {isActive && (
+                <div className="absolute right-0 top-0 bottom-0 w-1 bg-[#0f766e] dark:bg-emerald-400 rounded-l-md"></div>
+              )}
             </Link>
           );
         })}
       </div>
 
-      {/* Footer Actions */}
-      <div className="mt-auto border-t border-gray-100 dark:border-gray-800 pt-6 flex flex-col space-y-1.5">
-        <p className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2 px-2">Account</p>
-        <Link
-          href="/dashboard/settings"
-          className="group text-gray-600 hover:bg-gray-50 rounded-xl px-3 py-3 flex items-center space-x-3.5 hover:text-gray-900 transition-all duration-300 cursor-pointer active:scale-[0.98] dark:text-gray-400 dark:hover:bg-gray-800/50 dark:hover:text-white"
+      {/* Bottom Button */}
+      <div className="p-6 mt-auto">
+        <Link 
+          href="/campaigns"
+          className="w-full bg-[#0f766e] hover:bg-[#0d655e] text-white py-3.5 rounded-lg flex justify-center items-center text-sm font-bold shadow-md transition-colors"
         >
-          <Settings className="w-5 h-5 text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300" />
-          <span className="text-[15px] font-medium">Settings</span>
+          Discover Projects
         </Link>
-        <button
-          onClick={logout}
-          className="group w-full text-left text-gray-600 hover:bg-red-50 dark:hover:bg-red-900/10 rounded-xl px-3 py-3 flex items-center space-x-3.5 hover:text-red-600 dark:hover:text-red-400 transition-all duration-300 cursor-pointer active:scale-[0.98] dark:text-gray-400"
-        >
-          <LogOut className="w-5 h-5 text-gray-400 group-hover:text-red-500 dark:group-hover:text-red-400" />
-          <span className="text-[15px] font-medium">Logout</span>
-        </button>
       </div>
     </nav>
   );

@@ -1,7 +1,7 @@
 "use client";
 import { useAuth } from '@/context/AuthContext';
 import { motion } from 'framer-motion';
-import { LayoutDashboard, Coins, ArrowRight, TrendingUp } from 'lucide-react';
+import { HeartHandshake, Hourglass, WalletCards, ArrowRight, TrendingUp, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
 
 export default function DashboardPage() {
@@ -19,81 +19,124 @@ export default function DashboardPage() {
 
   return (
     <motion.section 
-      className="grid grid-cols-1 lg:grid-cols-12 gap-8"
+      className="max-w-6xl w-full"
       variants={containerVariants}
       initial="hidden"
       animate="visible"
     >
-      {/* Welcome Card */}
-      <motion.div 
-        variants={itemVariants}
-        className="lg:col-span-8 bg-white dark:bg-[#1e293b] rounded-[24px] p-8 md:p-12 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 dark:border-gray-800 flex flex-col justify-center relative overflow-hidden group"
-      >
-        <div className="absolute top-0 right-0 w-full h-full bg-gradient-to-br from-primary/5 to-transparent dark:from-primary/10 opacity-50 pointer-events-none transition-opacity duration-500 group-hover:opacity-100"></div>
-        <div className="absolute -right-20 -top-20 w-80 h-80 bg-primary/20 rounded-full blur-[80px] pointer-events-none"></div>
-        
-        <h1 className="text-3xl md:text-5xl font-extrabold text-gray-900 dark:text-white mb-6 relative z-10 tracking-tight leading-tight">
-          Welcome back,<br/>
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-emerald-400">
-            {user?.name || user?.email?.split('@')[0]}!
-          </span>
+      {/* Header Section */}
+      <motion.div variants={itemVariants} className="mb-8">
+        <h1 className="text-3xl md:text-[32px] font-bold text-[#0f172a] dark:text-white mb-2 tracking-tight">
+          Welcome back!
         </h1>
-        <p className="text-lg text-gray-600 dark:text-gray-400 max-w-xl relative z-10 mb-8 leading-relaxed">
-          Your support fuels innovation. Check out the latest updates from the projects you back and discover new opportunities to make an impact.
+        <p className="text-[15px] text-gray-600 dark:text-gray-400">
+          Here is an overview of your recent impact and active contributions.
         </p>
-        
-        <div className="relative z-10 flex items-center space-x-4">
-          <Link href="/campaigns" className="bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-6 py-3 rounded-xl font-semibold flex items-center space-x-2 hover:bg-gray-800 dark:hover:bg-gray-100 transition-all duration-300 shadow-lg shadow-gray-900/20 dark:shadow-white/10 active:scale-95">
-            <span>Explore Campaigns</span>
-            <ArrowRight className="w-4 h-4" />
-          </Link>
-        </div>
       </motion.div>
 
       {/* Summary Cards */}
       <motion.div 
         variants={itemVariants}
-        className="lg:col-span-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-6"
+        className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10"
       >
-        {/* Role Card */}
-        <div className="bg-white dark:bg-[#1e293b] rounded-[24px] p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 dark:border-gray-800 flex items-center justify-between hover:-translate-y-1 hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)] transition-all duration-300 group">
-          <div>
-            <p className="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2 font-bold">Your Role</p>
-            <p className="text-3xl text-gray-900 dark:text-white font-black capitalize tracking-tight">{user?.role || 'Supporter'}</p>
+        {/* Total Contributions */}
+        <div className="bg-white dark:bg-[#1e293b] rounded-xl p-6 shadow-sm border border-gray-200/60 dark:border-gray-800 relative overflow-hidden group hover:shadow-md transition-shadow">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50 dark:bg-emerald-900/10 rounded-bl-full -mr-10 -mt-10 transition-transform group-hover:scale-110"></div>
+          <div className="absolute top-6 right-6 w-10 h-10 rounded-lg bg-[#d1fae5] dark:bg-emerald-900/50 flex items-center justify-center text-[#0f766e] dark:text-emerald-400 z-10">
+            <HeartHandshake className="w-5 h-5" />
           </div>
-          <div className="w-14 h-14 rounded-2xl bg-gray-50 dark:bg-gray-800 flex items-center justify-center text-gray-900 dark:text-white group-hover:bg-primary group-hover:text-white transition-colors duration-300 shadow-sm">
-            <LayoutDashboard className="w-6 h-6" />
+          
+          <p className="text-[11px] text-gray-500 dark:text-gray-400 uppercase tracking-widest font-bold mb-4 relative z-10">Total Contributions</p>
+          <p className="text-[40px] font-bold text-[#0f172a] dark:text-white leading-none mb-3 relative z-10 tracking-tight">24</p>
+          
+          <div className="flex items-center text-xs font-semibold text-emerald-600 dark:text-emerald-400 relative z-10">
+            <TrendingUp className="w-3.5 h-3.5 mr-1" />
+            <span>+3 this month</span>
           </div>
         </div>
 
-        {/* Total Credits */}
-        <div className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-[24px] p-8 shadow-[0_8px_30px_rgb(99,102,241,0.2)] border border-indigo-400/30 flex items-center justify-between hover:-translate-y-1 hover:shadow-[0_20px_40px_rgb(99,102,241,0.3)] transition-all duration-300 group relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl transform translate-x-10 -translate-y-10"></div>
-          <div className="relative z-10">
-            <p className="text-xs text-indigo-100 uppercase tracking-widest mb-2 font-bold">Available Credits</p>
-            <p className="text-3xl text-white font-black tracking-tight">
-              {user?.credits || 0}
-            </p>
+        {/* Pending Contributions */}
+        <div className="bg-white dark:bg-[#1e293b] rounded-xl p-6 shadow-sm border border-gray-200/60 dark:border-gray-800 relative overflow-hidden group hover:shadow-md transition-shadow">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-amber-50 dark:bg-amber-900/10 rounded-bl-full -mr-10 -mt-10 transition-transform group-hover:scale-110"></div>
+          <div className="absolute top-6 right-6 w-10 h-10 rounded-lg bg-[#fef3c7] dark:bg-amber-900/50 flex items-center justify-center text-[#d97706] dark:text-amber-400 z-10">
+            <Hourglass className="w-5 h-5" />
           </div>
-          <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white border border-white/20 shadow-inner relative z-10">
-            <Coins className="w-6 h-6" />
+          
+          <p className="text-[11px] text-gray-500 dark:text-gray-400 uppercase tracking-widest font-bold mb-4 relative z-10">Pending Contributions</p>
+          <p className="text-[40px] font-bold text-[#0f172a] dark:text-white leading-none mb-3 relative z-10 tracking-tight">2</p>
+          
+          <p className="text-xs text-gray-500 dark:text-gray-400 relative z-10 font-medium">Awaiting creator approval</p>
+        </div>
+
+        {/* Total Approved Amount */}
+        <div className="bg-white dark:bg-[#1e293b] rounded-xl p-6 shadow-sm border border-gray-200/60 dark:border-gray-800 relative overflow-hidden group hover:shadow-md transition-shadow">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50 dark:bg-indigo-900/10 rounded-bl-full -mr-10 -mt-10 transition-transform group-hover:scale-110"></div>
+          <div className="absolute top-6 right-6 w-10 h-10 rounded-lg bg-[#e0e7ff] dark:bg-indigo-900/50 flex items-center justify-center text-[#4f46e5] dark:text-indigo-400 z-10">
+            <WalletCards className="w-5 h-5" />
           </div>
+          
+          <p className="text-[11px] text-gray-500 dark:text-gray-400 uppercase tracking-widest font-bold mb-4 relative z-10">Total Approved Amount</p>
+          <div className="flex items-baseline mb-3 relative z-10">
+            <p className="text-[40px] font-bold text-[#0f172a] dark:text-white leading-none tracking-tight">18,500</p>
+            <span className="text-lg font-bold text-gray-400 dark:text-gray-500 ml-2">CR</span>
+          </div>
+          
+          <p className="text-xs text-gray-500 dark:text-gray-400 relative z-10 font-medium">Lifetime deployed capital</p>
         </div>
       </motion.div>
 
-      {/* Quick Stats or Next Section (Placeholder for future) */}
-      <motion.div variants={itemVariants} className="lg:col-span-12 grid grid-cols-1 md:grid-cols-3 gap-6 mt-2">
-        {[1, 2, 3].map((i) => (
-           <div key={i} className="bg-white dark:bg-[#1e293b] rounded-[20px] p-6 shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100 dark:border-gray-800 flex items-center space-x-4 hover:border-primary/30 transition-colors">
-             <div className="w-12 h-12 rounded-xl bg-gray-50 dark:bg-gray-800 flex items-center justify-center text-gray-400">
-               <TrendingUp className="w-5 h-5" />
-             </div>
-             <div>
-               <div className="h-4 w-24 bg-gray-100 dark:bg-gray-800 rounded animate-pulse mb-2"></div>
-               <div className="h-3 w-16 bg-gray-50 dark:bg-gray-800/50 rounded animate-pulse"></div>
-             </div>
-           </div>
-        ))}
+      {/* Approved Contributions Table */}
+      <motion.div variants={itemVariants} className="bg-white dark:bg-[#1e293b] rounded-xl shadow-sm border border-gray-200/60 dark:border-gray-800 overflow-hidden">
+        <div className="px-6 py-5 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
+          <h3 className="text-[18px] font-bold text-[#0f172a] dark:text-white tracking-tight">Approved Contributions</h3>
+          <Link href="/dashboard/contributions" className="text-sm font-bold text-[#4f46e5] dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 flex items-center transition-colors">
+            View All <ArrowRight className="w-4 h-4 ml-1" />
+          </Link>
+        </div>
+        
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm text-left">
+            <thead className="text-[11px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-widest bg-gray-50/50 dark:bg-gray-800/50 border-b border-gray-100 dark:border-gray-800">
+              <tr>
+                <th className="px-6 py-4 font-bold">Campaign Title</th>
+                <th className="px-6 py-4 font-bold">Creator Name</th>
+                <th className="px-6 py-4 font-bold">Amount (Credits)</th>
+                <th className="px-6 py-4 font-bold text-right">Status</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+              {[
+                { title: "Eco-Friendly Urban Farm Pods", creator: "Sarah Jenkins", amount: "2,500 CR", image: "https://images.unsplash.com/photo-1530836369250-ef71a3f5e48d?auto=format&fit=crop&q=80&w=150" },
+                { title: "Aero V1 Electric Commuter", creator: "Marcus Chen", amount: "5,000 CR", image: "https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&q=80&w=150" },
+                { title: "Oasis VR Educational Platform", creator: "EduTech Dynamics", amount: "1,000 CR", image: "https://images.unsplash.com/photo-1622979135225-d2ba269cf1ac?auto=format&fit=crop&q=80&w=150" }
+              ].map((item, idx) => (
+                <tr key={idx} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors group">
+                  <td className="px-6 py-4">
+                    <div className="flex items-center space-x-4">
+                      <img src={item.image} alt={item.title} className="w-10 h-10 rounded-lg object-cover shadow-sm group-hover:shadow transition-shadow" />
+                      <span className="font-bold text-gray-800 dark:text-gray-200 text-[13px]">{item.title}</span>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="flex items-center space-x-3">
+                      <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(item.creator)}&background=random&color=fff`} alt={item.creator} className="w-6 h-6 rounded-full" />
+                      <span className="text-gray-600 dark:text-gray-300 font-medium text-[13px]">{item.creator}</span>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 font-bold text-[#0f172a] dark:text-white text-[13px]">
+                    {item.amount}
+                  </td>
+                  <td className="px-6 py-4 text-right">
+                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold bg-[#d1fae5] dark:bg-emerald-900/30 text-[#059669] dark:text-emerald-400 border border-[#a7f3d0] dark:border-emerald-800/50">
+                      <CheckCircle2 className="w-3 h-3 mr-1" />
+                      Success
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </motion.div>
     </motion.section>
   );
