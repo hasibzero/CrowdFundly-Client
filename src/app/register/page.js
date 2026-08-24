@@ -11,9 +11,39 @@ export default function RegisterPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState('Supporter');
-  const [photoURL, setPhotoURL] = useState('');
+  const [imageFile, setImageFile] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
   const { register } = useAuth();
   const router = useRouter();
+
+  const handleImageChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      setImageFile(e.target.files[0]);
+    }
+  };
+
+  const uploadToImgBB = async (file) => {
+    const formData = new FormData();
+    formData.append('image', file);
+    
+    // Key will be loaded from .env.local
+    const apiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
+    if (!apiKey || apiKey === 'your_imgbb_api_key_here') {
+      throw new Error("ImgBB API Key is missing or invalid in .env.local");
+    }
+
+    const res = await fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, {
+      method: 'POST',
+      body: formData,
+    });
+
+    const data = await res.json();
+    if (data.success) {
+      return data.data.url;
+    } else {
+      throw new Error(data.error.message || "Failed to upload image");
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -22,20 +52,37 @@ export default function RegisterPage() {
       return;
     }
 
-    const userData = {
-      name,
-      email,
-      password,
-      role,
-      photoURL,
-      credits: role === 'Supporter' ? 50 : 20, // Initial credits
-    };
+    setIsUploading(true);
+    const toastId = toast.loading("Creating your account...");
+    
+    try {
+      let finalPhotoURL = '';
+      if (imageFile) {
+        toast.loading("Uploading profile picture...", { id: toastId });
+        finalPhotoURL = await uploadToImgBB(imageFile);
+      }
 
-    const success = await register(userData);
-    if (success) {
-      toast.success("Successfully registered!");
-    } else {
-      toast.error("Registration failed. Please try again.");
+      const userData = {
+        name,
+        email,
+        password,
+        role,
+        photoURL: finalPhotoURL,
+        credits: role === 'Supporter' ? 50 : 20, // Initial credits
+      };
+
+      toast.loading("Registering...", { id: toastId });
+      const success = await register(userData);
+      
+      if (success) {
+        toast.success("Successfully registered!", { id: toastId });
+      } else {
+        toast.error("Registration failed. Email might already exist.", { id: toastId });
+      }
+    } catch (error) {
+      toast.error(error.message || "An error occurred during registration.", { id: toastId });
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -76,9 +123,10 @@ export default function RegisterPage() {
                   name="name"
                   type="text"
                   required
+                  disabled={isUploading}
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="block w-full rounded-md border-0 py-1.5 px-3 text-on-surface shadow-sm ring-1 ring-inset ring-outline-variant placeholder:text-outline focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6 bg-surface-container-lowest"
+                  className="block w-full rounded-md border-0 py-1.5 px-3 text-on-surface shadow-sm ring-1 ring-inset ring-outline-variant placeholder:text-outline focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6 bg-surface-container-lowest disabled:opacity-50"
                 />
               </div>
             </div>
@@ -94,9 +142,10 @@ export default function RegisterPage() {
                   type="email"
                   autoComplete="email"
                   required
+                  disabled={isUploading}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="block w-full rounded-md border-0 py-1.5 px-3 text-on-surface shadow-sm ring-1 ring-inset ring-outline-variant placeholder:text-outline focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6 bg-surface-container-lowest"
+                  className="block w-full rounded-md border-0 py-1.5 px-3 text-on-surface shadow-sm ring-1 ring-inset ring-outline-variant placeholder:text-outline focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6 bg-surface-container-lowest disabled:opacity-50"
                 />
               </div>
             </div>
@@ -112,26 +161,27 @@ export default function RegisterPage() {
                   type="password"
                   autoComplete="new-password"
                   required
+                  disabled={isUploading}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="block w-full rounded-md border-0 py-1.5 px-3 text-on-surface shadow-sm ring-1 ring-inset ring-outline-variant placeholder:text-outline focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6 bg-surface-container-lowest"
+                  className="block w-full rounded-md border-0 py-1.5 px-3 text-on-surface shadow-sm ring-1 ring-inset ring-outline-variant placeholder:text-outline focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6 bg-surface-container-lowest disabled:opacity-50"
                 />
               </div>
             </div>
 
             <div>
-              <label htmlFor="photoURL" className="block text-sm font-medium leading-6 text-on-surface">
-                Profile Picture URL (Optional for now)
+              <label htmlFor="photo" className="block text-sm font-medium leading-6 text-on-surface">
+                Profile Picture (Optional)
               </label>
               <div className="mt-2">
                 <input
-                  id="photoURL"
-                  name="photoURL"
-                  type="url"
-                  placeholder="https://example.com/photo.jpg"
-                  value={photoURL}
-                  onChange={(e) => setPhotoURL(e.target.value)}
-                  className="block w-full rounded-md border-0 py-1.5 px-3 text-on-surface shadow-sm ring-1 ring-inset ring-outline-variant placeholder:text-outline focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6 bg-surface-container-lowest"
+                  id="photo"
+                  name="photo"
+                  type="file"
+                  accept="image/*"
+                  disabled={isUploading}
+                  onChange={handleImageChange}
+                  className="block w-full rounded-md border-0 py-1.5 px-3 text-on-surface shadow-sm ring-1 ring-inset ring-outline-variant focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6 bg-surface-container-lowest file:mr-4 file:py-1 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-container disabled:opacity-50 cursor-pointer"
                 />
               </div>
             </div>
@@ -145,9 +195,10 @@ export default function RegisterPage() {
                   id="role"
                   name="role"
                   required
+                  disabled={isUploading}
                   value={role}
                   onChange={(e) => setRole(e.target.value)}
-                  className="block w-full rounded-md border-0 py-2 px-3 text-on-surface shadow-sm ring-1 ring-inset ring-outline-variant focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6 bg-surface-container-lowest"
+                  className="block w-full rounded-md border-0 py-2 px-3 text-on-surface shadow-sm ring-1 ring-inset ring-outline-variant focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6 bg-surface-container-lowest disabled:opacity-50"
                 >
                   <option value="Supporter">Supporter (Support projects)</option>
                   <option value="Creator">Creator (Launch projects)</option>
@@ -161,9 +212,10 @@ export default function RegisterPage() {
             <div>
               <button
                 type="submit"
-                className="flex w-full justify-center rounded-md bg-primary px-3 py-2 text-sm font-semibold text-on-primary shadow-sm hover:bg-primary-container focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-all"
+                disabled={isUploading}
+                className="flex w-full justify-center rounded-md bg-primary px-3 py-2 text-sm font-semibold text-on-primary shadow-sm hover:bg-primary-container focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Create Account
+                {isUploading ? "Creating Account..." : "Create Account"}
               </button>
             </div>
           </form>
