@@ -94,7 +94,7 @@ export default function NotificationBell() {
                   key={notif._id || index} 
                   className={`p-4 border-b border-gray-50 hover:bg-gray-50 transition-colors ${!notif.read ? 'bg-emerald-50/30' : ''}`}
                 >
-                  <p className="text-sm text-gray-700 mb-1 leading-tight">{notif.message}</p>
+                  <p className="text-sm text-gray-700 mb-1 leading-tight">{notif.message?.replace(/credits?/gi, 'USD')}</p>
                   <span className="text-xs text-gray-400">
                     {new Date(notif.time).toLocaleString(undefined, {
                       month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
