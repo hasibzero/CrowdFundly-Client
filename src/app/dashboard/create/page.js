@@ -204,7 +204,7 @@ export default function CreateCampaignPage() {
                   <input 
                     type="text" 
                     name="title"
-                    value={formData.title}
+                    value={formData.title || ''}
                     onChange={handleChange}
                     placeholder="e.g., The Next Generation Smart Watch" 
                     className="w-full px-4 py-2.5 rounded-md border border-gray-200 focus:outline-none focus:border-[#0f766e] focus:ring-1 focus:ring-[#0f766e] text-[14px] text-gray-900 placeholder-gray-400"
@@ -215,7 +215,7 @@ export default function CreateCampaignPage() {
                     <label className="block text-[13px] text-gray-700 mb-1.5">Category</label>
                     <select 
                       name="category"
-                      value={formData.category}
+                      value={formData.category || ''}
                       onChange={handleChange}
                       className="w-full px-4 py-2.5 rounded-md border border-gray-200 focus:outline-none focus:border-[#0f766e] focus:ring-1 focus:ring-[#0f766e] text-[14px] text-gray-500 bg-white appearance-none"
                     >
@@ -230,7 +230,7 @@ export default function CreateCampaignPage() {
                     <input 
                       type="text" 
                       name="subCategory"
-                      value={formData.subCategory}
+                      value={formData.subCategory || ''}
                       onChange={handleChange}
                       placeholder="e.g., Solar, AI, Hardware" 
                       className="w-full px-4 py-2.5 rounded-md border border-gray-200 focus:outline-none focus:border-[#0f766e] focus:ring-1 focus:ring-[#0f766e] text-[14px] text-gray-900 placeholder-gray-400"
@@ -243,7 +243,7 @@ export default function CreateCampaignPage() {
                   <input 
                     type="text" 
                     name="location"
-                    value={formData.location}
+                    value={formData.location || ''}
                     onChange={handleChange}
                     placeholder="e.g., Seattle, WA" 
                     className="w-full px-4 py-2.5 rounded-md border border-gray-200 focus:outline-none focus:border-[#0f766e] focus:ring-1 focus:ring-[#0f766e] text-[14px] text-gray-900 placeholder-gray-400"
@@ -268,7 +268,7 @@ export default function CreateCampaignPage() {
                   <input 
                     type="text" 
                     name="shortDescription"
-                    value={formData.shortDescription}
+                    value={formData.shortDescription || ''}
                     onChange={handleChange}
                     placeholder="Bring the future of sustainable agriculture into your home..." 
                     className="w-full px-4 py-2.5 rounded-md border border-gray-200 focus:outline-none focus:border-[#0f766e] focus:ring-1 focus:ring-[#0f766e] text-[14px] text-gray-900 placeholder-gray-400"
@@ -279,7 +279,7 @@ export default function CreateCampaignPage() {
                   <label className="block text-[13px] text-gray-700 mb-1.5">The Vision (Full Story)</label>
                   <textarea 
                     name="story"
-                    value={formData.story}
+                    value={formData.story || ''}
                     onChange={handleChange}
                     rows="4"
                     placeholder="We believe that everyone deserves access to fresh produce..."
@@ -293,7 +293,7 @@ export default function CreateCampaignPage() {
                     <input 
                       type="text" 
                       name="teamName"
-                      value={formData.teamName}
+                      value={formData.teamName || ''}
                       onChange={handleChange}
                       placeholder="e.g., Sarah Jenkins" 
                       className="w-full px-4 py-2.5 rounded-md border border-gray-200 focus:outline-none focus:border-[#0f766e] focus:ring-1 focus:ring-[#0f766e] text-[14px] text-gray-900 placeholder-gray-400"
@@ -304,7 +304,7 @@ export default function CreateCampaignPage() {
                     <input 
                       type="text" 
                       name="teamRole"
-                      value={formData.teamRole}
+                      value={formData.teamRole || ''}
                       onChange={handleChange}
                       placeholder="e.g., CEO & Lead Engineer" 
                       className="w-full px-4 py-2.5 rounded-md border border-gray-200 focus:outline-none focus:border-[#0f766e] focus:ring-1 focus:ring-[#0f766e] text-[14px] text-gray-900 placeholder-gray-400"
@@ -357,7 +357,7 @@ export default function CreateCampaignPage() {
                       <input 
                         type="text" 
                         name="rewardTitle"
-                        value={formData.rewardTitle}
+                        value={formData.rewardTitle || ''}
                         onChange={handleChange}
                         placeholder="e.g., Early Bird Access" 
                         className="w-full px-4 py-2.5 rounded-md border border-gray-200 focus:outline-none focus:border-[#0f766e] focus:ring-1 focus:ring-[#0f766e] text-[14px] text-gray-900 placeholder-gray-400"
@@ -368,7 +368,7 @@ export default function CreateCampaignPage() {
                       <input 
                         type="number" 
                         name="rewardAmount"
-                        value={formData.rewardAmount}
+                        value={formData.rewardAmount || ''}
                         onChange={handleChange}
                         placeholder="e.g., 50" 
                         className="w-full px-4 py-2.5 rounded-md border border-gray-200 focus:outline-none focus:border-[#0f766e] focus:ring-1 focus:ring-[#0f766e] text-[14px] text-gray-900 placeholder-gray-400"
@@ -379,7 +379,7 @@ export default function CreateCampaignPage() {
                     <label className="block text-[13px] text-gray-700 mb-1.5">Tier Description</label>
                     <textarea 
                       name="rewardDescription"
-                      value={formData.rewardDescription}
+                      value={formData.rewardDescription || ''}
                       onChange={handleChange}
                       rows="2"
                       placeholder="What backers get for this tier..."
