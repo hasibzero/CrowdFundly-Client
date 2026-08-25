@@ -2,6 +2,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import { Toaster } from "react-hot-toast";
+import { Providers } from "./providers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,8 +28,10 @@ export default function RootLayout({ children }) {
     >
       <body suppressHydrationWarning className="min-h-full flex flex-col w-full">
         <AuthProvider>
-          {children}
-          <Toaster position="bottom-right" />
+          <Providers>
+            {children}
+            <Toaster position="bottom-right" />
+          </Providers>
         </AuthProvider>
       </body>
     </html>

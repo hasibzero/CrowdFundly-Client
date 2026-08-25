@@ -6,7 +6,8 @@ import { Search, Filter, Download, Landmark, CreditCard as CreditCardIcon, Check
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
-const API = 'http://localhost:5000';
+import { API_URL } from '@/lib/api';
+const API = API_URL;
 
 export default function WithdrawalRequestsPage() {
   const { user } = useAuth();
@@ -128,28 +129,26 @@ export default function WithdrawalRequestsPage() {
               <table className="w-full text-left border-collapse min-w-[800px]">
                 <thead className="bg-[#f8f9fc]">
                   <tr>
-                    <th className="px-6 py-4 text-[13px] font-bold text-[#64748b]">Date</th>
-                    <th className="px-6 py-4 text-[13px] font-bold text-[#64748b]">Credits</th>
-                    <th className="px-6 py-4 text-[13px] font-bold text-[#64748b]">Amount (USD)</th>
-                    <th className="px-6 py-4 text-[13px] font-bold text-[#64748b]">Payment Method</th>
-                    <th className="px-6 py-4 text-[13px] font-bold text-[#64748b]">Status</th>
+                    <th className="px-6 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-widest">Date</th>
+                    <th className="px-6 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-widest">Amount (USD)</th>
+                    <th className="px-6 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-widest">Payment Method</th>
+                    <th className="px-6 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-widest text-right">Status</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   {filtered.map((req) => (
                     <tr key={req._id} className="hover:bg-gray-50/50 transition-colors">
-                      <td className="px-6 py-5 text-[14px] font-medium text-[#334155]">
+                      <td className="px-6 py-4 text-[13px] font-medium text-gray-600">
                         {req.requestDate ? new Date(req.requestDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}
                       </td>
-                      <td className="px-6 py-5 text-[14px] text-[#334155]">{(req.credits || 0).toLocaleString()} CR</td>
-                      <td className="px-6 py-5 text-[14px] font-medium text-[#334155]">${(req.amountUSD || 0).toFixed(2)}</td>
-                      <td className="px-6 py-5">
+                      <td className="px-6 py-4 text-[14px] font-bold text-[#0f172a]">${(req.amountUSD || 0).toFixed(2)}</td>
+                      <td className="px-6 py-4">
                         <div className="flex items-center text-[14px] text-[#334155]">
                           {getSystemIcon(req.paymentMethod)}
                           {req.paymentMethod || '—'}
                         </div>
                       </td>
-                      <td className="px-6 py-5">{getStatusBadge(req.status)}</td>
+                      <td className="px-6 py-4 text-right">{getStatusBadge(req.status)}</td>
                     </tr>
                   ))}
                 </tbody>

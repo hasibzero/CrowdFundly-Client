@@ -30,7 +30,8 @@ export default function DashboardPage() {
 
         if (user.role === 'Supporter') {
           const contRes = await axios.get(`${API}/api/contributions`, { headers });
-          setContributions(contRes.data.slice(0, 5));
+          const contribs = Array.isArray(contRes.data) ? contRes.data : contRes.data.contributions || [];
+          setContributions(contribs.slice(0, 5));
         }
         if (user.role === 'Creator') {
           const campRes = await axios.get(`${API}/api/creator/campaigns`, { headers });

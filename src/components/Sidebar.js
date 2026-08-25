@@ -22,6 +22,7 @@ export default function Sidebar({ mobileMenuOpen, setMobileMenuOpen }) {
 
   const creatorNavItems = [
     { name: 'Home', href: '/dashboard', icon: LayoutGrid },
+    { name: 'Review Pending', href: '/dashboard/review-contributions', icon: ClipboardList },
     { name: 'Add New Campaign', href: '/dashboard/create', icon: PlusCircle },
     { name: 'My Campaigns', href: '/dashboard/my-campaigns', icon: Layers },
     { name: 'Withdrawals', href: '/dashboard/withdrawals', icon: Wallet },
@@ -91,7 +92,7 @@ export default function Sidebar({ mobileMenuOpen, setMobileMenuOpen }) {
         {/* Navigation Links */}
         <div className={`flex-1 flex flex-col ${isAdmin ? 'py-4' : 'px-3'}`}>
           {navItems.map((item) => {
-            const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+            const isActive = (item.href === '/dashboard' || item.href === '/dashboard/admin') ? pathname === item.href : (pathname === item.href || pathname.startsWith(item.href + '/'));
             const Icon = item.icon;
             
             if (isAdmin) {
@@ -139,9 +140,9 @@ export default function Sidebar({ mobileMenuOpen, setMobileMenuOpen }) {
         <div className={`mt-auto pb-8 pt-4 ${isAdmin ? 'px-6' : 'px-3'}`}>
           {isAdmin ? (
             <div className="flex flex-col space-y-4">
-              <button className="w-full bg-[#12643E] hover:bg-[#0e4f31] text-white py-3 rounded-lg font-bold text-[13px] shadow-sm transition-colors">
-                Review Pending
-              </button>
+              <Link href="/dashboard/admin/campaigns" className="w-full bg-[#12643E] hover:bg-[#0e4f31] text-white py-3 rounded-lg font-bold text-[13px] shadow-sm transition-colors flex justify-center items-center">
+                Review Campaigns
+              </Link>
               <div className="pt-2 flex flex-col">
                 <Link 
                   href="/dashboard/settings"
@@ -177,14 +178,31 @@ export default function Sidebar({ mobileMenuOpen, setMobileMenuOpen }) {
               </button>
             </div>
           ) : (
-            <Link 
-              href="/dashboard/campaigns"
-              className="w-full bg-[#12643E] hover:bg-[#0e4f31] text-white py-3.5 rounded-lg flex justify-center items-center text-sm font-bold shadow-md transition-colors"
-            >
-              Discover Projects
-            </Link>
+            <div className="flex flex-col space-y-4">
+              <Link 
+                href="/dashboard/campaigns"
+                className="w-full bg-[#12643E] hover:bg-[#0e4f31] text-white py-3.5 rounded-lg flex justify-center items-center text-sm font-bold shadow-md transition-colors"
+              >
+                Discover Projects
+              </Link>
+              <div className="border-t border-gray-200 pt-4 flex flex-col">
+                <Link 
+                  href="/dashboard/settings"
+                  className="px-4 py-3 mb-1 rounded-xl flex items-center space-x-4 transition-colors text-gray-600 hover:bg-gray-200/60 hover:text-gray-900 font-medium"
+                >
+                  <Settings className="w-5 h-5 text-gray-500" strokeWidth={2} />
+                  <span className="text-[14px] tracking-wide">Settings</span>
+                </Link>
+                <button 
+                  onClick={logout}
+                  className="w-full px-4 py-3 rounded-xl flex items-center space-x-4 transition-colors text-gray-600 hover:bg-red-50 hover:text-red-600 font-medium text-left"
+                >
+                  <LogOut className="w-5 h-5 text-gray-500" strokeWidth={2} />
+                  <span className="text-[14px] tracking-wide">Logout</span>
+                </button>
+              </div>
+            </div>
           )}
-
         </div>
       </nav>
     </>

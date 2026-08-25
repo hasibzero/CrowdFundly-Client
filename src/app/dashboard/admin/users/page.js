@@ -6,7 +6,8 @@ import Link from 'next/link';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
-const API = 'http://localhost:5000';
+import { API_URL } from '@/lib/api';
+const API = API_URL;
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState([]);
@@ -72,16 +73,7 @@ export default function AdminUsersPage() {
   };
 
   return (
-    <div className="w-full flex flex-col -mt-8 -mx-6 md:-mx-8">
-      {/* Admin Topbar */}
-      <div className="w-full h-16 bg-white border-b border-gray-200 px-8 flex items-center sticky top-0 z-30">
-        <div className="flex space-x-8 h-full">
-          <Link href="/dashboard/admin" className="h-full flex items-center text-[13px] font-bold text-gray-500 hover:text-gray-900 transition-colors">Stats</Link>
-          <Link href="/dashboard/admin/campaigns" className="h-full flex items-center text-[13px] font-bold text-gray-500 hover:text-gray-900 transition-colors">Approvals</Link>
-          <Link href="/dashboard/admin/withdrawals" className="h-full flex items-center text-[13px] font-bold text-gray-500 hover:text-gray-900 transition-colors">Finance</Link>
-          <Link href="/dashboard/admin/users" className="h-full flex items-center border-b-2 border-[#12643E] text-[13px] font-bold text-[#12643E]">Users</Link>
-        </div>
-      </div>
+    <div className="w-full">
 
       <motion.div className="p-8 max-w-7xl mx-auto w-full" variants={containerVariants} initial="hidden" animate="visible">
         <motion.div variants={itemVariants} className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">

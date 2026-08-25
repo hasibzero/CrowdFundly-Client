@@ -6,6 +6,7 @@ import Link from 'next/link';
 import toast from 'react-hot-toast';
 import { Mail, Lock, Eye, EyeOff, Link as LinkIcon } from 'lucide-react';
 import Navbar from '@/components/Navbar';
+import { uploadImageToImgBB } from '@/lib/uploadImage';
 
 export default function RegisterPage() {
   const [name, setName] = useState('');
@@ -17,6 +18,24 @@ export default function RegisterPage() {
   const [isUploading, setIsUploading] = useState(false);
   const { register } = useAuth();
   const router = useRouter();
+
+  const handleImageChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    const toastId = toast.loading('Uploading profile picture...');
+    
+    try {
+      const url = await uploadImageToImgBB(file);
+      setPhotoURL(url);
+      toast.success('Image uploaded successfully!', { id: toastId });
+    } catch (error) {
+      toast.error(error.message || 'Failed to upload image', { id: toastId });
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   const getPasswordStrength = (pass) => {
     let score = 0;
@@ -140,7 +159,7 @@ export default function RegisterPage() {
 
               <div>
                 <label htmlFor="photoURL" className="block text-xs font-semibold text-slate-700 mb-1.5">
-                  Profile Picture URL (Optional)
+                  Profile Picture (Optional)
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -149,12 +168,11 @@ export default function RegisterPage() {
                   <input
                     id="photoURL"
                     name="photoURL"
-                    type="url"
+                    type="file"
+                    accept="image/*"
                     disabled={isUploading}
-                    value={photoURL}
-                    placeholder="https://example.com/avatar.jpg"
-                    onChange={(e) => setPhotoURL(e.target.value)}
-                    className="block w-full pl-10 pr-3 py-2.5 border border-slate-200 rounded-lg text-slate-900 focus:ring-2 focus:ring-[#12643E] focus:border-[#12643E] sm:text-sm transition-colors outline-none disabled:bg-slate-50"
+                    onChange={handleImageChange}
+                    className="block w-full pl-10 pr-3 py-2 border border-slate-200 rounded-lg text-slate-900 focus:ring-2 focus:ring-[#12643E] focus:border-[#12643E] sm:text-sm transition-colors outline-none disabled:bg-slate-50 file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 cursor-pointer"
                   />
                 </div>
               </div>

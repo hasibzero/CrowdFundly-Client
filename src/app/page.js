@@ -43,13 +43,163 @@ export default function Home() {
       </div>
     </section>
     <section className="border-b border-zinc-100 bg-white py-14"><div className="mx-auto grid max-w-5xl grid-cols-1 gap-8 px-6 text-center md:grid-cols-3"><Metric value={currency.format(stats.totalFunded / 10)} label="Total funded" /><Metric value={stats.activeCampaigns.toLocaleString()} label="Active campaigns" /><Metric value={stats.supporters.toLocaleString()} label="Supporters" /></div></section>
-    <section className="mx-auto max-w-6xl px-6 py-20"><div className="mb-10 text-center"><h2 className="font-serif text-3xl font-bold">How it works</h2><p className="mt-2 text-sm text-zinc-500">A simple path from discovering an idea to making it possible.</p></div><div className="grid grid-cols-1 gap-6 md:grid-cols-3"><Step icon={<Search />} title="Discover" text="Explore approved projects and see each goal, timeline, and funding progress." /><Step icon={<DollarSign />} title="Support" text="Purchase credits securely and contribute the amount that is right for you." /><Step icon={<Rocket />} title="Follow progress" text="Track the campaigns you support from your personal dashboard." /></div></section>
-    <section className="border-y border-zinc-200/60 bg-[#EEF2F6] py-16"><div className="mx-auto max-w-6xl px-6"><div className="mb-8 flex items-end justify-between gap-4"><div><h2 className="font-serif text-3xl font-bold">Live campaigns</h2><p className="mt-1 text-sm text-zinc-500">Projects currently accepting support.</p></div><Link href="/campaigns" className="flex items-center gap-1 text-sm font-semibold text-indigo-600 hover:text-indigo-800">View all <ArrowRight className="h-4 w-4" /></Link></div>{loading ? <div className="py-12 text-center text-sm text-zinc-500">Loading live campaigns…</div> : campaigns.length === 0 ? <div className="rounded-2xl border border-dashed border-zinc-300 bg-white p-12 text-center text-sm text-zinc-500">No approved campaigns are live yet. Check back soon.</div> : <div className="grid grid-cols-1 gap-6 md:grid-cols-3">{campaigns.map((campaign) => <CampaignCard key={campaign._id} campaign={campaign} />)}</div>}</div></section>
+    <section className="mx-auto max-w-6xl px-6 py-20">
+      <div className="mb-10 text-center">
+        <h2 className="text-3xl font-bold text-[#0f172a]">How Crowdfundly Works</h2>
+        <p className="mt-2 text-sm text-gray-500">Three simple steps to bring ideas to life.</p>
+      </div>
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+        <Step 
+          icon={<Search className="w-6 h-6 text-indigo-500" />} 
+          title="1. Discover" 
+          text="Explore thousands of verified campaigns across diverse categories that match your interests." 
+          iconBg="bg-indigo-50"
+        />
+        <Step 
+          icon={<DollarSign className="w-6 h-6 text-emerald-500" />} 
+          title="2. Contribute" 
+          text="Back projects securely. Choose reward tiers or simply donate to fuel their passion." 
+          iconBg="bg-emerald-50"
+        />
+        <Step 
+          icon={<Rocket className="w-6 h-6 text-orange-400" />} 
+          title="3. Impact" 
+          text="Watch ideas become reality. Get updates directly from creators and see your impact grow." 
+          iconBg="bg-orange-50"
+        />
+      </div>
+    </section>
+    
+    <section className="border-y border-zinc-200/60 bg-[#EEF2F6] py-16">
+      <div className="mx-auto max-w-6xl px-6">
+        <div className="mb-8 flex items-end justify-between gap-4">
+          <div>
+            <h2 className="text-3xl font-bold text-[#0f172a]">Top Funded Campaigns</h2>
+            <p className="mt-1 text-sm text-zinc-500">Projects currently leading the charge on Crowdfundly.</p>
+          </div>
+          <Link href="/campaigns" className="flex items-center gap-1 text-sm font-semibold text-indigo-600 hover:text-indigo-800">
+            View All <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
+        {loading ? (
+          <div className="py-12 text-center text-sm text-zinc-500">Loading campaigns…</div>
+        ) : campaigns.length === 0 ? (
+          <div className="rounded-2xl border border-dashed border-zinc-300 bg-white p-12 text-center text-sm text-zinc-500">No campaigns found.</div>
+        ) : (
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+            {campaigns.map((campaign) => <CampaignCard key={campaign._id} campaign={campaign} />)}
+          </div>
+        )}
+      </div>
+    </section>
+
+    {/* Community Voices Section */}
+    <section className="bg-white py-24">
+      <div className="mx-auto max-w-6xl px-6">
+        <h2 className="text-3xl font-bold text-center text-[#0f172a] mb-12">Community Voices</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <TestimonialCard 
+            quote="Crowdfundly provided the exact launchpad we needed. The community here is incredibly supportive and genuinely cares about sustainable tech. We hit our goal in just 48 hours!"
+            name="Sarah Jenkins"
+            role="Creator, EcoPod"
+            image="https://ui-avatars.com/api/?name=Sarah+Jenkins&background=random"
+          />
+          <TestimonialCard 
+            quote="As a backer, I love the transparency. The platform makes it easy to track the progress of the hardware projects I've invested in. It feels safe, professional, and exciting."
+            name="Michael Chen"
+            role="Super Backer"
+            image="https://ui-avatars.com/api/?name=Michael+Chen&background=random"
+          />
+          <TestimonialCard 
+            quote="The tools provided for creators are top-notch. Managing updates and communicating with my supporters was seamless. Highly recommend this platform to any indie artist."
+            name="Elena Rodriguez"
+            role="Artist & Creator"
+            image="https://ui-avatars.com/api/?name=Elena+Rodriguez&background=random"
+          />
+        </div>
+      </div>
+    </section>
+
+    {/* Footer */}
+    <footer className="bg-[#f8fafc] border-t border-gray-200 pt-16 pb-8">
+      <div className="mx-auto max-w-6xl px-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+          <div className="col-span-1">
+            <h3 className="text-xl font-bold text-[#12643E] mb-4">Crowdfundly</h3>
+            <p className="text-sm text-gray-600 leading-relaxed">
+              Empowering creators and supporters to build a better future together through transparent, community-driven funding.
+            </p>
+          </div>
+          <div>
+            <h4 className="font-bold text-gray-900 mb-4 text-sm uppercase tracking-wider">Explore</h4>
+            <ul className="space-y-3 text-sm text-gray-600">
+              <li><Link href="/campaigns" className="hover:text-[#12643E]">All Campaigns</Link></li>
+              <li><Link href="/campaigns" className="hover:text-[#12643E]">Technology</Link></li>
+              <li><Link href="/campaigns" className="hover:text-[#12643E]">Art & Design</Link></li>
+              <li><Link href="/campaigns" className="hover:text-[#12643E]">Community</Link></li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="font-bold text-gray-900 mb-4 text-sm uppercase tracking-wider">Resources</h4>
+            <ul className="space-y-3 text-sm text-gray-600">
+              <li><Link href="#" className="hover:text-[#12643E]">How it Works</Link></li>
+              <li><Link href="#" className="hover:text-[#12643E]">Pricing</Link></li>
+              <li><Link href="#" className="hover:text-[#12643E]">Help Center</Link></li>
+              <li><Link href="#" className="hover:text-[#12643E]">Terms of Service</Link></li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="font-bold text-gray-900 mb-4 text-sm uppercase tracking-wider">Connect</h4>
+            <ul className="space-y-3 text-sm text-gray-600">
+              <li><Link href="#" className="hover:text-[#12643E]">LinkedIn</Link></li>
+              <li><Link href="#" className="hover:text-[#12643E]">Facebook</Link></li>
+              <li><Link href="#" className="hover:text-[#12643E]">GitHub</Link></li>
+              <li><Link href="#" className="hover:text-[#12643E]">Twitter</Link></li>
+            </ul>
+          </div>
+        </div>
+        <div className="pt-8 border-t border-gray-200 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-500">
+          <p>© 2024 Crowdfundly. Built for creators.</p>
+          <div className="flex gap-6">
+            <Link href="#" className="hover:text-gray-900">Privacy Policy</Link>
+            <Link href="#" className="hover:text-gray-900">Cookie Policy</Link>
+          </div>
+        </div>
+      </div>
+    </footer>
   </div>;
 }
 
 function Metric({ value, label }) { return <div><p className="font-serif text-4xl font-bold text-[#12643E]">{value}</p><p className="mt-1 text-xs font-medium uppercase tracking-wide text-zinc-500">{label}</p></div>; }
-function Step({ icon, title, text }) { return <div className="flex flex-col items-center rounded-2xl border border-zinc-100 bg-white p-8 text-center shadow-sm"><div className="mb-5 rounded-full bg-emerald-50 p-3 text-emerald-700">{icon}</div><h3 className="font-serif text-lg font-bold">{title}</h3><p className="mt-2 text-sm leading-relaxed text-zinc-500">{text}</p></div>; }
+function Step({ icon, title, text, iconBg }) { 
+  return (
+    <div className="flex flex-col items-center rounded-2xl border border-gray-100 bg-white p-8 text-center shadow-[0_2px_15px_rgb(0,0,0,0.03)] hover:shadow-[0_4px_25px_rgb(0,0,0,0.06)] transition-shadow">
+      <div className={`mb-5 rounded-full p-4 ${iconBg}`}>{icon}</div>
+      <h3 className="text-xl font-bold text-gray-900">{title}</h3>
+      <p className="mt-3 text-[14px] leading-relaxed text-gray-500">{text}</p>
+    </div>
+  ); 
+}
+
+function TestimonialCard({ quote, name, role, image }) {
+  return (
+    <div className="bg-white rounded-2xl border border-gray-100 p-8 shadow-[0_2px_15px_rgb(0,0,0,0.03)] flex flex-col justify-between">
+      <div>
+        <div className="text-orange-400 font-serif text-5xl leading-none h-6 mb-4">"</div>
+        <p className="text-[15px] italic text-gray-600 leading-relaxed mb-8">
+          {quote}
+        </p>
+      </div>
+      <div className="flex items-center gap-3">
+        <img src={image} alt={name} className="w-10 h-10 rounded-full object-cover" />
+        <div>
+          <h4 className="text-[13px] font-bold text-gray-900">{name}</h4>
+          <p className="text-[12px] text-gray-500">{role}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
 function CampaignCard({ campaign }) {
   const percent = campaign.targetAmount ? Math.min(Math.round(((campaign.raised || 0) / campaign.targetAmount) * 100), 100) : 0;
   const end = new Date(new Date(campaign.createdAt).getTime() + campaign.duration * 86400000);

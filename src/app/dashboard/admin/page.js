@@ -9,8 +9,10 @@ import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend
 } from 'recharts';
+import ManualNotificationForm from '@/components/ManualNotificationForm';
 
-const API = 'http://localhost:5000';
+import { API_URL } from '@/lib/api';
+const API = API_URL;
 
 export default function AdminDashboardPage() {
   const { user } = useAuth();
@@ -75,29 +77,8 @@ export default function AdminDashboardPage() {
   const itemVariants = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } };
 
   return (
-    <div className="w-full flex flex-col -mt-8 -mx-6 md:-mx-8">
-      {/* Admin Topbar */}
-      <div className="w-full h-16 bg-white border-b border-gray-200 px-8 flex items-center justify-between sticky top-0 z-30">
-        <div className="flex space-x-8 h-full">
-          <Link href="/dashboard/admin" className="h-full flex items-center border-b-2 border-[#12643E] text-[13px] font-bold text-[#12643E]">Stats</Link>
-          <Link href="/dashboard/admin/campaigns" className="h-full flex items-center text-[13px] font-bold text-gray-500 hover:text-gray-900 transition-colors">Approvals</Link>
-          <Link href="/dashboard/admin/withdrawals" className="h-full flex items-center text-[13px] font-bold text-gray-500 hover:text-gray-900 transition-colors">Finance</Link>
-          <Link href="/dashboard/admin/users" className="h-full flex items-center text-[13px] font-bold text-gray-500 hover:text-gray-900 transition-colors">Users</Link>
-          <Link href="/dashboard/admin/reports" className="h-full flex items-center text-[13px] font-bold text-gray-500 hover:text-gray-900 transition-colors">Reports</Link>
-        </div>
-        <div className="flex items-center space-x-5">
-          <div className="relative hidden md:block">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-            <input type="text" placeholder="Search..." className="pl-9 pr-4 py-1.5 bg-gray-50 border border-gray-200 rounded-full text-[13px] focus:outline-none focus:ring-1 focus:ring-gray-300 w-64" />
-          </div>
-          <button className="text-gray-400 hover:text-gray-600 transition-colors"><Bell className="w-5 h-5" /></button>
-          <div className="w-8 h-8 rounded-full overflow-hidden border border-gray-200">
-            <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'Admin')}&background=4f46e5&color=fff`} alt="Admin" className="w-full h-full object-cover" />
-          </div>
-        </div>
-      </div>
-
-      <motion.div className="p-8 max-w-7xl mx-auto w-full" variants={containerVariants} initial="hidden" animate="visible">
+    <div className="w-full">
+      <motion.div className="max-w-7xl mx-auto w-full" variants={containerVariants} initial="hidden" animate="visible">
         <motion.div variants={itemVariants} className="mb-8">
           <h1 className="text-[28px] md:text-[32px] font-bold text-[#0f172a] mb-1 tracking-tight">Platform Overview</h1>
           <p className="text-[14px] text-gray-500">Current metrics and system health for Crowdfundly platform.</p>
@@ -223,6 +204,11 @@ export default function AdminDashboardPage() {
               <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-[#12643E] transition-colors" />
             </Link>
           ))}
+        </motion.div>
+
+        {/* Manual Notification Form */}
+        <motion.div variants={itemVariants}>
+          <ManualNotificationForm />
         </motion.div>
       </motion.div>
     </div>

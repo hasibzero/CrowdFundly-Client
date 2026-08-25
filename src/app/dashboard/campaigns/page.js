@@ -1,7 +1,10 @@
 "use client";
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Search, Bell, ChevronDown, CheckCircle2, ArrowRight, Hourglass } from 'lucide-react';
 import Link from 'next/link';
+import axios from 'axios';
+import { API_URL } from '@/lib/api';
 
 export default function ExploreCampaignsPage() {
   const containerVariants = {
@@ -14,52 +17,42 @@ export default function ExploreCampaignsPage() {
     visible: { opacity: 1, y: 0 }
   };
 
-  const categories = ["All Projects", "Technology", "Art & Design", "Community", "Health & Wellness", "Games"];
+  const categories = ["All Projects", "Technology", "Art & Design", "Community", "Environment", "Health & Wellness", "Games"];
+  const sortOptions = ["Trending", "Funding Goal (High-Low)", "Most Funded"];
 
-  const campaigns = [
-    {
-      id: 1,
-      tag: "Technology",
-      verified: true,
-      creator: "Elena Rostova",
-      image: "https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&q=80&w=600",
-      title: "EcoSmart Hub: Intelligent Energy...",
-      description: "A beautiful, AI-powered hub that optimizes your home energy...",
-      amount: "$42,500",
-      raisedGoal: "raised of $50k",
-      fundedPercent: "85%",
-      daysLeft: "12 Days Left",
-      progressWidth: "85%"
-    },
-    {
-      id: 2,
-      tag: "Community",
-      verified: false,
-      creator: "UrbanGreen Initiative",
-      image: "https://images.unsplash.com/photo-1530836369250-ef71a3f5e48d?auto=format&fit=crop&q=80&w=600",
-      title: "Rooftop Oasis: Transforming City...",
-      description: "Help us build a network of rooftop community gardens to...",
-      amount: "$18,200",
-      raisedGoal: "raised of $15k",
-      fundedPercent: "121%",
-      daysLeft: "5 Days Left",
-      progressWidth: "100%"
-    },
-    {
-      id: 3,
-      tag: "Art & Design",
-      verified: true,
-      creator: "Studio Klay",
-      image: "https://images.unsplash.com/photo-1610701596007-11502861dcfa?auto=format&fit=crop&q=80&w=600",
-      title: "The GeoMug Collection: ...",
-      description: "A limited run of handcrafted, ergonomically designed ceram...",
-      amount: "$3,450",
-      raisedGoal: "raised of $10k",
-      fundedPercent: "34%",
-      daysLeft: "28 Days Left",
-      progressWidth: "34%"
-    }
-  ];
+  const [campaigns, setCampaigns] = useState([]);
+  const [loading, setLoading] = useState(true);
+  
+  const [search, setSearch] = useState('');
+  const [category, setCategory] = useState('All Projects');
+  const [sort, setSort] = useState('Trending');
+  const [showSortDropdown, setShowSortDropdown] = useState(false);
+
+  useEffect(() => {
+    const fetchCampaigns = async () => {
+      setLoading(true);
+      try {
+        const queryParams = new URLSearchParams();
+        if (search) queryParams.append('search', search);
+        if (category && category !== 'All Projects') queryParams.append('category', category);
+        if (sort) queryParams.append('sort', sort);
+
+        const response = await axios.get(`${API_URL}/api/campaigns?${queryParams.toString()}`);
+        setCampaigns(response.data);
+      } catch (error) {
+        console.error("Failed to load campaigns:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    // Add a slight debounce for search
+    const timer = setTimeout(() => {
+      fetchCampaigns();
+    }, 300);
+    
+    return () => clearTimeout(timer);
+  }, [search, category, sort]);
 
   return (
     <motion.section 
@@ -75,6 +68,8 @@ export default function ExploreCampaignsPage() {
           <input 
             type="text" 
             placeholder="Search campaigns..." 
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
             className="w-full pl-12 pr-4 py-3 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0f766e] focus:border-transparent text-sm placeholder-gray-400 text-gray-900 shadow-sm"
           />
         </div>
@@ -82,13 +77,6 @@ export default function ExploreCampaignsPage() {
         <div className="flex items-center space-x-6">
           <div className="bg-[#a7f3d0] text-[#047857] px-4 py-2 rounded-full font-bold text-sm shadow-sm flex items-center">
             1,250 Credits
-          </div>
-          <button className="relative text-gray-600 hover:text-gray-900 transition-colors">
-            <Bell className="w-6 h-6" />
-            <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-[#f8f9fc]"></span>
-          </button>
-          <div className="w-10 h-10 rounded-full border-2 border-gray-300 flex items-center justify-center text-gray-600 overflow-hidden bg-white cursor-pointer">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
           </div>
         </div>
       </div>
@@ -104,10 +92,29 @@ export default function ExploreCampaignsPage() {
           </p>
         </div>
         
-        <button className="flex items-center justify-between bg-white border border-gray-200 rounded-lg px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm min-w-[180px] hover:bg-gray-50 transition-colors">
-          <span>Sort by: Trending</span>
-          <ChevronDown className="w-4 h-4 text-gray-500 ml-2" />
-        </button>
+        <div className="relative">
+          <button 
+            onClick={() => setShowSortDropdown(!showSortDropdown)}
+            className="flex items-center justify-between bg-white border border-gray-200 rounded-lg px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm min-w-[180px] hover:bg-gray-50 transition-colors"
+          >
+            <span>Sort by: {sort}</span>
+            <ChevronDown className={`w-4 h-4 text-gray-500 ml-2 transition-transform ${showSortDropdown ? 'rotate-180' : ''}`} />
+          </button>
+          
+          {showSortDropdown && (
+            <div className="absolute right-0 mt-2 w-[180px] bg-white border border-gray-200 rounded-lg shadow-lg z-10 overflow-hidden">
+              {sortOptions.map((opt) => (
+                <button
+                  key={opt}
+                  onClick={() => { setSort(opt); setShowSortDropdown(false); }}
+                  className={`w-full text-left px-4 py-2.5 text-sm transition-colors hover:bg-gray-50 ${sort === opt ? 'font-bold text-[#0f766e]' : 'text-gray-700'}`}
+                >
+                  {opt}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       </motion.div>
 
       {/* Categories Filter */}
@@ -115,8 +122,9 @@ export default function ExploreCampaignsPage() {
         {categories.map((cat, idx) => (
           <button 
             key={idx}
+            onClick={() => setCategory(cat)}
             className={`px-5 py-2 rounded-full text-sm font-bold transition-colors ${
-              idx === 0 
+              category === cat 
                 ? 'bg-[#3b2de6] text-white shadow-md' 
                 : 'bg-[#e0e7ff] text-[#3b2de6] hover:bg-[#c7d2fe]'
             }`}
@@ -131,22 +139,27 @@ export default function ExploreCampaignsPage() {
         variants={itemVariants}
         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
       >
-        {campaigns.map((camp) => (
-          <div key={camp.id} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden group hover:shadow-lg transition-all duration-300 flex flex-col h-full">
+        {campaigns.map((camp) => {
+          const raised = camp.raised || 0;
+          const target = camp.targetAmount || 1;
+          const percent = Math.min(Math.round((raised / target) * 100), 100);
+          
+          return (
+          <div key={camp._id} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden group hover:shadow-lg transition-all duration-300 flex flex-col h-full">
             
             {/* Image Container */}
             <div className="relative h-[220px] w-full overflow-hidden">
-              <img src={camp.image} alt={camp.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+              <img src={camp.coverImage || "https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&q=80&w=600"} alt={camp.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
               
               {/* Days Left Badge */}
               <div className="absolute top-4 right-4 bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-lg shadow-sm flex items-center text-[#d97706] text-xs font-bold">
                 <Hourglass className="w-3.5 h-3.5 mr-1.5" />
-                {camp.daysLeft}
+                {camp.deadline ? Math.max(0, Math.ceil((new Date(camp.deadline) - new Date()) / (1000 * 60 * 60 * 24))) + " Days Left" : "Ongoing"}
               </div>
 
               {/* Tag Badge */}
               <div className="absolute bottom-4 left-4 bg-indigo-50/95 backdrop-blur-sm px-3 py-1 rounded-full shadow-sm">
-                <span className="text-[#3b2de6] text-xs font-bold">{camp.tag}</span>
+                <span className="text-[#3b2de6] text-xs font-bold">{camp.category}</span>
               </div>
             </div>
 
@@ -155,14 +168,8 @@ export default function ExploreCampaignsPage() {
               
               {/* Creator Info */}
               <div className="flex items-center text-xs text-gray-500 mb-3">
-                {camp.verified ? (
-                  <CheckCircle2 className="w-3.5 h-3.5 text-blue-600 mr-1.5" />
-                ) : (
-                  <div className="w-3.5 h-3.5 mr-1.5 flex items-center justify-center text-gray-400">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3 h-3"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                  </div>
-                )}
-                <span className="font-medium">by {camp.creator}</span>
+                <CheckCircle2 className="w-3.5 h-3.5 text-blue-600 mr-1.5" />
+                <span className="font-medium">by {camp.creatorName || camp.creatorEmail}</span>
               </div>
 
               {/* Title & Description */}
@@ -176,19 +183,19 @@ export default function ExploreCampaignsPage() {
               {/* Funding Stats */}
               <div className="mt-auto">
                 <div className="flex items-baseline mb-2">
-                  <span className="text-[22px] font-bold text-[#059669] tracking-tight">{camp.amount}</span>
-                  <span className="text-xs text-gray-400 font-medium ml-2">{camp.raisedGoal}</span>
-                  <span className="text-[13px] font-bold text-gray-900 ml-auto">{camp.fundedPercent}</span>
+                  <span className="text-[22px] font-bold text-[#059669] tracking-tight">${raised.toLocaleString()}</span>
+                  <span className="text-xs text-gray-400 font-medium ml-2">raised of ${target.toLocaleString()}</span>
+                  <span className="text-[13px] font-bold text-gray-900 ml-auto">{percent}%</span>
                 </div>
                 
                 {/* Progress Bar */}
                 <div className="w-full h-2 bg-[#d1fae5] rounded-full overflow-hidden mb-6">
-                  <div className="h-full bg-[#059669] rounded-full" style={{ width: camp.progressWidth }}></div>
+                  <div className="h-full bg-[#059669] rounded-full" style={{ width: `${percent}%` }}></div>
                 </div>
 
                 {/* Action Button */}
                 <Link 
-                  href={`/campaigns/${camp.id}`}
+                  href={`/campaigns/${camp._id}`}
                   className="w-full py-3 px-4 border border-[#3b2de6] text-[#3b2de6] hover:bg-indigo-50 rounded-lg flex items-center justify-center text-sm font-bold transition-colors group-hover:bg-[#3b2de6] group-hover:text-white"
                 >
                   View Details
@@ -198,7 +205,7 @@ export default function ExploreCampaignsPage() {
             </div>
 
           </div>
-        ))}
+        )})}
       </motion.div>
     </motion.section>
   );

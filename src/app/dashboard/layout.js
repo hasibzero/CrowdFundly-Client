@@ -4,6 +4,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Menu, X } from 'lucide-react';
+import NotificationBell from '@/components/NotificationBell';
 
 export default function DashboardLayout({ children }) {
   const { user, loading } = useAuth();
@@ -53,7 +54,10 @@ export default function DashboardLayout({ children }) {
 
       <Sidebar mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} />
       
-      <main className="flex-1 md:ml-64 flex flex-col min-h-screen transition-all duration-300 w-full overflow-x-hidden">
+      <main className="flex-1 md:ml-64 flex flex-col min-h-screen transition-all duration-300 w-full overflow-x-hidden relative">
+        <div className="absolute top-4 right-4 md:top-8 md:right-8 z-30">
+          <NotificationBell />
+        </div>
         <div className="p-4 sm:p-6 md:p-8 lg:p-12 max-w-[1400px] mx-auto w-full flex-1">
           {children}
         </div>

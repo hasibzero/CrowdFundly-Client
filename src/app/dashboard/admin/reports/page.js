@@ -6,7 +6,9 @@ import Link from 'next/link';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
-const API = 'http://localhost:5000';
+import { API_URL } from '@/lib/api';
+
+const API = API_URL;
 
 const REASON_STYLES = {
   'Misleading Claims':    'bg-[#fee2e2] text-[#dc2626]',
@@ -96,17 +98,7 @@ export default function AdminReportsPage() {
   const itemVariants      = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } };
 
   return (
-    <div className="w-full flex flex-col -mt-8 -mx-6 md:-mx-8">
-      {/* Admin Topbar */}
-      <div className="w-full h-16 bg-white border-b border-gray-200 px-8 flex items-center sticky top-0 z-30">
-        <div className="flex space-x-8 h-full">
-          <Link href="/dashboard/admin" className="h-full flex items-center text-[13px] font-bold text-gray-500 hover:text-gray-900 transition-colors">Stats</Link>
-          <Link href="/dashboard/admin/campaigns" className="h-full flex items-center text-[13px] font-bold text-gray-500 hover:text-gray-900 transition-colors">Approvals</Link>
-          <Link href="/dashboard/admin/withdrawals" className="h-full flex items-center text-[13px] font-bold text-gray-500 hover:text-gray-900 transition-colors">Finance</Link>
-          <Link href="/dashboard/admin/users" className="h-full flex items-center text-[13px] font-bold text-gray-500 hover:text-gray-900 transition-colors">Users</Link>
-          <Link href="/dashboard/admin/reports" className="h-full flex items-center border-b-2 border-[#12643E] text-[13px] font-bold text-[#12643E]">Reports</Link>
-        </div>
-      </div>
+    <div className="w-full">
 
       <motion.div className="p-8 max-w-7xl mx-auto w-full" variants={containerVariants} initial="hidden" animate="visible">
 
@@ -117,10 +109,10 @@ export default function AdminReportsPage() {
             <p className="text-[15px] text-gray-500">Monitor platform health, user acquisition, and flagged activities.</p>
           </div>
           <div className="flex items-center space-x-3">
-            <button className="flex items-center space-x-2 bg-white border border-gray-200 px-4 py-2 rounded-md text-[13px] font-medium text-[#0f172a] hover:bg-gray-50 transition-colors shadow-sm">
+            <button onClick={() => toast.success('Exporting CSV...')} className="flex items-center space-x-2 bg-white border border-gray-200 px-4 py-2 rounded-md text-[13px] font-medium text-[#0f172a] hover:bg-gray-50 transition-colors shadow-sm">
               <Download className="w-4 h-4 text-gray-500" /><span>Export CSV</span>
             </button>
-            <button className="flex items-center space-x-2 bg-white border border-gray-200 px-4 py-2 rounded-md text-[13px] font-medium text-[#0f172a] hover:bg-gray-50 transition-colors shadow-sm">
+            <button onClick={() => toast.success('Filter coming soon!')} className="flex items-center space-x-2 bg-white border border-gray-200 px-4 py-2 rounded-md text-[13px] font-medium text-[#0f172a] hover:bg-gray-50 transition-colors shadow-sm">
               <Calendar className="w-4 h-4 text-gray-500" /><span>Last 30 Days</span>
             </button>
           </div>

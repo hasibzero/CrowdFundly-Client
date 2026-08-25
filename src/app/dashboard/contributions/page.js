@@ -5,11 +5,15 @@ import { motion } from 'framer-motion';
 import { Banknote, Rocket, Loader2, CheckCircle2 } from 'lucide-react';
 import axios from 'axios';
 
-const API = 'http://localhost:5000';
+import { API_URL } from '@/lib/api';
+const API = API_URL;
 
 export default function ContributionsPage() {
   const { user } = useAuth();
   const [contributions, setContributions] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({ totalContributed: 0, projectsSupported: 0 });
 
@@ -19,12 +23,15 @@ export default function ContributionsPage() {
     const headers = { Authorization: `Bearer ${token}` };
 
     const fetch = async () => {
+      setLoading(true);
       try {
         const [contRes, statsRes] = await Promise.all([
-          axios.get(`${API}/api/contributions`, { headers }),
+          axios.get(`${API}/api/contributions?page=${currentPage}&limit=10`, { headers }),
           axios.get(`${API}/api/dashboard/stats`, { headers }),
         ]);
-        setContributions(contRes.data);
+        setContributions(contRes.data.contributions || []);
+        setTotalPages(contRes.data.totalPages || 1);
+        setTotalItems(contRes.data.totalItems || 0);
         setStats(statsRes.data);
       } catch (err) {
         console.error('Failed to load contributions:', err);
@@ -33,7 +40,7 @@ export default function ContributionsPage() {
       }
     };
     fetch();
-  }, [user]);
+  }, [user, currentPage]);
 
   const containerVariants = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.1 } } };
   const itemVariants = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } };
@@ -119,8 +126,29 @@ export default function ContributionsPage() {
                 </tbody>
               </table>
             </div>
-            <div className="p-5 border-t border-gray-100 text-[13px] text-gray-500">
-              Showing {contributions.length} contribution{contributions.length !== 1 ? 's' : ''}
+            <div className="p-5 border-t border-gray-100 flex items-center justify-between">
+              <span className="text-[13px] text-gray-500">
+                Showing {contributions.length} of {totalItems} contribution{totalItems !== 1 ? 's' : ''}
+              </span>
+              <div className="flex space-x-2">
+                <button
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                  className="px-3 py-1 text-[13px] font-medium border border-gray-200 rounded-md disabled:opacity-50 hover:bg-gray-50 transition-colors"
+                >
+                  Previous
+                </button>
+                <span className="px-3 py-1 text-[13px] font-medium text-gray-700 bg-gray-50 rounded-md border border-gray-100">
+                  {currentPage} / {totalPages || 1}
+                </span>
+                <button
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage >= totalPages || totalPages === 0}
+                  className="px-3 py-1 text-[13px] font-medium border border-gray-200 rounded-md disabled:opacity-50 hover:bg-gray-50 transition-colors"
+                >
+                  Next
+                </button>
+              </div>
             </div>
           </>
         )}

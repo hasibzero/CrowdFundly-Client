@@ -40,6 +40,7 @@ export const AuthProvider = ({ children }) => {
       
       localStorage.setItem('crowdfundly_token', token);
       localStorage.setItem('crowdfundly_user', JSON.stringify(userData));
+      document.cookie = `crowdfundly_token=${token}; path=/; max-age=604800; SameSite=Lax`;
       setUser(userData);
       
       router.push('/dashboard');
@@ -64,6 +65,7 @@ export const AuthProvider = ({ children }) => {
       
       localStorage.setItem('crowdfundly_token', token);
       localStorage.setItem('crowdfundly_user', JSON.stringify(newUserData));
+      document.cookie = `crowdfundly_token=${token}; path=/; max-age=604800; SameSite=Lax`;
       setUser(newUserData);
       
       router.push('/dashboard');
@@ -77,8 +79,9 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     localStorage.removeItem('crowdfundly_token');
     localStorage.removeItem('crowdfundly_user');
-    setUser(null);
-    router.push('/');
+    document.cookie = "crowdfundly_token=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax";
+    document.cookie = "better-auth.session_token=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax";
+    window.location.href = '/login';
   };
 
   return (

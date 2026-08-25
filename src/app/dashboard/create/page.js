@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { API_URL } from '@/lib/api';
+import { uploadImageToImgBB } from '@/lib/uploadImage';
 
 export default function CreateCampaignPage() {
   const { user } = useAuth();
@@ -13,6 +14,7 @@ export default function CreateCampaignPage() {
   
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   
   // Form State
   const [formData, setFormData] = useState({
@@ -31,6 +33,24 @@ export default function CreateCampaignPage() {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleImageChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    const toastId = toast.loading('Uploading cover image...');
+    
+    try {
+      const url = await uploadImageToImgBB(file);
+      setFormData(prev => ({ ...prev, coverImage: url }));
+      toast.success('Image uploaded successfully!', { id: toastId });
+    } catch (error) {
+      toast.error(error.message || 'Failed to upload image', { id: toastId });
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const handleSubmitCampaign = async () => {
@@ -348,15 +368,19 @@ export default function CreateCampaignPage() {
                 className="space-y-6"
               >
                 <div>
-                  <label className="block text-[13px] text-gray-700 mb-1.5">Campaign Cover Image URL</label>
+                  <label className="block text-[13px] text-gray-700 mb-1.5">Campaign Cover Image</label>
                   <input 
-                    type="text" 
-                    name="coverImage"
-                    value={formData.coverImage}
-                    onChange={handleChange}
-                    placeholder="https://example.com/image.jpg" 
-                    className="w-full px-4 py-2.5 rounded-md border border-gray-200 focus:outline-none focus:border-[#0f766e] focus:ring-1 focus:ring-[#0f766e] text-[14px] text-gray-900 placeholder-gray-400"
+                    type="file" 
+                    accept="image/*"
+                    disabled={isUploading}
+                    onChange={handleImageChange}
+                    className="w-full px-4 py-2 rounded-md border border-gray-200 focus:outline-none focus:border-[#0f766e] focus:ring-1 focus:ring-[#0f766e] text-[14px] text-gray-900 file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-[13px] file:font-semibold file:bg-[#eef2f6] file:text-gray-700 hover:file:bg-gray-200 cursor-pointer"
                   />
+                  {formData.coverImage && (
+                    <div className="mt-4 border rounded-md p-2 relative h-32 w-full overflow-hidden">
+                      <img src={formData.coverImage} alt="Cover Preview" className="absolute inset-0 w-full h-full object-cover" />
+                    </div>
+                  )}
                 </div>
               </motion.div>
             )}
@@ -382,7 +406,7 @@ export default function CreateCampaignPage() {
             </button>
             <button 
               onClick={step < 4 ? nextStep : handleSubmitCampaign}
-              disabled={isSubmitting}
+              disabled={isSubmitting || isUploading}
               className="bg-[#12643E] hover:bg-[#0e4f31] text-white px-6 py-2 rounded-md font-bold text-[13px] transition-colors shadow-sm disabled:opacity-50"
             >
               {isSubmitting ? 'Submitting...' : (step < 4 ? 'Continue' : 'Submit Campaign')}

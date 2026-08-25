@@ -6,7 +6,9 @@ import Link from 'next/link';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
-const API = 'http://localhost:5000';
+import { API_URL } from '@/lib/api';
+
+const API = API_URL;
 
 export default function AdminWithdrawalsPage() {
   const [withdrawals, setWithdrawals] = useState([]);
@@ -57,16 +59,8 @@ export default function AdminWithdrawalsPage() {
   const itemVariants = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } };
 
   return (
-    <div className="w-full flex flex-col -mt-8 -mx-6 md:-mx-8">
-      {/* Admin Topbar */}
-      <div className="w-full h-16 bg-white border-b border-gray-200 px-8 flex items-center justify-between sticky top-0 z-30">
-        <div className="flex space-x-8 h-full">
-          <Link href="/dashboard/admin" className="h-full flex items-center text-[13px] font-bold text-gray-500 hover:text-gray-900 transition-colors">Stats</Link>
-          <Link href="/dashboard/admin/campaigns" className="h-full flex items-center text-[13px] font-bold text-gray-500 hover:text-gray-900 transition-colors">Approvals</Link>
-          <Link href="/dashboard/admin/withdrawals" className="h-full flex items-center border-b-2 border-[#12643E] text-[13px] font-bold text-[#12643E]">Finance</Link>
-          <Link href="/dashboard/admin/users" className="h-full flex items-center text-[13px] font-bold text-gray-500 hover:text-gray-900 transition-colors">Users</Link>
-        </div>
-      </div>
+    <div className="w-full">
+
 
       <motion.div className="p-8 max-w-7xl mx-auto w-full" variants={containerVariants} initial="hidden" animate="visible">
         <motion.div variants={itemVariants} className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
@@ -75,10 +69,10 @@ export default function AdminWithdrawalsPage() {
             <p className="text-[14px] text-gray-500">Review and process pending creator payouts.</p>
           </div>
           <div className="flex space-x-3">
-            <button className="flex items-center space-x-2 bg-white border border-[#c7d2fe] px-4 py-2 rounded-md text-[13px] font-bold text-[#4f46e5] hover:bg-indigo-50 transition-colors shadow-sm">
+            <button onClick={() => toast.success('Filter coming soon!')} className="flex items-center space-x-2 bg-white border border-[#c7d2fe] px-4 py-2 rounded-md text-[13px] font-bold text-[#4f46e5] hover:bg-indigo-50 transition-colors shadow-sm">
               <Filter className="w-4 h-4" /><span>Filter</span>
             </button>
-            <button className="flex items-center space-x-2 bg-white border border-[#c7d2fe] px-4 py-2 rounded-md text-[13px] font-bold text-[#4f46e5] hover:bg-indigo-50 transition-colors shadow-sm">
+            <button onClick={() => toast.success('Exporting CSV...')} className="flex items-center space-x-2 bg-white border border-[#c7d2fe] px-4 py-2 rounded-md text-[13px] font-bold text-[#4f46e5] hover:bg-indigo-50 transition-colors shadow-sm">
               <Download className="w-4 h-4" /><span>Export</span>
             </button>
           </div>
@@ -121,7 +115,6 @@ export default function AdminWithdrawalsPage() {
                   <thead className="bg-[#fcfdfd]">
                     <tr className="border-b border-gray-100">
                       <th className="px-6 py-5 text-[11px] font-bold text-gray-500 uppercase tracking-widest">Creator</th>
-                      <th className="px-6 py-5 text-[11px] font-bold text-gray-500 uppercase tracking-widest">Credits</th>
                       <th className="px-6 py-5 text-[11px] font-bold text-gray-500 uppercase tracking-widest">Amount ($)</th>
                       <th className="px-6 py-5 text-[11px] font-bold text-gray-500 uppercase tracking-widest">Payment Method</th>
                       <th className="px-6 py-5 text-[11px] font-bold text-gray-500 uppercase tracking-widest">Request Date</th>
@@ -140,7 +133,6 @@ export default function AdminWithdrawalsPage() {
                             <p className="text-[13px] font-bold text-[#0f172a] leading-tight max-w-[140px] truncate">{req.creatorEmail}</p>
                           </div>
                         </td>
-                        <td className="px-6 py-5 text-[13px] font-medium text-gray-600">{(req.credits || 0).toLocaleString()}</td>
                         <td className="px-6 py-5 text-[14px] font-bold text-[#0f172a]">${(req.amountUSD || 0).toFixed(2)}</td>
                         <td className="px-6 py-5">
                           <span className="px-3 py-1.5 rounded-full text-[10px] font-bold bg-[#eef2ff] text-[#4f46e5]">

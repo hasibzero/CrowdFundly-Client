@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Filter, Check, X, Eye, ArrowRight } from 'lucide-react';
+import { Filter, Check, X, Eye, ArrowRight, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import axios from 'axios';
 import toast from 'react-hot-toast';
@@ -39,6 +39,19 @@ export default function AdminCampaignsPage() {
     }
   };
 
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this campaign? All backers will be refunded.")) return;
+    try {
+      const token = localStorage.getItem('crowdfundly_token');
+      await axios.delete(`${API_URL}/api/campaigns/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+      toast.success('Campaign deleted successfully!');
+      fetchCampaigns();
+    } catch (error) {
+      console.error('Failed to delete campaign', error);
+      toast.error(error.response?.data?.message || 'Failed to delete campaign');
+    }
+  };
+
   const pendingCampaigns = campaigns.filter(c => c.status === 'Pending');
   const approvedCampaigns = campaigns.filter(c => c.status === 'Approved');
   const containerVariants = {
@@ -54,21 +67,8 @@ export default function AdminCampaignsPage() {
 
 
   return (
-    <div className="w-full flex flex-col -mt-8 -mx-6 md:-mx-8">
-      {/* Admin Topbar */}
-      <div className="w-full h-16 bg-white border-b border-gray-200 px-8 flex items-center justify-between sticky top-0 z-30">
-        <div className="flex space-x-8 h-full">
-          <Link href="/dashboard/admin" className="h-full flex items-center text-[13px] font-bold text-gray-500 hover:text-gray-900 transition-colors">
-            Stats
-          </Link>
-          <Link href="/dashboard/admin/campaigns" className="h-full flex items-center border-b-2 border-[#12643E] text-[13px] font-bold text-[#12643E]">
-            Approvals
-          </Link>
-          <Link href="#" className="h-full flex items-center text-[13px] font-bold text-gray-500 hover:text-gray-900 transition-colors">
-            Finance
-          </Link>
-        </div>
-      </div>
+    <div className="w-full">
+
 
       {/* Main Admin Content */}
       <motion.div 
@@ -82,7 +82,7 @@ export default function AdminCampaignsPage() {
         <motion.div variants={itemVariants} className="mb-12">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-[22px] font-bold text-[#0f172a] tracking-tight">Pending Campaigns</h2>
-            <button className="flex items-center text-[13px] font-bold text-[#3b2de6] hover:text-indigo-800 transition-colors">
+            <button onClick={() => toast.success('Filter coming soon!')} className="flex items-center text-[13px] font-bold text-[#3b2de6] hover:text-indigo-800 transition-colors">
               Filter <Filter className="w-3.5 h-3.5 ml-1" />
             </button>
           </div>
@@ -143,14 +143,17 @@ export default function AdminCampaignsPage() {
                       {/* Actions */}
                       <td className="px-6 py-5 text-right">
                         <div className="flex items-center justify-end space-x-2">
-                          <button className="p-1.5 text-gray-400 hover:text-[#0f766e] hover:bg-[#e6f7ef] rounded-md transition-colors" title="View Details">
+                          <Link href={`/campaigns/${campaign._id}`} className="p-1.5 text-gray-400 hover:text-[#0f766e] hover:bg-[#e6f7ef] rounded-md transition-colors inline-block" title="View Details">
                             <Eye className="w-4 h-4" />
-                          </button>
+                          </Link>
                           <button onClick={() => handleUpdateStatus(campaign._id, 'Approved')} className="p-1.5 text-gray-400 hover:text-[#059669] hover:bg-[#d1fae5] rounded-md transition-colors" title="Approve">
                             <Check className="w-4 h-4" />
                           </button>
                           <button onClick={() => handleUpdateStatus(campaign._id, 'Rejected')} className="p-1.5 text-gray-400 hover:text-[#dc2626] hover:bg-[#fee2e2] rounded-md transition-colors" title="Reject">
                             <X className="w-4 h-4" />
+                          </button>
+                          <button onClick={() => handleDelete(campaign._id)} className="p-1.5 text-gray-400 hover:text-red-700 hover:bg-red-50 rounded-md transition-colors" title="Delete">
+                            <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
                       </td>
@@ -167,7 +170,7 @@ export default function AdminCampaignsPage() {
         <motion.div variants={itemVariants} className="mb-8">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-[22px] font-bold text-[#0f172a] tracking-tight">Approved Campaigns</h2>
-            <button className="flex items-center text-[13px] font-bold text-[#3b2de6] hover:text-indigo-800 transition-colors">
+            <button onClick={() => toast.success('Filter coming soon!')} className="flex items-center text-[13px] font-bold text-[#3b2de6] hover:text-indigo-800 transition-colors">
               Filter <Filter className="w-3.5 h-3.5 ml-1" />
             </button>
           </div>
@@ -228,9 +231,12 @@ export default function AdminCampaignsPage() {
                       {/* Actions */}
                       <td className="px-6 py-5 text-right">
                         <div className="flex items-center justify-end space-x-2">
-                          <Link href={`/dashboard/admin/campaigns/${campaign._id}`} className="text-[13px] font-bold text-[#3b2de6] hover:text-indigo-800 transition-colors flex items-center">
-                            Manage <ArrowRight className="w-3.5 h-3.5 ml-1" />
+                          <Link href={`/campaigns/${campaign._id}`} className="text-[13px] font-bold text-[#3b2de6] hover:text-indigo-800 transition-colors flex items-center">
+                            View <ArrowRight className="w-3.5 h-3.5 ml-1" />
                           </Link>
+                          <button onClick={() => handleDelete(campaign._id)} className="p-1.5 ml-2 text-gray-400 hover:text-red-700 hover:bg-red-50 rounded-md transition-colors" title="Delete">
+                            <Trash2 className="w-4 h-4" />
+                          </button>
                         </div>
                       </td>
                     </tr>

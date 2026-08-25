@@ -24,16 +24,28 @@ export default function PurchaseCreditPage() {
     const confirmPurchase = async () => {
       const params = new URLSearchParams(window.location.search);
       const sessionId = params.get('session_id');
+      const isDummy = params.get('dummy') === 'true';
+      const creditsFromDummy = params.get('credits');
+      
       if (params.get('checkout') === 'success' && sessionId) {
         try {
-          const response = await axios.post(`${API_URL}/api/credits/confirm-checkout`, { sessionId }, { headers: authHeaders() });
+          const response = await axios.post(`${API_URL}/api/credits/confirm-checkout`, { 
+            sessionId, 
+            isDummy, 
+            credits: creditsFromDummy 
+          }, { headers: authHeaders() });
+          
           setBalance(response.data.credits || 0);
           toast.success(response.data.granted ? `${response.data.granted.toLocaleString()} credits added.` : 'Your payment was already processed.');
+          
+          // Clean up URL
+          window.history.replaceState({}, document.title, window.location.pathname);
         } catch (error) {
           toast.error(error.response?.data?.message || 'We could not verify that payment.');
         }
       } else if (params.get('checkout') === 'cancelled') {
         toast('Checkout was cancelled. No credits were added.');
+        window.history.replaceState({}, document.title, window.location.pathname);
       }
     };
     loadBalance();
