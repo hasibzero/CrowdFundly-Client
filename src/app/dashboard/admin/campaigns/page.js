@@ -172,7 +172,6 @@ export default function AdminCampaignsPage() {
                 </tbody>
               </table>
             </div>
-            </div>
             {/* Pagination Controls for Pending */}
             {pendingCampaigns.length > itemsPerPage && (
               <div className="px-6 py-4 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4 bg-[#fcfcfd]">
@@ -199,7 +198,6 @@ export default function AdminCampaignsPage() {
             )}
           </div>
         </motion.div>
-
 
         {/* APPROVED CAMPAIGNS SECTION */}
         <motion.div variants={itemVariants} className="mb-8">
@@ -276,7 +274,6 @@ export default function AdminCampaignsPage() {
                   ))}
                 </tbody>
               </table>
-            </div>
             </div>
             {/* Pagination Controls for Approved */}
             {approvedCampaigns.length > itemsPerPage && (
