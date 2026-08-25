@@ -18,7 +18,8 @@ export default function ExploreCampaignsPage() {
   const [selectedStatus, setSelectedStatus] = useState('All');
   const [selectedPledge, setSelectedPledge] = useState('All');
   const [selectedSort, setSelectedSort] = useState('Trending');
-  const [visibleCount, setVisibleCount] = useState(6);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
 
   useEffect(() => {
     const fetchApprovedCampaigns = async () => {
@@ -102,6 +103,7 @@ export default function ExploreCampaignsPage() {
     }
 
     setFilteredCampaigns([...result]);
+    setCurrentPage(1); // Reset to first page on filter change
   }, [searchQuery, selectedCategory, selectedStatus, selectedSort, selectedPledge, campaigns]);
 
   const calculateProgress = (raised, target) => {
@@ -225,7 +227,7 @@ export default function ExploreCampaignsPage() {
                 No campaigns match your filters. Try adjusting them!
               </div>
             ) : (
-              filteredCampaigns.slice(0, visibleCount).map((campaign, index) => {
+              filteredCampaigns.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((campaign, index) => {
                 const truePercent = calculateTruePercent(campaign.raised, campaign.targetAmount);
                 const progressWidth = calculateProgress(campaign.raised, campaign.targetAmount);
                 const daysLeft = getDaysLeft(campaign.createdAt, campaign.duration);
@@ -325,15 +327,28 @@ export default function ExploreCampaignsPage() {
               </div>
             )}
 
-            {/* Load More */}
-            {!loading && visibleCount < filteredCampaigns.length && (
-              <div className="mt-12 flex justify-center">
-                <button 
-                  onClick={() => setVisibleCount(prev => prev + 6)}
-                  className="bg-[#0f5132] hover:bg-[#0a3622] text-white px-6 py-2.5 rounded-md text-[13px] font-bold transition-colors shadow-sm"
-                >
-                  Load More Projects
-                </button>
+            {/* Pagination Controls */}
+            {!loading && filteredCampaigns.length > itemsPerPage && (
+              <div className="mt-12 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <span className="text-[13px] text-gray-500 font-medium">
+                  Showing {Math.min(filteredCampaigns.length, (currentPage - 1) * itemsPerPage + 1)} to {Math.min(filteredCampaigns.length, currentPage * itemsPerPage)} of {filteredCampaigns.length} projects
+                </span>
+                <div className="flex space-x-2">
+                  <button 
+                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                    disabled={currentPage === 1}
+                    className="px-4 py-2 border border-gray-200 text-gray-600 rounded-md text-[13px] font-bold hover:bg-gray-50 disabled:opacity-50 transition-colors"
+                  >
+                    Previous
+                  </button>
+                  <button 
+                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, Math.ceil(filteredCampaigns.length / itemsPerPage)))}
+                    disabled={currentPage === Math.ceil(filteredCampaigns.length / itemsPerPage)}
+                    className="px-4 py-2 border border-gray-200 text-gray-600 rounded-md text-[13px] font-bold hover:bg-gray-50 disabled:opacity-50 transition-colors"
+                  >
+                    Next
+                  </button>
+                </div>
               </div>
             )}
           </div>

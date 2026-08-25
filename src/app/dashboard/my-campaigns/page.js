@@ -14,6 +14,8 @@ export default function MyCampaignsPage() {
   const { user } = useAuth();
   const [campaigns, setCampaigns] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
 
   const fetchCampaigns = async () => {
     if (!user) return;
@@ -103,7 +105,7 @@ export default function MyCampaignsPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {campaigns.map((c) => {
+                  {campaigns.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((c) => {
                     const progress = Math.min(Math.round(((c.raised || 0) / (c.targetAmount || 1)) * 100), 100);
                     return (
                       <tr key={c._id} className="hover:bg-gray-50/50 transition-colors">
@@ -151,7 +153,7 @@ export default function MyCampaignsPage() {
 
             {/* Mobile Card View */}
             <div className="md:hidden divide-y divide-gray-100">
-              {campaigns.map((c) => {
+              {campaigns.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((c) => {
                 const progress = Math.min(Math.round(((c.raised || 0) / (c.targetAmount || 1)) * 100), 100);
                 return (
                   <div key={c._id} className="p-4">
@@ -192,6 +194,31 @@ export default function MyCampaignsPage() {
                 );
               })}
             </div>
+
+            {/* Pagination Controls */}
+            {campaigns.length > itemsPerPage && (
+              <div className="mt-8 pt-6 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <span className="text-[13px] text-gray-500 font-medium">
+                  Showing {Math.min(campaigns.length, (currentPage - 1) * itemsPerPage + 1)} to {Math.min(campaigns.length, currentPage * itemsPerPage)} of {campaigns.length} campaigns
+                </span>
+                <div className="flex space-x-2">
+                  <button 
+                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                    disabled={currentPage === 1}
+                    className="px-4 py-2 border border-gray-200 text-gray-600 rounded-md text-[13px] font-bold hover:bg-gray-50 disabled:opacity-50 transition-colors"
+                  >
+                    Previous
+                  </button>
+                  <button 
+                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, Math.ceil(campaigns.length / itemsPerPage)))}
+                    disabled={currentPage === Math.ceil(campaigns.length / itemsPerPage)}
+                    className="px-4 py-2 border border-gray-200 text-gray-600 rounded-md text-[13px] font-bold hover:bg-gray-50 disabled:opacity-50 transition-colors"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            )}
           </>
         )}
       </motion.div>

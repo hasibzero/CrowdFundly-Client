@@ -202,3 +202,9 @@ body {
   .text-label-md { font-size: 14px; line-height: 1.4; font-weight: 600; letter-spacing: 0.05em; }
   .font-label-md { font-family: var(--font-label-md); }
 }
+
+@layer base {
+  button, [type='button'], [type='reset'], [type='submit'], [role='button'] {
+    cursor: pointer;
+  }
+}

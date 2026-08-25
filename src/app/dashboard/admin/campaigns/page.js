@@ -10,6 +10,11 @@ import { API_URL, authHeaders } from '@/lib/api';
 export default function AdminCampaignsPage() {
   const [campaigns, setCampaigns] = useState([]);
   const [loading, setLoading] = useState(true);
+  
+  // Pagination States
+  const [currentPendingPage, setCurrentPendingPage] = useState(1);
+  const [currentApprovedPage, setCurrentApprovedPage] = useState(1);
+  const itemsPerPage = 5;
 
   const fetchCampaigns = async () => {
     try {
@@ -105,7 +110,7 @@ export default function AdminCampaignsPage() {
                       </td>
                     </tr>
                   ) : (
-                    pendingCampaigns.map((campaign) => (
+                    pendingCampaigns.slice((currentPendingPage - 1) * itemsPerPage, currentPendingPage * itemsPerPage).map((campaign) => (
                       <tr key={campaign._id?.toString()} className="hover:bg-gray-50/50 transition-colors">
                       {/* Campaign Title */}
                       <td className="px-6 py-5">
@@ -167,6 +172,31 @@ export default function AdminCampaignsPage() {
                 </tbody>
               </table>
             </div>
+            </div>
+            {/* Pagination Controls for Pending */}
+            {pendingCampaigns.length > itemsPerPage && (
+              <div className="px-6 py-4 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4 bg-[#fcfcfd]">
+                <span className="text-[13px] text-gray-500 font-medium">
+                  Showing {Math.min(pendingCampaigns.length, (currentPendingPage - 1) * itemsPerPage + 1)} to {Math.min(pendingCampaigns.length, currentPendingPage * itemsPerPage)} of {pendingCampaigns.length}
+                </span>
+                <div className="flex space-x-2">
+                  <button 
+                    onClick={() => setCurrentPendingPage(prev => Math.max(prev - 1, 1))}
+                    disabled={currentPendingPage === 1}
+                    className="px-3 py-1.5 border border-gray-200 text-gray-600 rounded-md text-[12px] font-bold hover:bg-gray-50 disabled:opacity-50 transition-colors"
+                  >
+                    Previous
+                  </button>
+                  <button 
+                    onClick={() => setCurrentPendingPage(prev => Math.min(prev + 1, Math.ceil(pendingCampaigns.length / itemsPerPage)))}
+                    disabled={currentPendingPage === Math.ceil(pendingCampaigns.length / itemsPerPage)}
+                    className="px-3 py-1.5 border border-gray-200 text-gray-600 rounded-md text-[12px] font-bold hover:bg-gray-50 disabled:opacity-50 transition-colors"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </motion.div>
 
@@ -191,7 +221,7 @@ export default function AdminCampaignsPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {approvedCampaigns.map((campaign) => (
+                  {approvedCampaigns.slice((currentApprovedPage - 1) * itemsPerPage, currentApprovedPage * itemsPerPage).map((campaign) => (
                     <tr key={campaign._id?.toString()} className="hover:bg-gray-50/50 transition-colors">
                       {/* Campaign Title */}
                       <td className="px-6 py-5">
@@ -247,6 +277,31 @@ export default function AdminCampaignsPage() {
                 </tbody>
               </table>
             </div>
+            </div>
+            {/* Pagination Controls for Approved */}
+            {approvedCampaigns.length > itemsPerPage && (
+              <div className="px-6 py-4 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4 bg-[#fcfcfd]">
+                <span className="text-[13px] text-gray-500 font-medium">
+                  Showing {Math.min(approvedCampaigns.length, (currentApprovedPage - 1) * itemsPerPage + 1)} to {Math.min(approvedCampaigns.length, currentApprovedPage * itemsPerPage)} of {approvedCampaigns.length}
+                </span>
+                <div className="flex space-x-2">
+                  <button 
+                    onClick={() => setCurrentApprovedPage(prev => Math.max(prev - 1, 1))}
+                    disabled={currentApprovedPage === 1}
+                    className="px-3 py-1.5 border border-gray-200 text-gray-600 rounded-md text-[12px] font-bold hover:bg-gray-50 disabled:opacity-50 transition-colors"
+                  >
+                    Previous
+                  </button>
+                  <button 
+                    onClick={() => setCurrentApprovedPage(prev => Math.min(prev + 1, Math.ceil(approvedCampaigns.length / itemsPerPage)))}
+                    disabled={currentApprovedPage === Math.ceil(approvedCampaigns.length / itemsPerPage)}
+                    className="px-3 py-1.5 border border-gray-200 text-gray-600 rounded-md text-[12px] font-bold hover:bg-gray-50 disabled:opacity-50 transition-colors"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </motion.div>
 
