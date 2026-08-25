@@ -5,8 +5,8 @@ import { motion } from 'framer-motion';
 import { Save, User, Mail, Camera, Loader2, ShieldCheck, BadgeCheck } from 'lucide-react';
 import toast from 'react-hot-toast';
 import axios from 'axios';
-import { authClient } from '@/lib/auth-client';
 import { uploadImageToImgBB } from '@/lib/uploadImage';
+import { API_URL, authHeaders } from '@/lib/api';
 
 export default function SettingsPage() {
   const { user, login } = useAuth(); // using login to update user state if needed
@@ -62,17 +62,17 @@ export default function SettingsPage() {
 
     setLoading(true);
     try {
-      // Use Better Auth client to update user profile directly
-      const { data, error } = await authClient.updateUser({
-        name: formData.name,
-        image: formData.photoURL
-      });
+      // Use the actual custom backend to update the profile
+      const response = await axios.patch(
+        `${API_URL}/api/users/profile`, 
+        {
+          name: formData.name,
+          photoURL: formData.photoURL
+        },
+        { headers: authHeaders() }
+      );
       
-      if (error) {
-        toast.error(error.message || 'Failed to update profile');
-        setLoading(false);
-        return;
-      }
+      const { user: updatedUser } = response.data;
 
       toast.success('Profile updated successfully!');
       
