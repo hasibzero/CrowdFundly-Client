@@ -74,10 +74,14 @@ export default function Navbar() {
             ) : (
               <div className="flex items-center gap-2 text-gray-700 ml-2">
                 <span className="text-[14px] font-bold mr-2 text-gray-800 hidden lg:block">{user.name}</span>
-                <Link href="/dashboard" className="p-1 hover:text-[#12643E] transition-colors" title="Dashboard">
-                  <UserCircle className="w-5 h-5 stroke-[1.8]" />
+                <Link href="/dashboard" className="transition-opacity hover:opacity-80" title="Dashboard">
+                  <img 
+                    src={user?.photoURL || user?.avatar || "https://ui-avatars.com/api/?name=" + encodeURIComponent(user?.name || "User") + "&background=12643E&color=fff"} 
+                    alt={user?.name || "Profile"}
+                    className="w-8 h-8 rounded-full object-cover border border-gray-200 shadow-sm"
+                  />
                 </Link>
-                <button type="button" onClick={logout} className="p-1 hover:text-red-500 transition-colors" title="Logout">
+                <button type="button" onClick={logout} className="p-2 ml-1 hover:text-red-500 transition-colors" title="Logout">
                   <LogOut className="w-5 h-5 stroke-[1.8]" />
                 </button>
               </div>
@@ -152,9 +156,13 @@ export default function Navbar() {
           
           {/* Mobile Auth Links (if logged in) */}
           {!loading && user && (
-            <div className="flex items-center justify-between mt-4 bg-gray-50 p-3 rounded-lg">
-              <div className="flex items-center gap-2">
-                <UserCircle className="w-5 h-5 text-gray-500" />
+            <div className="flex items-center justify-between mt-4 bg-gray-50 p-3 rounded-lg border border-gray-100">
+              <div className="flex items-center gap-3">
+                <img 
+                  src={user?.photoURL || user?.avatar || "https://ui-avatars.com/api/?name=" + encodeURIComponent(user?.name || "User") + "&background=12643E&color=fff"} 
+                  alt={user?.name || "Profile"}
+                  className="w-9 h-9 rounded-full object-cover border border-gray-200 shadow-sm"
+                />
                 <span className="text-[14px] font-bold text-gray-800">{user.name}</span>
               </div>
               <button 

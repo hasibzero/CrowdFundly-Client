@@ -1,7 +1,7 @@
 "use client";
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
-import { Home, Compass, Heart, CreditCard, History, PlusCircle, Layers, Wallet, Settings, LogOut, LayoutGrid, Users, BarChart, ClipboardList } from 'lucide-react';
+import { Home, Compass, Heart, CreditCard, History, PlusCircle, Layers, Wallet, Settings, LogOut, LayoutGrid, Users, BarChart, ClipboardList, Globe } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
 export default function Sidebar({ mobileMenuOpen, setMobileMenuOpen }) {
@@ -16,7 +16,7 @@ export default function Sidebar({ mobileMenuOpen, setMobileMenuOpen }) {
     { name: 'Home', href: '/dashboard', icon: Home },
     { name: 'Explore Campaigns', href: '/dashboard/campaigns', icon: Compass },
     { name: 'My Contributions', href: '/dashboard/contributions', icon: Heart },
-    { name: 'Purchase Credit', href: '/dashboard/credits', icon: CreditCard },
+    { name: 'Add USD', href: '/dashboard/credits', icon: CreditCard },
     { name: 'Payment History', href: '/dashboard/history', icon: History },
   ];
 
@@ -54,40 +54,24 @@ export default function Sidebar({ mobileMenuOpen, setMobileMenuOpen }) {
       }`}>
         
         {/* Profile Header */}
-        {isAdmin ? (
-          <div className="pt-8 pb-6 mb-2 px-6 border-b border-gray-100">
-            <h2 className="text-[22px] font-extrabold text-[#12643E] tracking-tight leading-none mb-1">
-              CrowdFund Admin
-            </h2>
-            <p className="text-[12px] text-gray-500 font-medium">Platform Controller</p>
+        <div className="flex flex-col items-center pt-8 pb-6 mb-2 border-b border-gray-200/50">
+          <div className="w-20 h-20 rounded-full p-1 bg-white mb-3 shadow-sm border border-gray-100">
+            <img 
+              src={user?.photoURL || user?.avatar || "https://ui-avatars.com/api/?name=" + encodeURIComponent(user?.name || "User") + "&background=12643E&color=fff"} 
+              alt={user?.name || "Profile"}
+              className="w-full h-full rounded-full object-cover"
+            />
           </div>
-        ) : (
-          <div className="flex flex-col items-center pt-10 pb-6 mb-2">
-            {isSupporter && (
-              <div className="w-20 h-20 rounded-full p-1 bg-[#f4fbf8] mb-4 flex items-center justify-center">
-                <img 
-                  src={user?.avatar || "https://ui-avatars.com/api/?name=" + (user?.name || "U") + "&background=0f766e&color=fff"} 
-                  alt="Profile"
-                  className="w-full h-full rounded-full object-cover border-2 border-white shadow-sm"
-                />
-              </div>
-            )}
-            {isCreator ? (
-              <div className="w-full px-8 text-left mb-2">
-                <h2 className="text-xl font-bold text-gray-900 leading-tight">
-                  Creator Panel
-                </h2>
-              </div>
-            ) : (
-              <>
-                <h2 className="text-xl font-bold text-[#0f766e] capitalize text-center leading-tight">
-                  {user?.role || 'Supporter'}<br/>Dashboard
-                </h2>
-                <p className="text-xs text-gray-500 mt-2 font-medium">Community Backer</p>
-              </>
-            )}
+          <h2 className="text-[17px] font-bold text-gray-900 text-center leading-tight mb-1">
+            {user?.name || 'Loading...'}
+          </h2>
+          <p className="text-[13px] text-gray-500 font-medium mb-3">
+            {user?.email || ''}
+          </p>
+          <div className="text-[10px] uppercase tracking-widest font-bold text-[#12643E] bg-[#12643E]/10 px-3 py-1.5 rounded-full">
+            {user?.role || 'Supporter'} Dashboard
           </div>
-        )}
+        </div>
 
         {/* Navigation Links */}
         <div className={`flex-1 flex flex-col ${isAdmin ? 'py-4' : 'px-3'}`}>
@@ -145,6 +129,13 @@ export default function Sidebar({ mobileMenuOpen, setMobileMenuOpen }) {
               </Link>
               <div className="pt-2 flex flex-col">
                 <Link 
+                  href="/"
+                  className="py-2 flex items-center space-x-4 transition-colors text-gray-600 hover:text-gray-900 font-medium"
+                >
+                  <Globe className="w-5 h-5 text-gray-400" strokeWidth={2} />
+                  <span className="text-[14px] tracking-wide">Back to Website</span>
+                </Link>
+                <Link 
                   href="/dashboard/settings"
                   className="py-2 flex items-center space-x-4 transition-colors text-gray-600 hover:text-gray-900 font-medium"
                 >
@@ -162,6 +153,13 @@ export default function Sidebar({ mobileMenuOpen, setMobileMenuOpen }) {
             </div>
           ) : isCreator ? (
             <div className="border-t border-gray-200/60 pt-4 flex flex-col">
+              <Link 
+                href="/"
+                className="px-4 py-3 mb-1 rounded-xl flex items-center space-x-4 transition-colors text-gray-600 hover:bg-gray-200/60 hover:text-gray-900 font-medium"
+              >
+                <Globe className="w-5 h-5 text-gray-500" strokeWidth={2} />
+                <span className="text-[14px] tracking-wide">Back to Website</span>
+              </Link>
               <Link 
                 href="/dashboard/settings"
                 className="px-4 py-3 mb-1 rounded-xl flex items-center space-x-4 transition-colors text-gray-600 hover:bg-gray-200/60 hover:text-gray-900 font-medium"
@@ -186,6 +184,13 @@ export default function Sidebar({ mobileMenuOpen, setMobileMenuOpen }) {
                 Discover Projects
               </Link>
               <div className="border-t border-gray-200 pt-4 flex flex-col">
+                <Link 
+                  href="/"
+                  className="px-4 py-3 mb-1 rounded-xl flex items-center space-x-4 transition-colors text-gray-600 hover:bg-gray-200/60 hover:text-gray-900 font-medium"
+                >
+                  <Globe className="w-5 h-5 text-gray-500" strokeWidth={2} />
+                  <span className="text-[14px] tracking-wide">Back to Website</span>
+                </Link>
                 <Link 
                   href="/dashboard/settings"
                   className="px-4 py-3 mb-1 rounded-xl flex items-center space-x-4 transition-colors text-gray-600 hover:bg-gray-200/60 hover:text-gray-900 font-medium"

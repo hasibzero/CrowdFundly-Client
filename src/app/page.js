@@ -21,7 +21,9 @@ export default function Home() {
           axios.get(`${API_URL}/api/campaigns`),
           axios.get(`${API_URL}/api/platform/stats`),
         ]);
-        setCampaigns(campaignsResponse.data.slice(0, 3));
+        // Sort campaigns by amount raised descending, then take top 3
+        const sortedCampaigns = [...campaignsResponse.data].sort((a, b) => (b.raised || 0) - (a.raised || 0));
+        setCampaigns(sortedCampaigns.slice(0, 3));
         setStats(statsResponse.data);
       } finally {
         setLoading(false);
@@ -42,7 +44,7 @@ export default function Home() {
         <div className="flex flex-col justify-center gap-3 sm:flex-row"><Link href="/campaigns" className="rounded-full bg-[#12643E] px-8 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#0e4f31]">Explore campaigns</Link><Link href="/register" className="rounded-full bg-white px-8 py-3 text-sm font-semibold text-[#12643E] transition-colors hover:bg-zinc-100">Create an account</Link></div>
       </div>
     </section>
-    <section className="border-b border-zinc-100 bg-white py-14"><div className="mx-auto grid max-w-5xl grid-cols-1 gap-8 px-6 text-center md:grid-cols-3"><Metric value={currency.format(stats.totalFunded / 10)} label="Total funded" /><Metric value={stats.activeCampaigns.toLocaleString()} label="Active campaigns" /><Metric value={stats.supporters.toLocaleString()} label="Supporters" /></div></section>
+    <section className="border-b border-zinc-100 bg-white py-14"><div className="mx-auto grid max-w-5xl grid-cols-1 gap-8 px-6 text-center md:grid-cols-3"><Metric value={currency.format(stats.totalFunded)} label="Total funded" /><Metric value={stats.activeCampaigns.toLocaleString()} label="Active campaigns" /><Metric value={stats.supporters.toLocaleString()} label="Supporters" /></div></section>
     <section className="mx-auto max-w-6xl px-6 py-20">
       <div className="mb-10 text-center">
         <h2 className="text-3xl font-bold text-[#0f172a]">How Crowdfundly Works</h2>
@@ -204,5 +206,5 @@ function CampaignCard({ campaign }) {
   const percent = campaign.targetAmount ? Math.min(Math.round(((campaign.raised || 0) / campaign.targetAmount) * 100), 100) : 0;
   const end = new Date(new Date(campaign.createdAt).getTime() + campaign.duration * 86400000);
   const days = Math.max(Math.ceil((end - new Date()) / 86400000), 0);
-  return <Link href={`/campaigns/${campaign._id}`} className="group overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm transition-shadow hover:shadow-md"><div className="h-44 bg-zinc-100">{campaign.coverImage ? <img src={campaign.coverImage} alt={campaign.title} className="h-full w-full object-cover" /> : <div className="flex h-full items-center justify-center text-sm text-zinc-400">No campaign image</div>}</div><div className="p-5"><span className="rounded-full bg-indigo-50 px-2.5 py-1 text-[11px] font-semibold text-indigo-700">{campaign.category}</span><h3 className="mt-3 truncate font-serif text-lg font-bold group-hover:text-[#12643E]">{campaign.title}</h3><p className="mt-2 line-clamp-2 min-h-10 text-sm text-zinc-500">{campaign.shortDescription || campaign.story}</p><div className="mt-5 flex justify-between text-sm"><span className="font-bold text-[#12643E]">{percent}% funded</span><span className="text-zinc-500">{days} days left</span></div><div className="mt-2 h-1.5 overflow-hidden rounded-full bg-zinc-100"><div className="h-full rounded-full bg-[#12643E]" style={{ width: `${percent}%` }} /></div><p className="mt-2 text-sm text-zinc-600"><strong>{currency.format((campaign.raised || 0) / 10)}</strong> of {currency.format((campaign.targetAmount || 0) / 10)}</p></div></Link>;
+  return <Link href={`/campaigns/${campaign._id}`} className="group overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm transition-shadow hover:shadow-md"><div className="h-44 bg-zinc-100">{campaign.coverImage ? <img src={campaign.coverImage} alt={campaign.title} className="h-full w-full object-cover" /> : <div className="flex h-full items-center justify-center text-sm text-zinc-400">No campaign image</div>}</div><div className="p-5"><span className="rounded-full bg-indigo-50 px-2.5 py-1 text-[11px] font-semibold text-indigo-700">{campaign.category}</span><h3 className="mt-3 truncate font-serif text-lg font-bold group-hover:text-[#12643E]">{campaign.title}</h3><p className="mt-2 line-clamp-2 min-h-10 text-sm text-zinc-500">{campaign.shortDescription || campaign.story}</p><div className="mt-5 flex justify-between text-sm"><span className="font-bold text-[#12643E]">{percent}% funded</span><span className="text-zinc-500">{days} days left</span></div><div className="mt-2 h-1.5 overflow-hidden rounded-full bg-zinc-100"><div className="h-full rounded-full bg-[#12643E]" style={{ width: `${percent}%` }} /></div><p className="mt-2 text-sm text-zinc-600"><strong>{currency.format(campaign.raised || 0)}</strong> of {currency.format(campaign.targetAmount || 0)}</p></div></Link>;
 }

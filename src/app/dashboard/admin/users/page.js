@@ -14,6 +14,7 @@ export default function AdminUsersPage() {
   const [loading, setLoading] = useState(true);
   const [roleFilter, setRoleFilter] = useState('All');
   const [search, setSearch] = useState('');
+  const [visibleCount, setVisibleCount] = useState(10);
 
   const fetchUsers = async () => {
     try {
@@ -75,7 +76,7 @@ export default function AdminUsersPage() {
   return (
     <div className="w-full">
 
-      <motion.div className="p-8 max-w-7xl mx-auto w-full" variants={containerVariants} initial="hidden" animate="visible">
+      <motion.div className="p-4 sm:p-6 md:p-8 max-w-7xl mx-auto w-full" variants={containerVariants} initial="hidden" animate="visible">
         <motion.div variants={itemVariants} className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
           <div>
             <h1 className="text-[28px] md:text-[32px] font-bold text-[#0f172a] mb-1 tracking-tight">User Directory</h1>
@@ -107,9 +108,6 @@ export default function AdminUsersPage() {
               </select>
               <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
             </div>
-            <button className="flex items-center space-x-2 bg-white border border-gray-200 px-4 py-2 rounded-md text-[13px] font-medium text-[#0f172a] hover:bg-gray-50 transition-colors shadow-sm">
-              <Filter className="w-4 h-4 text-gray-500" /><span>Filters</span>
-            </button>
           </div>
         </motion.div>
 
@@ -135,20 +133,20 @@ export default function AdminUsersPage() {
             <div className="py-20 text-center text-gray-400 text-sm">No users match your filters.</div>
           ) : (
             <>
-              <div className="overflow-x-auto">
+              <div className="hidden sm:block overflow-x-auto">
                 <table className="w-full text-left border-collapse min-w-[800px]">
                   <thead className="bg-[#f8f9fc]">
                     <tr>
                       <th className="px-6 py-4 text-[12px] font-bold text-gray-500 uppercase tracking-widest">User</th>
                       <th className="px-6 py-4 text-[12px] font-bold text-gray-500 uppercase tracking-widest">Email</th>
                       <th className="px-6 py-4 text-[12px] font-bold text-gray-500 uppercase tracking-widest">Role</th>
-                      <th className="px-6 py-4 text-[12px] font-bold text-gray-500 uppercase tracking-widest">Credits</th>
+                      <th className="px-6 py-4 text-[12px] font-bold text-gray-500 uppercase tracking-widest">USD</th>
                       <th className="px-6 py-4 text-[12px] font-bold text-gray-500 uppercase tracking-widest">Joined</th>
                       <th className="px-6 py-4 text-[12px] font-bold text-gray-500 uppercase tracking-widest text-right">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
-                    {filtered.map((u) => (
+                    {filtered.slice(0, visibleCount).map((u) => (
                       <tr key={u._id} className="hover:bg-gray-50/50 transition-colors group">
                         <td className="px-6 py-5">
                           <div className="flex items-center space-x-3">
@@ -181,7 +179,7 @@ export default function AdminUsersPage() {
                           </div>
                         </td>
                         <td className="px-6 py-5 text-[14px] font-bold text-[#0f172a]">
-                          {(u.credits || 0).toLocaleString()} <span className="text-[11px] text-gray-400 font-normal">CR</span>
+                          {(u.credits || 0).toLocaleString()} <span className="text-[11px] text-gray-400 font-normal">USD</span>
                         </td>
                         <td className="px-6 py-5 text-[13px] text-gray-500">
                           {u.createdAt ? new Date(u.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}
@@ -200,10 +198,53 @@ export default function AdminUsersPage() {
                   </tbody>
                 </table>
               </div>
+              {/* Mobile Card View */}
+              <div className="sm:hidden divide-y divide-gray-100">
+                {filtered.slice(0, visibleCount).map((u) => (
+                  <div key={u._id} className="p-4">
+                    <div className="flex items-start justify-between gap-3 mb-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full overflow-hidden border border-gray-200 flex-shrink-0">
+                          <img src={u.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(u.name || u.email)}&background=e0e7ff&color=4f46e5`} alt={u.name} className="w-full h-full object-cover" />
+                        </div>
+                        <div>
+                          <p className="text-[14px] font-bold text-[#0f172a] leading-tight">{u.name || 'Unnamed'}</p>
+                          <p className="text-[12px] text-gray-500">{u.email}</p>
+                        </div>
+                      </div>
+                      <button onClick={() => handleDelete(u._id, u.name)} className="p-1.5 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors">
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div className="relative w-32">
+                        <select defaultValue={u.role} onChange={(e) => handleRoleChange(u._id, e.target.value)} className="w-full appearance-none pl-3 pr-8 py-1.5 bg-white border border-gray-200 rounded text-[13px] font-medium focus:outline-none">
+                          <option value="Admin">Admin</option>
+                          <option value="Creator">Creator</option>
+                          <option value="Supporter">Supporter</option>
+                        </select>
+                        <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500 pointer-events-none" />
+                      </div>
+                      <span className="text-[13px] font-bold text-[#0f172a]">{(u.credits || 0).toLocaleString()} <span className="text-[11px] text-gray-400 font-normal">USD</span></span>
+                    </div>
+                  </div>
+                ))}
+              </div>
               <div className="px-6 py-4 border-t border-gray-100 text-[12px] text-gray-500">
                 Showing {filtered.length} of {users.length} users
               </div>
             </>
+          )}
+          
+          {!loading && visibleCount < filtered.length && (
+            <div className="mt-8 flex justify-center pb-8">
+              <button 
+                onClick={() => setVisibleCount(prev => prev + 10)}
+                className="bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 px-6 py-2 rounded-md text-[13px] font-bold transition-colors shadow-sm"
+              >
+                Load More Users
+              </button>
+            </div>
           )}
         </motion.div>
       </motion.div>

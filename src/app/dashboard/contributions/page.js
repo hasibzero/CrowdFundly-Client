@@ -65,7 +65,7 @@ export default function ContributionsPage() {
           <div>
             <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Total Contributed</p>
             <p className="text-[24px] font-bold text-[#0f172a] leading-none">
-              {loading ? '—' : stats.totalContributed?.toLocaleString()} <span className="text-[18px] font-medium text-gray-700">Credits</span>
+              {loading ? '—' : stats.totalContributed?.toLocaleString()} <span className="text-[18px] font-medium text-gray-700">USD</span>
             </p>
           </div>
         </div>
@@ -93,13 +93,13 @@ export default function ContributionsPage() {
           </div>
         ) : (
           <>
-            <div className="overflow-x-auto">
+            <div className="hidden sm:block overflow-x-auto">
               <table className="w-full text-left border-collapse min-w-[700px]">
                 <thead className="bg-[#f8f9fc]">
                   <tr>
                     <th className="px-6 py-4 text-[13px] font-bold text-[#64748b]">Campaign ID</th>
                     <th className="px-6 py-4 text-[13px] font-bold text-[#64748b]">Date</th>
-                    <th className="px-6 py-4 text-[13px] font-bold text-[#64748b]">Amount (Credits)</th>
+                    <th className="px-6 py-4 text-[13px] font-bold text-[#64748b]">Amount (USD)</th>
                     <th className="px-6 py-4 text-[13px] font-bold text-[#64748b]">Method</th>
                     <th className="px-6 py-4 text-[13px] font-bold text-[#64748b]">Status</th>
                   </tr>
@@ -119,37 +119,58 @@ export default function ContributionsPage() {
                         {c.date ? new Date(c.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}
                       </td>
                       <td className="px-6 py-5 text-[15px] font-bold text-[#0f172a]">{(c.amount || 0).toLocaleString()}</td>
-                      <td className="px-6 py-5 text-[14px] text-[#475569]">{c.paymentMethod || 'Credits'}</td>
+                      <td className="px-6 py-5 text-[14px] text-[#475569]">{c.paymentMethod || 'USD'}</td>
                       <td className="px-6 py-5">{getStatusBadge(c.status)}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-            <div className="p-5 border-t border-gray-100 flex items-center justify-between">
-              <span className="text-[13px] text-gray-500">
-                Showing {contributions.length} of {totalItems} contribution{totalItems !== 1 ? 's' : ''}
-              </span>
-              <div className="flex space-x-2">
-                <button
-                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                  disabled={currentPage === 1}
-                  className="px-3 py-1 text-[13px] font-medium border border-gray-200 rounded-md disabled:opacity-50 hover:bg-gray-50 transition-colors"
-                >
-                  Previous
-                </button>
-                <span className="px-3 py-1 text-[13px] font-medium text-gray-700 bg-gray-50 rounded-md border border-gray-100">
-                  {currentPage} / {totalPages || 1}
-                </span>
-                <button
-                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                  disabled={currentPage >= totalPages || totalPages === 0}
-                  className="px-3 py-1 text-[13px] font-medium border border-gray-200 rounded-md disabled:opacity-50 hover:bg-gray-50 transition-colors"
-                >
-                  Next
-                </button>
-              </div>
+
+            {/* Mobile Card View */}
+            <div className="sm:hidden divide-y divide-gray-100">
+              {contributions.map((c, idx) => (
+                <div key={c._id || idx} className="p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center flex-shrink-0">
+                        <CheckCircle2 className="w-4 h-4 text-indigo-500" />
+                      </div>
+                      <span className="text-[13px] font-bold text-[#0f172a]">#{c.campaignId?.toString().slice(-8)}</span>
+                    </div>
+                    {getStatusBadge(c.status)}
+                  </div>
+                  <div className="flex justify-between text-[13px] text-gray-500 mt-2">
+                    <span>{c.date ? new Date(c.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}</span>
+                    <span className="font-bold text-[#0f172a]">{(c.amount || 0).toLocaleString()} USD</span>
+                  </div>
+                </div>
+              ))}
             </div>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <span className="text-[13px] text-gray-500">
+                  Showing {contributions.length} of {totalItems} contribution{totalItems !== 1 ? 's' : ''}
+                </span>
+                <div className="flex space-x-2">
+                  <button
+                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                    disabled={currentPage === 1}
+                    className="px-3 py-1 text-[13px] font-medium border border-gray-200 rounded-md disabled:opacity-50 hover:bg-gray-50 transition-colors"
+                  >
+                    Previous
+                  </button>
+                  <span className="px-3 py-1 text-[13px] font-medium text-gray-700 bg-gray-50 rounded-md border border-gray-100">
+                    {currentPage} / {totalPages || 1}
+                  </span>
+                  <button
+                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                    disabled={currentPage >= totalPages || totalPages === 0}
+                    className="px-3 py-1 text-[13px] font-medium border border-gray-200 rounded-md disabled:opacity-50 hover:bg-gray-50 transition-colors"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
           </>
         )}
       </motion.div>

@@ -36,7 +36,7 @@ export default function PurchaseCreditPage() {
           }, { headers: authHeaders() });
           
           setBalance(response.data.credits || 0);
-          toast.success(response.data.granted ? `${response.data.granted.toLocaleString()} credits added.` : 'Your payment was already processed.');
+          toast.success(response.data.granted ? `${response.data.granted.toLocaleString()} USD added.` : 'Your payment was already processed.');
           
           // Clean up URL
           window.history.replaceState({}, document.title, window.location.pathname);
@@ -44,7 +44,7 @@ export default function PurchaseCreditPage() {
           toast.error(error.response?.data?.message || 'We could not verify that payment.');
         }
       } else if (params.get('checkout') === 'cancelled') {
-        toast('Checkout was cancelled. No credits were added.');
+        toast('Checkout was cancelled. No funds were added.');
         window.history.replaceState({}, document.title, window.location.pathname);
       }
     };
@@ -90,8 +90,8 @@ export default function PurchaseCreditPage() {
   ];
 
   // Determine current active amount and price
-  const activeCredits = customAmount ? parseInt(customAmount) : selectedPackage;
-  const activePrice = activeCredits ? (activeCredits / 10).toFixed(2) : '0.00';
+  const activeUSD = customAmount ? parseInt(customAmount) : selectedPackage;
+  const activePrice = activeUSD ? activeUSD.toFixed(2) : '0.00';
 
   const handlePackageSelect = (credits) => {
     setSelectedPackage(credits);
@@ -109,10 +109,10 @@ export default function PurchaseCreditPage() {
   };
 
   const startCheckout = async () => {
-    if (!Number.isInteger(activeCredits) || activeCredits < 100) return;
+    if (!Number.isInteger(activeUSD) || activeUSD < 100) return;
     setIsCheckingOut(true);
     try {
-      const response = await axios.post(`${API_URL}/api/credits/checkout-session`, { credits: activeCredits }, { headers: authHeaders() });
+      const response = await axios.post(`${API_URL}/api/credits/checkout-session`, { credits: activeUSD }, { headers: authHeaders() });
       window.location.assign(response.data.url);
     } catch (error) {
       toast.error(error.response?.data?.message || 'Unable to start secure checkout.');
@@ -131,7 +131,7 @@ export default function PurchaseCreditPage() {
       <motion.div variants={itemVariants} className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
         <div>
           <h1 className="text-[28px] md:text-[32px] font-bold text-[#0f172a] mb-1 tracking-tight">
-            Purchase Credit
+            Add USD
           </h1>
           <p className="text-[14px] text-gray-500">
             Top up your balance to back the next big idea.
@@ -145,7 +145,7 @@ export default function PurchaseCreditPage() {
           <div>
             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">Current Balance</p>
             <p className="text-[20px] font-bold text-[#0f172a] leading-none">
-              {balance.toLocaleString()} <span className="text-[#2ea673] font-medium text-[16px]">Credits</span>
+              {balance.toLocaleString()} <span className="text-[#2ea673] font-medium text-[16px]">USD</span>
             </p>
           </div>
         </div>
@@ -156,8 +156,7 @@ export default function PurchaseCreditPage() {
         {/* Left Column: Packages */}
         <motion.div variants={itemVariants} className="flex-1">
           <div className="bg-white rounded-xl p-8 shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100">
-            <h2 className="text-[20px] font-bold text-[#0f172a] mb-1">Select a Package</h2>
-            <p className="text-[13px] text-gray-500 mb-6">Exchange rate: $1 = 10 Credits.</p>
+            <h2 className="text-[20px] font-bold text-[#0f172a] mb-6">Select a Package</h2>
 
             {/* Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-8">
@@ -188,11 +187,9 @@ export default function PurchaseCreditPage() {
                       {pkg.icon}
                     </div>
                     <div className="text-[20px] font-bold text-[#0f172a] mb-1">
-                      {pkg.credits.toLocaleString()} Credits
+                      {pkg.credits.toLocaleString()} USD
                     </div>
-                    <div className="text-[13px] font-medium text-gray-500">
-                      ${pkg.price.toFixed(2)} USD
-                    </div>
+
                   </div>
                 );
               })}
@@ -207,7 +204,7 @@ export default function PurchaseCreditPage() {
 
             {/* Custom Amount */}
             <div className="mt-2">
-              <label className="block text-[12px] font-bold text-[#0f172a] mb-2">Custom Amount (Credits)</label>
+              <label className="block text-[12px] font-bold text-[#0f172a] mb-2">Custom Amount (USD)</label>
               <div className="relative">
                 <Circle className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input 
@@ -218,10 +215,10 @@ export default function PurchaseCreditPage() {
                   className="w-full pl-11 pr-24 py-3 bg-[#f8fafc] border border-gray-200 rounded-md text-[14px] focus:outline-none focus:border-[#12643E] focus:ring-1 focus:ring-[#12643E] transition-colors"
                 />
                 <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-[13px] font-medium text-gray-500">
-                  ~ ${customAmount ? (parseInt(customAmount) / 10).toFixed(2) : '0.00'}
+                  USD
                 </div>
               </div>
-              <p className="text-[11px] text-gray-500 mt-2">Minimum purchase: 100 Credits ($10.00)</p>
+              <p className="text-[11px] text-gray-500 mt-2">Minimum purchase: 100 USD</p>
             </div>
 
           </div>
@@ -235,17 +232,14 @@ export default function PurchaseCreditPage() {
             {/* Summary Box */}
             <div className="bg-[#f8f9fc] rounded-lg p-5 mb-8 border border-gray-100">
               <div className="flex justify-between items-center mb-3 text-[13px]">
-                <span className="text-gray-500 font-medium">Credits to Buy</span>
-                <span className="font-bold text-[#0f172a]">{activeCredits ? activeCredits.toLocaleString() : '0'}</span>
+                <span className="text-gray-500 font-medium">USD to Buy</span>
+                <span className="font-bold text-[#0f172a]">{activeUSD ? activeUSD.toLocaleString() : '0'}</span>
               </div>
-              <div className="flex justify-between items-center mb-5 text-[13px]">
-                <span className="text-gray-500 font-medium">Rate</span>
-                <span className="font-bold text-[#0f172a]">10 / $1</span>
-              </div>
+
               
               <div className="border-t border-gray-200 pt-4 flex justify-between items-end">
-                <span className="font-bold text-[#0f172a] text-[15px]">Total Cost</span>
-                <span className="text-[24px] font-bold text-[#12643E] leading-none">${activePrice}</span>
+                <span className="font-bold text-[#0f172a] text-[15px]">Total Amount</span>
+                <span className="text-[24px] font-bold text-[#12643E] leading-none">${activeUSD ? activeUSD.toLocaleString() : '0'}</span>
               </div>
             </div>
 
@@ -265,9 +259,9 @@ export default function PurchaseCreditPage() {
 
             {/* Action */}
             <button onClick={startCheckout}
-              disabled={isCheckingOut || !activeCredits || activeCredits < 100}
+              disabled={isCheckingOut || !activeUSD || activeUSD < 100}
               className={`w-full py-3.5 rounded-lg font-bold text-[15px] flex items-center justify-center transition-colors shadow-sm ${
-                (!activeCredits || activeCredits < 100)
+                (!activeUSD || activeUSD < 100)
                   ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
                   : 'bg-[#12643E] hover:bg-[#0e4f31] text-white'
               }`}

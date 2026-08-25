@@ -1,16 +1,17 @@
 "use client";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { API_URL } from '@/lib/api';
 import { uploadImageToImgBB } from '@/lib/uploadImage';
 
-export default function CreateCampaignPage() {
+export default function EditCampaignPage() {
   const { user } = useAuth();
   const router = useRouter();
+  const { id } = useParams();
   
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -34,6 +35,33 @@ export default function CreateCampaignPage() {
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+
+  useEffect(() => {
+    if (!id) return;
+    const fetchCampaign = async () => {
+      try {
+        const token = localStorage.getItem('crowdfundly_token');
+        const res = await axios.get(`${API_URL}/api/creator/campaigns/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+        const c = res.data;
+        setFormData({
+          title: c.title || '',
+          category: c.category || '',
+          subCategory: c.subCategory || '',
+          location: c.location || '',
+          shortDescription: c.shortDescription || '',
+          story: c.story || '',
+          targetAmount: c.targetAmount || '',
+          duration: c.duration || '',
+          coverImage: c.coverImage || '',
+          teamName: c.team?.[0]?.name || '',
+          teamRole: c.team?.[0]?.role || ''
+        });
+      } catch (e) {
+        toast.error('Failed to load campaign');
+      }
+    };
+    fetchCampaign();
+  }, [id]);
 
   const handleImageChange = async (e) => {
     const file = e.target.files?.[0];
@@ -60,11 +88,11 @@ export default function CreateCampaignPage() {
     }
 
     setIsSubmitting(true);
-    const toastId = toast.loading('Submitting campaign...');
+    const toastId = toast.loading('Updating campaign...');
 
     try {
       const token = localStorage.getItem('crowdfundly_token');
-      await axios.post(`${API_URL}/api/campaigns`, {
+      await axios.put(`${API_URL}/api/campaigns/${id}`, {
         ...formData,
         targetAmount: Number(formData.targetAmount),
         duration: Number(formData.duration),
@@ -97,10 +125,10 @@ export default function CreateCampaignPage() {
         }
       });
 
-      toast.success('Campaign created successfully! Awaiting Admin approval.', { id: toastId });
+      toast.success('Campaign updated! Reverting to Pending for admin review.', { id: toastId });
       router.push('/dashboard/my-campaigns');
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to create campaign.', { id: toastId });
+      toast.error(error.response?.data?.message || 'Failed to update campaign.', { id: toastId });
       setIsSubmitting(false);
     }
   };
@@ -143,10 +171,10 @@ export default function CreateCampaignPage() {
       {/* Header Section */}
       <motion.div variants={itemVariants} className="text-center mb-10">
         <h1 className="text-[28px] md:text-[32px] font-bold text-[#0f172a] mb-2 tracking-tight">
-          Create a New Campaign
+          Edit Campaign
         </h1>
         <p className="text-[14px] text-gray-500">
-          Turn your idea into reality. Follow the steps below to launch your project.
+          Update your project details. Note: making changes requires re-approval.
         </p>
       </motion.div>
 
@@ -209,7 +237,7 @@ export default function CreateCampaignPage() {
                   <input 
                     type="text" 
                     name="title"
-                    value={formData.title}
+                    value={formData.teamRole || ''}
                     onChange={handleChange}
                     placeholder="e.g., The Next Generation Smart Watch" 
                     className="w-full px-4 py-2.5 rounded-md border border-gray-200 focus:outline-none focus:border-[#0f766e] focus:ring-1 focus:ring-[#0f766e] text-[14px] text-gray-900 placeholder-gray-400"
@@ -220,7 +248,7 @@ export default function CreateCampaignPage() {
                     <label className="block text-[13px] text-gray-700 mb-1.5">Category</label>
                     <select 
                       name="category"
-                      value={formData.category}
+                      value={formData.teamRole || ''}
                       onChange={handleChange}
                       className="w-full px-4 py-2.5 rounded-md border border-gray-200 focus:outline-none focus:border-[#0f766e] focus:ring-1 focus:ring-[#0f766e] text-[14px] text-gray-500 bg-white appearance-none"
                     >
@@ -235,7 +263,7 @@ export default function CreateCampaignPage() {
                     <input 
                       type="text" 
                       name="subCategory"
-                      value={formData.subCategory}
+                      value={formData.teamRole || ''}
                       onChange={handleChange}
                       placeholder="e.g., Solar, AI, Hardware" 
                       className="w-full px-4 py-2.5 rounded-md border border-gray-200 focus:outline-none focus:border-[#0f766e] focus:ring-1 focus:ring-[#0f766e] text-[14px] text-gray-900 placeholder-gray-400"
@@ -248,7 +276,7 @@ export default function CreateCampaignPage() {
                   <input 
                     type="text" 
                     name="location"
-                    value={formData.location}
+                    value={formData.teamRole || ''}
                     onChange={handleChange}
                     placeholder="e.g., Seattle, WA" 
                     className="w-full px-4 py-2.5 rounded-md border border-gray-200 focus:outline-none focus:border-[#0f766e] focus:ring-1 focus:ring-[#0f766e] text-[14px] text-gray-900 placeholder-gray-400"
@@ -273,7 +301,7 @@ export default function CreateCampaignPage() {
                   <input 
                     type="text" 
                     name="shortDescription"
-                    value={formData.shortDescription}
+                    value={formData.teamRole || ''}
                     onChange={handleChange}
                     placeholder="Bring the future of sustainable agriculture into your home..." 
                     className="w-full px-4 py-2.5 rounded-md border border-gray-200 focus:outline-none focus:border-[#0f766e] focus:ring-1 focus:ring-[#0f766e] text-[14px] text-gray-900 placeholder-gray-400"
@@ -284,7 +312,7 @@ export default function CreateCampaignPage() {
                   <label className="block text-[13px] text-gray-700 mb-1.5">The Vision (Full Story)</label>
                   <textarea 
                     name="story"
-                    value={formData.story}
+                    value={formData.teamRole || ''}
                     onChange={handleChange}
                     rows="4"
                     placeholder="We believe that everyone deserves access to fresh produce..."
@@ -298,7 +326,7 @@ export default function CreateCampaignPage() {
                     <input 
                       type="text" 
                       name="teamName"
-                      value={formData.teamName}
+                      value={formData.teamRole || ''}
                       onChange={handleChange}
                       placeholder="e.g., Sarah Jenkins" 
                       className="w-full px-4 py-2.5 rounded-md border border-gray-200 focus:outline-none focus:border-[#0f766e] focus:ring-1 focus:ring-[#0f766e] text-[14px] text-gray-900 placeholder-gray-400"
@@ -309,7 +337,7 @@ export default function CreateCampaignPage() {
                     <input 
                       type="text" 
                       name="teamRole"
-                      value={formData.teamRole}
+                      value={formData.teamRole || ''}
                       onChange={handleChange}
                       placeholder="e.g., CEO & Lead Engineer" 
                       className="w-full px-4 py-2.5 rounded-md border border-gray-200 focus:outline-none focus:border-[#0f766e] focus:ring-1 focus:ring-[#0f766e] text-[14px] text-gray-900 placeholder-gray-400"
@@ -409,7 +437,7 @@ export default function CreateCampaignPage() {
               disabled={isSubmitting || isUploading}
               className="bg-[#12643E] hover:bg-[#0e4f31] text-white px-6 py-2 rounded-md font-bold text-[13px] transition-colors shadow-sm disabled:opacity-50"
             >
-              {isSubmitting ? 'Submitting...' : (step < 4 ? 'Continue' : 'Submit Campaign')}
+              {isSubmitting ? 'Submitting...' : (step < 4 ? 'Continue' : 'Update Campaign')}
             </button>
           </div>
         </div>

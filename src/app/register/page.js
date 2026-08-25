@@ -1,5 +1,5 @@
 "use client";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -16,8 +16,14 @@ export default function RegisterPage() {
   const [photoURL, setPhotoURL] = useState('');
   const [role, setRole] = useState('Supporter');
   const [isUploading, setIsUploading] = useState(false);
-  const { register } = useAuth();
+  const { register, user, loading } = useAuth();
   const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && user) {
+      router.push('/dashboard');
+    }
+  }, [user, loading, router]);
 
   const handleImageChange = async (e) => {
     const file = e.target.files?.[0];
@@ -188,8 +194,8 @@ export default function RegisterPage() {
                   disabled={isUploading}
                   className="block w-full px-3 py-2.5 border border-slate-200 rounded-lg text-slate-900 focus:ring-2 focus:ring-[#12643E] focus:border-[#12643E] sm:text-sm transition-colors outline-none disabled:bg-slate-50 cursor-pointer"
                 >
-                  <option value="Supporter">Supporter (Starts with 50 credits)</option>
-                  <option value="Creator">Creator (Starts with 20 credits)</option>
+                  <option value="Supporter">Supporter (Starts with 50 USD)</option>
+                  <option value="Creator">Creator (Starts with 20 USD)</option>
                 </select>
               </div>
 

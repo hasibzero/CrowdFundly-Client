@@ -65,12 +65,12 @@ export default function MyCampaignsPage() {
 
   return (
     <motion.section className="w-full max-w-6xl mx-auto pt-4" variants={containerVariants} initial="hidden" animate="visible">
-      <motion.div variants={itemVariants} className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
+      <motion.div variants={itemVariants} className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
         <div>
-          <h1 className="text-[28px] md:text-[32px] font-bold text-[#0f172a] mb-1 tracking-tight">My Campaigns</h1>
+          <h1 className="text-[24px] md:text-[32px] font-bold text-[#0f172a] mb-1 tracking-tight">My Campaigns</h1>
           <p className="text-[14px] text-gray-500">Manage and track the progress of your launched projects.</p>
         </div>
-        <Link href="/dashboard/create" className="bg-[#12643E] hover:bg-[#0e4f31] text-white px-5 py-2.5 rounded-full font-bold text-[14px] flex items-center transition-colors shadow-sm">
+        <Link href="/dashboard/create" className="bg-[#12643E] hover:bg-[#0e4f31] text-white px-5 py-2.5 rounded-full font-bold text-[14px] flex items-center transition-colors shadow-sm whitespace-nowrap">
           <Plus className="w-4 h-4 mr-1.5 stroke-[3]" />
           New Campaign
         </Link>
@@ -89,67 +89,110 @@ export default function MyCampaignsPage() {
             </Link>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse min-w-[800px]">
-              <thead className="bg-white border-b border-gray-200">
-                <tr>
-                  <th className="px-6 py-5 text-[13px] font-bold text-gray-600">Campaign</th>
-                  <th className="px-6 py-5 text-[13px] font-bold text-gray-600">Deadline</th>
-                  <th className="px-6 py-5 text-[13px] font-bold text-gray-600">Status</th>
-                  <th className="px-6 py-5 text-[13px] font-bold text-gray-600">Raised</th>
-                  <th className="px-6 py-5 text-[13px] font-bold text-gray-600 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {campaigns.map((c) => {
-                  const progress = Math.min(Math.round(((c.raised || 0) / (c.targetAmount || 1)) * 100), 100);
-                  return (
-                    <tr key={c._id} className="hover:bg-gray-50/50 transition-colors">
-                      <td className="px-6 py-5">
-                        <div className="flex items-center space-x-4">
-                          <div className="w-16 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100 border border-gray-200">
-                            <img
-                              src={c.coverImage || `https://ui-avatars.com/api/?name=${encodeURIComponent(c.title)}&background=e0e7ff&color=4f46e5`}
-                              alt={c.title}
-                              className="w-full h-full object-cover"
-                            />
+          <>
+            {/* Desktop Table */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full text-left border-collapse min-w-[700px]">
+                <thead className="bg-white border-b border-gray-200">
+                  <tr>
+                    <th className="px-6 py-5 text-[13px] font-bold text-gray-600">Campaign</th>
+                    <th className="px-6 py-5 text-[13px] font-bold text-gray-600">Deadline</th>
+                    <th className="px-6 py-5 text-[13px] font-bold text-gray-600">Status</th>
+                    <th className="px-6 py-5 text-[13px] font-bold text-gray-600">Raised</th>
+                    <th className="px-6 py-5 text-[13px] font-bold text-gray-600 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {campaigns.map((c) => {
+                    const progress = Math.min(Math.round(((c.raised || 0) / (c.targetAmount || 1)) * 100), 100);
+                    return (
+                      <tr key={c._id} className="hover:bg-gray-50/50 transition-colors">
+                        <td className="px-6 py-5">
+                          <div className="flex items-center space-x-4">
+                            <div className="w-16 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100 border border-gray-200">
+                              <img src={c.coverImage || `https://ui-avatars.com/api/?name=${encodeURIComponent(c.title)}&background=e0e7ff&color=4f46e5`} alt={c.title} className="w-full h-full object-cover" />
+                            </div>
+                            <div>
+                              <p className="text-[14px] font-bold text-[#0f172a] leading-tight mb-1">{c.title}</p>
+                              <p className="text-[12px] text-gray-500 font-medium">{c.category}</p>
+                            </div>
                           </div>
-                          <div>
-                            <p className="text-[14px] font-bold text-[#0f172a] leading-tight mb-1">{c.title}</p>
-                            <p className="text-[12px] text-gray-500 font-medium">{c.category}</p>
+                        </td>
+                        <td className="px-6 py-5 text-[13px] font-bold text-gray-700">{getDeadline(c.createdAt, c.duration)}</td>
+                        <td className="px-6 py-5">{getStatusBadge(c.status)}</td>
+                        <td className="px-6 py-5">
+                          <div className="mb-2 text-[13px]">
+                            <span className="font-bold text-[#0f172a]">{(c.raised || 0).toLocaleString()} USD</span>
+                            <span className="text-gray-400 font-medium"> / {(c.targetAmount || 0).toLocaleString()}</span>
                           </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-5 text-[13px] font-bold text-gray-700">{getDeadline(c.createdAt, c.duration)}</td>
-                      <td className="px-6 py-5">{getStatusBadge(c.status)}</td>
-                      <td className="px-6 py-5">
-                        <div className="mb-2 text-[13px]">
-                          <span className="font-bold text-[#0f172a]">${(c.raised || 0).toLocaleString()}</span>
-                          <span className="text-gray-400 font-medium"> / ${(c.targetAmount || 0).toLocaleString()}</span>
-                        </div>
-                        <div className="w-32 h-1.5 bg-[#eef2f6] rounded-full overflow-hidden">
-                          <div className="h-full bg-[#12643E] rounded-full" style={{ width: `${progress}%` }}></div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-5 text-right">
-                        <div className="flex items-center justify-end space-x-2 text-gray-400">
-                          <Link href={`/campaigns/${c._id}`} className="p-1.5 hover:bg-gray-100 hover:text-gray-700 rounded-md transition-colors" title="View">
-                            <Eye className="w-4 h-4" />
-                          </Link>
-                          <button className="p-1.5 hover:bg-gray-100 hover:text-gray-700 rounded-md transition-colors" title="Edit">
-                            <Edit className="w-4 h-4" />
-                          </button>
-                          <button onClick={() => handleDelete(c._id)} className="p-1.5 hover:bg-red-50 hover:text-red-600 rounded-md transition-colors" title="Delete">
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+                          <div className="w-32 h-1.5 bg-[#eef2f6] rounded-full overflow-hidden">
+                            <div className="h-full bg-[#12643E] rounded-full" style={{ width: `${progress}%` }}></div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-5 text-right">
+                          <div className="flex items-center justify-end space-x-2 text-gray-400">
+                            <Link href={`/campaigns/${c._id}`} className="p-1.5 hover:bg-gray-100 hover:text-gray-700 rounded-md transition-colors" title="View">
+                              <Eye className="w-4 h-4" />
+                            </Link>
+                            <Link href={`/dashboard/edit/${c._id}`} className="p-1.5 hover:bg-gray-100 hover:text-gray-700 rounded-md transition-colors" title="Edit">
+                              <Edit className="w-4 h-4" />
+                            </Link>
+                            <button onClick={() => handleDelete(c._id)} className="p-1.5 hover:bg-red-50 hover:text-red-600 rounded-md transition-colors" title="Delete">
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile Card View */}
+            <div className="md:hidden divide-y divide-gray-100">
+              {campaigns.map((c) => {
+                const progress = Math.min(Math.round(((c.raised || 0) / (c.targetAmount || 1)) * 100), 100);
+                return (
+                  <div key={c._id} className="p-4">
+                    <div className="flex items-start gap-3 mb-3">
+                      <div className="w-16 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100 border border-gray-200">
+                        <img src={c.coverImage || `https://ui-avatars.com/api/?name=${encodeURIComponent(c.title)}&background=e0e7ff&color=4f46e5`} alt={c.title} className="w-full h-full object-cover" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[14px] font-bold text-[#0f172a] leading-tight truncate">{c.title}</p>
+                        <p className="text-[12px] text-gray-500 mt-0.5">{c.category}</p>
+                      </div>
+                      <div className="flex-shrink-0">{getStatusBadge(c.status)}</div>
+                    </div>
+
+                    <div className="mb-2 text-[13px]">
+                      <span className="font-bold text-[#0f172a]">{(c.raised || 0).toLocaleString()} USD</span>
+                      <span className="text-gray-400 font-medium"> / {(c.targetAmount || 0).toLocaleString()} goal</span>
+                    </div>
+                    <div className="w-full h-1.5 bg-[#eef2f6] rounded-full overflow-hidden mb-3">
+                      <div className="h-full bg-[#12643E] rounded-full" style={{ width: `${progress}%` }}></div>
+                    </div>
+
+                    <div className="flex items-center justify-between text-[12px] text-gray-500">
+                      <span>Deadline: {getDeadline(c.createdAt, c.duration)}</span>
+                      <div className="flex items-center space-x-1 text-gray-400">
+                        <Link href={`/campaigns/${c._id}`} className="p-2 hover:bg-gray-100 hover:text-gray-700 rounded-md transition-colors" title="View">
+                          <Eye className="w-4 h-4" />
+                        </Link>
+                        <Link href={`/dashboard/edit/${c._id}`} className="p-2 hover:bg-gray-100 hover:text-gray-700 rounded-md transition-colors" title="Edit">
+                          <Edit className="w-4 h-4" />
+                        </Link>
+                        <button onClick={() => handleDelete(c._id)} className="p-2 hover:bg-red-50 hover:text-red-600 rounded-md transition-colors" title="Delete">
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </>
         )}
       </motion.div>
     </motion.section>

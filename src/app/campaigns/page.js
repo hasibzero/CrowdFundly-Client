@@ -18,6 +18,7 @@ export default function ExploreCampaignsPage() {
   const [selectedStatus, setSelectedStatus] = useState('All');
   const [selectedPledge, setSelectedPledge] = useState('All');
   const [selectedSort, setSelectedSort] = useState('Trending');
+  const [visibleCount, setVisibleCount] = useState(6);
 
   useEffect(() => {
     const fetchApprovedCampaigns = async () => {
@@ -224,7 +225,7 @@ export default function ExploreCampaignsPage() {
                 No campaigns match your filters. Try adjusting them!
               </div>
             ) : (
-              filteredCampaigns.map((campaign, index) => {
+              filteredCampaigns.slice(0, visibleCount).map((campaign, index) => {
                 const truePercent = calculateTruePercent(campaign.raised, campaign.targetAmount);
                 const progressWidth = calculateProgress(campaign.raised, campaign.targetAmount);
                 const daysLeft = getDaysLeft(campaign.createdAt, campaign.duration);
@@ -325,9 +326,12 @@ export default function ExploreCampaignsPage() {
             )}
 
             {/* Load More */}
-            {!loading && (
+            {!loading && visibleCount < filteredCampaigns.length && (
               <div className="mt-12 flex justify-center">
-                <button className="bg-[#0f5132] hover:bg-[#0a3622] text-white px-6 py-2.5 rounded-md text-[13px] font-bold transition-colors shadow-sm">
+                <button 
+                  onClick={() => setVisibleCount(prev => prev + 6)}
+                  className="bg-[#0f5132] hover:bg-[#0a3622] text-white px-6 py-2.5 rounded-md text-[13px] font-bold transition-colors shadow-sm"
+                >
                   Load More Projects
                 </button>
               </div>

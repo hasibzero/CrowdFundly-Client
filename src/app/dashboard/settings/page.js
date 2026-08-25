@@ -111,15 +111,15 @@ export default function SettingsPage() {
       animate="visible"
     >
       <motion.div variants={itemVariants} className="mb-8">
-        <h1 className="text-3xl font-bold text-[#0f172a] mb-2 tracking-tight">Account Settings</h1>
-        <p className="text-[15px] text-gray-500">Manage your profile information and account preferences.</p>
+        <h1 className="text-2xl md:text-3xl font-bold text-[#0f172a] mb-2 tracking-tight">Account Settings</h1>
+        <p className="text-[14px] md:text-[15px] text-gray-500">Manage your profile information and account preferences.</p>
       </motion.div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         
         {/* Left Sidebar - Profile Summary */}
         <motion.div variants={itemVariants} className="md:col-span-1">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden sticky top-8">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden md:sticky md:top-8">
             <div className="h-32 bg-gradient-to-r from-emerald-500 to-teal-500 relative"></div>
             <div className="px-6 pb-6 relative">
               <div className="w-24 h-24 rounded-full border-4 border-white bg-white shadow-md absolute -top-12 left-6 overflow-hidden">
@@ -213,7 +213,7 @@ export default function SettingsPage() {
                 </div>
               </div>
 
-              <div className="pt-6 border-t border-gray-100 flex justify-end">
+              <div className="pt-6 border-t border-gray-100 flex flex-col sm:flex-row justify-end gap-3">
                 <button
                   type="submit"
                   disabled={loading}

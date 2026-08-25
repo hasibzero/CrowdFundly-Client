@@ -8,16 +8,16 @@ import toast from 'react-hot-toast';
 import { API_URL, authHeaders } from '@/lib/api';
 
 export default function WithdrawalsPage() {
-  const [credits, setCredits] = useState('');
-  const [availableCredits, setAvailableCredits] = useState(0);
+  const [credits, setUSD] = useState('');
+  const [availableUSD, setAvailableUSD] = useState(0);
   const [paymentMethod, setPaymentMethod] = useState('');
   const [paymentDetails, setPaymentDetails] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     axios.get(`${API_URL}/api/users/me`, { headers: authHeaders() })
-      .then((response) => setAvailableCredits(response.data.credits || 0))
-      .catch(() => setAvailableCredits(0));
+      .then((response) => setAvailableUSD(response.data.credits || 0))
+      .catch(() => setAvailableUSD(0));
   }, []);
   
   const containerVariants = {
@@ -30,16 +30,16 @@ export default function WithdrawalsPage() {
     visible: { opacity: 1, y: 0 }
   };
 
-  const usdAmount = credits ? (parseInt(credits, 10) / 10).toFixed(2) : '0.00';
-  const isInsufficient = credits && (parseInt(credits, 10) < 100 || parseInt(credits, 10) > availableCredits);
+  const usdAmount = credits ? parseInt(credits, 10).toFixed(2) : '0.00';
+  const isInsufficient = credits && (parseInt(credits, 10) < 100 || parseInt(credits, 10) > availableUSD);
 
   const submitWithdrawal = async () => {
     if (isInsufficient || !paymentMethod || !paymentDetails.trim()) return;
     setIsSubmitting(true);
     try {
       await axios.post(`${API_URL}/api/withdrawals`, { creditsToWithdraw: Number(credits), paymentMethod, paymentDetails }, { headers: authHeaders() });
-      setAvailableCredits((current) => current - Number(credits));
-      setCredits(''); setPaymentMethod(''); setPaymentDetails('');
+      setAvailableUSD((current) => current - Number(credits));
+      setUSD(''); setPaymentMethod(''); setPaymentDetails('');
       toast.success('Withdrawal request submitted for review.');
     } catch (error) {
       toast.error(error.response?.data?.message || 'Unable to request a withdrawal.');
@@ -74,13 +74,10 @@ export default function WithdrawalsPage() {
             Available for Withdrawal
           </div>
           <div className="flex items-baseline mb-4">
-            <span className="text-[48px] font-bold text-[#0f172a] tracking-tight mr-3 leading-none">{availableCredits.toLocaleString()}</span>
-            <span className="text-[15px] font-medium text-gray-500">Credits</span>
+            <span className="text-[48px] font-bold text-[#0f172a] tracking-tight mr-3 leading-none">{availableUSD.toLocaleString()}</span>
+            <span className="text-[15px] font-medium text-gray-500">USD</span>
           </div>
-          <div className="flex items-center text-[13px]">
-            <span className="font-bold text-[#0f766e] mr-2">≈ ${(availableCredits / 10).toFixed(2)} USD</span>
-            <span className="text-gray-500">(Rate: 10 credits = $1)</span>
-          </div>
+
         </div>
 
         {/* Ready to cash out Card */}
@@ -90,7 +87,7 @@ export default function WithdrawalsPage() {
           </div>
           <h3 className="text-[18px] font-bold text-[#0f172a] mb-2">Ready to cash out?</h3>
           <p className="text-[12px] text-gray-500 mb-6 px-2">
-            Minimum withdrawal is 100 credits ($10.00).
+            Minimum withdrawal is 100 USD.
           </p>
           <button onClick={() => document.getElementById('withdrawal-amount')?.focus()} className="w-full bg-[#12643E] hover:bg-[#0e4f31] text-white py-2.5 rounded-lg font-bold text-[14px] transition-colors shadow-sm">
             Start Withdrawal
@@ -112,33 +109,22 @@ export default function WithdrawalsPage() {
           {/* Form Column */}
           <div className="space-y-6">
             <div>
-              <label className="block text-[12px] font-bold text-[#0f172a] mb-1.5">Credits To Withdraw</label>
+              <label className="block text-[12px] font-bold text-[#0f172a] mb-1.5">USD To Withdraw</label>
               <div className="relative">
                 <input 
-                  id="withdrawal-amount" type="number" min="100" max={availableCredits}
+                  id="withdrawal-amount" type="number" min="100" max={availableUSD}
                   value={credits}
-                  onChange={(e) => setCredits(e.target.value)}
+                  onChange={(e) => setUSD(e.target.value)}
                   placeholder="e.g. 500" 
                   className="w-full pl-4 pr-16 py-3 rounded-md border border-gray-200 focus:outline-none focus:border-[#0f766e] focus:ring-1 focus:ring-[#0f766e] text-[14px] text-gray-900 placeholder-gray-400"
                 />
                 <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-[12px] text-gray-500 font-bold">
-                  Credits
+                  USD
                 </span>
               </div>
             </div>
 
-            <div>
-              <label className="block text-[12px] font-bold text-[#0f172a] mb-1.5">Withdraw Amount ($)</label>
-              <div className="relative">
-                <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 font-bold">$</span>
-                <input 
-                  type="text" 
-                  value={usdAmount}
-                  disabled
-                  className="w-full pl-8 pr-4 py-3 rounded-md border border-gray-100 bg-[#f8fafc] text-[14px] text-gray-500 font-semibold cursor-not-allowed"
-                />
-              </div>
-            </div>
+
 
             <div>
               <label className="block text-[12px] font-bold text-[#0f172a] mb-1.5">Payment System</label>
@@ -174,7 +160,7 @@ export default function WithdrawalsPage() {
               
               {isInsufficient && (
                 <p className="text-[12px] text-red-500 mt-2 text-center font-medium">
-                  Enter at least 100 credits and no more than your available balance.
+                  Enter at least 100 USD and no more than your available balance.
                 </p>
               )}
             </div>

@@ -14,7 +14,7 @@ export default function WithdrawalRequestsPage() {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [credits, setCredits] = useState(0);
+  const [credits, setUSD] = useState(0);
 
   useEffect(() => {
     if (!user) return;
@@ -28,7 +28,7 @@ export default function WithdrawalRequestsPage() {
           axios.get(`${API}/api/users/me`, { headers }),
         ]);
         setRequests(wdRes.data);
-        setCredits(meRes.data.credits || 0);
+        setUSD(meRes.data.credits || 0);
       } catch (err) {
         console.error('Failed to fetch withdrawals:', err);
         toast.error('Failed to load withdrawal history');
@@ -44,8 +44,8 @@ export default function WithdrawalRequestsPage() {
     r.status?.toLowerCase().includes(search.toLowerCase())
   );
 
-  const pendingAmount = requests.filter(r => r.status === 'Pending').reduce((s, r) => s + (r.amountUSD || 0), 0);
-  const completedAmount = requests.filter(r => r.status === 'Processed').reduce((s, r) => s + (r.amountUSD || 0), 0);
+  const pendingAmount = requests.filter(r => r.status === 'Pending').reduce((s, r) => s + (r.credits || 0), 0);
+  const completedAmount = requests.filter(r => r.status === 'Processed').reduce((s, r) => s + (r.credits || 0), 0);
 
   const getStatusBadge = (status) => {
     const styles = {
@@ -76,7 +76,7 @@ export default function WithdrawalRequestsPage() {
       {/* Stats */}
       <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         {[
-          { label: 'Available Balance', value: `${credits.toLocaleString()} CR`, icon: Wallet, bg: 'bg-[#e6f7ef]', color: 'text-[#2ea673]' },
+          { label: 'Available Balance', value: `$${credits.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`, icon: Wallet, bg: 'bg-[#e6f7ef]', color: 'text-[#2ea673]' },
           { label: 'Pending Withdrawals', value: `$${pendingAmount.toFixed(2)}`, icon: Clock, bg: 'bg-[#fff7ed]', color: 'text-[#ea580c]' },
           { label: 'Total Processed', value: `$${completedAmount.toFixed(2)}`, icon: CheckCircle2, bg: 'bg-[#f3f0ff]', color: 'text-[#6d28d9]' },
         ].map((card) => (
@@ -106,12 +106,7 @@ export default function WithdrawalRequestsPage() {
             />
           </div>
           <div className="flex space-x-3 w-full md:w-auto">
-            <button className="flex-1 md:flex-none flex items-center justify-center px-4 py-2 border border-gray-200 rounded-lg text-[13px] font-bold text-gray-600 hover:bg-gray-50 transition-colors">
-              <Filter className="w-3.5 h-3.5 mr-2 text-gray-500" /> Filter
-            </button>
-            <button className="flex-1 md:flex-none flex items-center justify-center px-4 py-2 border border-gray-200 rounded-lg text-[13px] font-bold text-gray-600 hover:bg-gray-50 transition-colors">
-              <Download className="w-3.5 h-3.5 mr-2 text-gray-500" /> Export
-            </button>
+            {/* Buttons removed */}
           </div>
         </div>
 
@@ -141,7 +136,7 @@ export default function WithdrawalRequestsPage() {
                       <td className="px-6 py-4 text-[13px] font-medium text-gray-600">
                         {req.requestDate ? new Date(req.requestDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}
                       </td>
-                      <td className="px-6 py-4 text-[14px] font-bold text-[#0f172a]">${(req.amountUSD || 0).toFixed(2)}</td>
+                      <td className="px-6 py-4 text-[14px] font-bold text-[#0f172a]">${(req.credits || 0).toFixed(2)}</td>
                       <td className="px-6 py-4">
                         <div className="flex items-center text-[14px] text-[#334155]">
                           {getSystemIcon(req.paymentMethod)}

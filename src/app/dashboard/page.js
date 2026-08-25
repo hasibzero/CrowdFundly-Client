@@ -210,7 +210,7 @@ export default function DashboardPage() {
           </div>
           <p className="text-[11px] text-gray-500 uppercase tracking-widest font-bold mb-4 relative z-10">Total Contributed</p>
           <p className="text-[40px] font-bold text-[#0f172a] leading-none mb-3 relative z-10 tracking-tight">{(stats?.totalContributed ?? 0).toLocaleString()}</p>
-          <p className="text-xs text-gray-500 relative z-10 font-medium">Credits deployed</p>
+          <p className="text-xs text-gray-500 relative z-10 font-medium">USD deployed</p>
         </div>
 
         <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200/60 relative overflow-hidden group hover:shadow-md transition-shadow">
@@ -218,10 +218,10 @@ export default function DashboardPage() {
           <div className="absolute top-6 right-6 w-10 h-10 rounded-lg bg-[#e0e7ff] flex items-center justify-center text-[#4f46e5] z-10">
             <WalletCards className="w-5 h-5" />
           </div>
-          <p className="text-[11px] text-gray-500 uppercase tracking-widest font-bold mb-4 relative z-10">Available Credits</p>
+          <p className="text-[11px] text-gray-500 uppercase tracking-widest font-bold mb-4 relative z-10">Available USD</p>
           <div className="flex items-baseline mb-3 relative z-10">
             <p className="text-[40px] font-bold text-[#0f172a] leading-none tracking-tight">{(stats?.credits ?? user?.credits ?? 0).toLocaleString()}</p>
-            <span className="text-lg font-bold text-gray-400 ml-2">CR</span>
+            <span className="text-lg font-bold text-gray-400 ml-2">USD</span>
           </div>
           <p className="text-xs text-gray-500 relative z-10 font-medium">Ready to deploy</p>
         </div>
@@ -245,7 +245,7 @@ export default function DashboardPage() {
               <thead className="text-[11px] text-gray-500 font-bold uppercase tracking-widest bg-gray-50/50 border-b border-gray-100">
                 <tr>
                   <th className="px-6 py-4 font-bold">Campaign</th>
-                  <th className="px-6 py-4 font-bold">Amount (Credits)</th>
+                  <th className="px-6 py-4 font-bold">Amount (USD)</th>
                   <th className="px-6 py-4 font-bold">Date</th>
                   <th className="px-6 py-4 font-bold text-right">Status</th>
                 </tr>
@@ -256,7 +256,7 @@ export default function DashboardPage() {
                     <td className="px-6 py-4">
                       <span className="font-bold text-gray-800 text-[13px]">Campaign #{item.campaignId?.toString().slice(-6)}</span>
                     </td>
-                    <td className="px-6 py-4 font-bold text-[#0f172a] text-[13px]">{(item.amount || 0).toLocaleString()} CR</td>
+                    <td className="px-6 py-4 font-bold text-[#0f172a] text-[13px]">{(item.amount || 0).toLocaleString()} USD</td>
                     <td className="px-6 py-4 text-gray-500 text-[13px]">{new Date(item.date).toLocaleDateString()}</td>
                     <td className="px-6 py-4 text-right">
                       <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold bg-[#d1fae5] text-[#059669] border border-[#a7f3d0]">

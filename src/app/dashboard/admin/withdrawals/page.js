@@ -49,8 +49,8 @@ export default function AdminWithdrawalsPage() {
 
   const pending = withdrawals.filter(w => w.status === 'Pending');
   const processed = withdrawals.filter(w => w.status === 'Processed');
-  const pendingTotal = pending.reduce((s, w) => s + (w.amountUSD || 0), 0);
-  const processedTotal = processed.reduce((s, w) => s + (w.amountUSD || 0), 0);
+  const pendingTotal = pending.reduce((s, w) => s + (w.credits || 0), 0);
+  const processedTotal = processed.reduce((s, w) => s + (w.credits || 0), 0);
 
   const getInitials = (email) => email?.slice(0, 2).toUpperCase() || '??';
   const colors = ['bg-[#6366f1]', 'bg-[#d97706]', 'bg-[#059669]', 'bg-[#dc2626]', 'bg-[#7c3aed]'];
@@ -69,12 +69,7 @@ export default function AdminWithdrawalsPage() {
             <p className="text-[14px] text-gray-500">Review and process pending creator payouts.</p>
           </div>
           <div className="flex space-x-3">
-            <button onClick={() => toast.success('Filter coming soon!')} className="flex items-center space-x-2 bg-white border border-[#c7d2fe] px-4 py-2 rounded-md text-[13px] font-bold text-[#4f46e5] hover:bg-indigo-50 transition-colors shadow-sm">
-              <Filter className="w-4 h-4" /><span>Filter</span>
-            </button>
-            <button onClick={() => toast.success('Exporting CSV...')} className="flex items-center space-x-2 bg-white border border-[#c7d2fe] px-4 py-2 rounded-md text-[13px] font-bold text-[#4f46e5] hover:bg-indigo-50 transition-colors shadow-sm">
-              <Download className="w-4 h-4" /><span>Export</span>
-            </button>
+            {/* Action buttons removed as requested */}
           </div>
         </motion.div>
 
@@ -133,7 +128,7 @@ export default function AdminWithdrawalsPage() {
                             <p className="text-[13px] font-bold text-[#0f172a] leading-tight max-w-[140px] truncate">{req.creatorEmail}</p>
                           </div>
                         </td>
-                        <td className="px-6 py-5 text-[14px] font-bold text-[#0f172a]">${(req.amountUSD || 0).toFixed(2)}</td>
+                        <td className="px-6 py-5 text-[14px] font-bold text-[#0f172a]">${(req.credits || 0).toFixed(2)}</td>
                         <td className="px-6 py-5">
                           <span className="px-3 py-1.5 rounded-full text-[10px] font-bold bg-[#eef2ff] text-[#4f46e5]">
                             {req.paymentMethod || 'N/A'}

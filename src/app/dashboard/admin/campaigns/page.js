@@ -82,9 +82,7 @@ export default function AdminCampaignsPage() {
         <motion.div variants={itemVariants} className="mb-12">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-[22px] font-bold text-[#0f172a] tracking-tight">Pending Campaigns</h2>
-            <button onClick={() => toast.success('Filter coming soon!')} className="flex items-center text-[13px] font-bold text-[#3b2de6] hover:text-indigo-800 transition-colors">
-              Filter <Filter className="w-3.5 h-3.5 ml-1" />
-            </button>
+            {/* Filter removed */}
           </div>
 
           <div className="bg-white rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100 overflow-hidden flex flex-col">
@@ -100,8 +98,15 @@ export default function AdminCampaignsPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {pendingCampaigns.map((campaign) => (
-                    <tr key={campaign._id?.toString()} className="hover:bg-gray-50/50 transition-colors">
+                  {pendingCampaigns.length === 0 ? (
+                    <tr>
+                      <td colSpan="5" className="px-6 py-12 text-center text-[14px] text-gray-500 font-medium">
+                        No pending campaigns to review.
+                      </td>
+                    </tr>
+                  ) : (
+                    pendingCampaigns.map((campaign) => (
+                      <tr key={campaign._id?.toString()} className="hover:bg-gray-50/50 transition-colors">
                       {/* Campaign Title */}
                       <td className="px-6 py-5">
                         <div className="flex items-center space-x-4">
@@ -158,7 +163,7 @@ export default function AdminCampaignsPage() {
                         </div>
                       </td>
                     </tr>
-                  ))}
+                  )))}
                 </tbody>
               </table>
             </div>
@@ -170,9 +175,7 @@ export default function AdminCampaignsPage() {
         <motion.div variants={itemVariants} className="mb-8">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-[22px] font-bold text-[#0f172a] tracking-tight">Approved Campaigns</h2>
-            <button onClick={() => toast.success('Filter coming soon!')} className="flex items-center text-[13px] font-bold text-[#3b2de6] hover:text-indigo-800 transition-colors">
-              Filter <Filter className="w-3.5 h-3.5 ml-1" />
-            </button>
+            {/* Filter removed */}
           </div>
 
           <div className="bg-white rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100 overflow-hidden flex flex-col">
