@@ -24,15 +24,11 @@ export default function PurchaseCreditPage() {
     const confirmPurchase = async () => {
       const params = new URLSearchParams(window.location.search);
       const sessionId = params.get('session_id');
-      const isDummy = params.get('dummy') === 'true';
-      const creditsFromDummy = params.get('credits');
       
       if (params.get('checkout') === 'success' && sessionId) {
         try {
           const response = await axios.post(`${API_URL}/api/credits/confirm-checkout`, { 
-            sessionId, 
-            isDummy, 
-            credits: creditsFromDummy 
+            sessionId 
           }, { headers: authHeaders() });
           
           setBalance(response.data.credits || 0);
