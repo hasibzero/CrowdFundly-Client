@@ -112,7 +112,7 @@ export default function ContributionsPage() {
                           <div className="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center flex-shrink-0">
                             <CheckCircle2 className="w-5 h-5 text-indigo-500" />
                           </div>
-                          <span className="text-[13px] font-bold text-[#0f172a]">#{c.campaignId?.toString().slice(-8)}</span>
+                          <span className="text-[13px] font-bold text-[#0f172a]">{c.campaignTitle || `#${c.campaignId?.toString().slice(-8)}`}</span>
                         </div>
                       </td>
                       <td className="px-6 py-5 text-[14px] text-[#475569] font-medium">
@@ -136,7 +136,7 @@ export default function ContributionsPage() {
                       <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center flex-shrink-0">
                         <CheckCircle2 className="w-4 h-4 text-indigo-500" />
                       </div>
-                      <span className="text-[13px] font-bold text-[#0f172a]">#{c.campaignId?.toString().slice(-8)}</span>
+                      <span className="text-[13px] font-bold text-[#0f172a]">{c.campaignTitle || `#${c.campaignId?.toString().slice(-8)}`}</span>
                     </div>
                     {getStatusBadge(c.status)}
                   </div>

@@ -254,7 +254,7 @@ export default function DashboardPage() {
                 {contributions.map((item, idx) => (
                   <tr key={item._id || idx} className="hover:bg-gray-50/50 transition-colors group">
                     <td className="px-6 py-4">
-                      <span className="font-bold text-gray-800 text-[13px]">Campaign #{item.campaignId?.toString().slice(-6)}</span>
+                      <span className="font-bold text-gray-800 text-[13px]">{item.campaignTitle || `Campaign #${item.campaignId?.toString().slice(-6)}`}</span>
                     </td>
                     <td className="px-6 py-4 font-bold text-[#0f172a] text-[13px]">{(item.amount || 0).toLocaleString()} USD</td>
                     <td className="px-6 py-4 text-gray-500 text-[13px]">{new Date(item.date).toLocaleDateString()}</td>
