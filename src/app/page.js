@@ -95,32 +95,7 @@ export default function Home() {
       </div>
     </section>
 
-    {/* Community Voices Section */}
-    <section className="bg-white py-24">
-      <div className="mx-auto max-w-6xl px-6">
-        <h2 className="text-3xl font-bold text-center text-[#0f172a] mb-12">Community Voices</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <TestimonialCard 
-            quote="Crowdfundly provided the exact launchpad we needed. The community here is incredibly supportive and genuinely cares about sustainable tech. We hit our goal in just 48 hours!"
-            name="Sarah Jenkins"
-            role="Creator, EcoPod"
-            image="https://ui-avatars.com/api/?name=Sarah+Jenkins&background=random"
-          />
-          <TestimonialCard 
-            quote="As a backer, I love the transparency. The platform makes it easy to track the progress of the hardware projects I've invested in. It feels safe, professional, and exciting."
-            name="Michael Chen"
-            role="Super Backer"
-            image="https://ui-avatars.com/api/?name=Michael+Chen&background=random"
-          />
-          <TestimonialCard 
-            quote="The tools provided for creators are top-notch. Managing updates and communicating with my supporters was seamless. Highly recommend this platform to any indie artist."
-            name="Elena Rodriguez"
-            role="Artist & Creator"
-            image="https://ui-avatars.com/api/?name=Elena+Rodriguez&background=random"
-          />
-        </div>
-      </div>
-    </section>
+    {/* Removed Hardcoded Community Voices Section as requested */}
 
     {/* Footer */}
     <footer className="bg-[#f8fafc] border-t border-gray-200 pt-16 pb-8">
