@@ -28,7 +28,10 @@ export default function CreateCampaignPage() {
     duration: '',
     coverImage: '',
     teamName: '',
-    teamRole: ''
+    teamRole: '',
+    rewardTitle: '',
+    rewardAmount: '',
+    rewardDescription: ''
   });
 
   const handleChange = (e) => {
@@ -72,25 +75,17 @@ export default function CreateCampaignPage() {
         creatorName: user?.name,
         creatorAvatar: user?.photoURL,
         team: formData.teamName ? [{ name: formData.teamName, role: formData.teamRole, initials: formData.teamName.substring(0, 2).toUpperCase() }] : [],
-        rewards: [
+        rewards: formData.rewardTitle ? [
           {
-            title: "Supporter",
-            amount: 25,
-            description: "Show your support for sustainable agriculture! Get exclusive behind-the-scenes updates.",
-            items: ["Exclusive Updates", "Digital Backer Wall"],
-            estimatedDelivery: "Aug 2024",
-            backers: 0
-          },
-          {
-            title: "Early Bird",
-            amount: 249,
-            description: "Get the complete system at a significant discount off retail price. Everything you need.",
-            items: ["1x Smart Farm", "Starter Seed Pod Kit", "Nutrient Solution", "App Access"],
-            estimatedDelivery: "Nov 2024",
+            title: formData.rewardTitle,
+            amount: Number(formData.rewardAmount) || 25,
+            description: formData.rewardDescription,
+            items: [],
+            estimatedDelivery: "TBD",
             backers: 0,
             popular: true
           }
-        ]
+        ] : []
       }, {
         headers: {
           Authorization: `Bearer ${token}`
@@ -352,6 +347,45 @@ export default function CreateCampaignPage() {
                     placeholder="e.g., 30" 
                     className="w-full px-4 py-2.5 rounded-md border border-gray-200 focus:outline-none focus:border-[#0f766e] focus:ring-1 focus:ring-[#0f766e] text-[14px] text-gray-900 placeholder-gray-400"
                   />
+                </div>
+
+                <div className="pt-4 border-t border-gray-100">
+                  <h4 className="text-[14px] font-bold text-gray-900 mb-4">Add a Support Tier (Optional)</h4>
+                  <div className="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                      <label className="block text-[13px] text-gray-700 mb-1.5">Tier Title</label>
+                      <input 
+                        type="text" 
+                        name="rewardTitle"
+                        value={formData.rewardTitle}
+                        onChange={handleChange}
+                        placeholder="e.g., Early Bird Access" 
+                        className="w-full px-4 py-2.5 rounded-md border border-gray-200 focus:outline-none focus:border-[#0f766e] focus:ring-1 focus:ring-[#0f766e] text-[14px] text-gray-900 placeholder-gray-400"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[13px] text-gray-700 mb-1.5">Tier Minimum Amount (USD)</label>
+                      <input 
+                        type="number" 
+                        name="rewardAmount"
+                        value={formData.rewardAmount}
+                        onChange={handleChange}
+                        placeholder="e.g., 50" 
+                        className="w-full px-4 py-2.5 rounded-md border border-gray-200 focus:outline-none focus:border-[#0f766e] focus:ring-1 focus:ring-[#0f766e] text-[14px] text-gray-900 placeholder-gray-400"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-[13px] text-gray-700 mb-1.5">Tier Description</label>
+                    <textarea 
+                      name="rewardDescription"
+                      value={formData.rewardDescription}
+                      onChange={handleChange}
+                      rows="2"
+                      placeholder="What backers get for this tier..."
+                      className="w-full px-4 py-3 rounded-md border border-gray-200 focus:outline-none focus:border-[#0f766e] focus:ring-1 focus:ring-[#0f766e] text-[14px] text-gray-900 placeholder-gray-400 resize-none"
+                    ></textarea>
+                  </div>
                 </div>
               </motion.div>
             )}
