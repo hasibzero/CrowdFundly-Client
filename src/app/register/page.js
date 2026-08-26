@@ -7,6 +7,7 @@ import toast from 'react-hot-toast';
 import { Mail, Lock, Eye, EyeOff, Link as LinkIcon } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import { uploadImageToImgBB } from '@/lib/uploadImage';
+import { authClient } from '@/lib/auth-client';
 
 export default function RegisterPage() {
   const [name, setName] = useState('');
@@ -16,7 +17,7 @@ export default function RegisterPage() {
   const [photoURL, setPhotoURL] = useState('');
   const [role, setRole] = useState('Supporter');
   const [isUploading, setIsUploading] = useState(false);
-  const { register, user, loading } = useAuth();
+  const { register, loginWithGoogleToken, user, loading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
@@ -39,6 +40,18 @@ export default function RegisterPage() {
     } catch (error) {
       toast.error(error.message || 'Failed to upload image', { id: toastId });
     } finally {
+      setIsUploading(false);
+    }
+  };
+  const triggerGoogleLogin = async () => {
+    setIsUploading(true);
+    try {
+      await authClient.signIn.social({
+        provider: 'google',
+        callbackURL: '/select-role',
+      });
+    } catch (err) {
+      toast.error('Failed to initialize Google login');
       setIsUploading(false);
     }
   };
@@ -194,9 +207,14 @@ export default function RegisterPage() {
                   disabled={isUploading}
                   className="block w-full px-3 py-2.5 border border-slate-200 rounded-lg text-slate-900 focus:ring-2 focus:ring-[#12643E] focus:border-[#12643E] sm:text-sm transition-colors outline-none disabled:bg-slate-50 cursor-pointer"
                 >
-                  <option value="Supporter">Supporter (Starts with 50 USD)</option>
-                  <option value="Creator">Creator (Starts with 20 USD)</option>
+                  <option value="Supporter">Supporter</option>
+                  <option value="Creator">Creator</option>
                 </select>
+                <p className="mt-1.5 text-[11px] text-slate-500">
+                  {role === 'Creator'
+                    ? 'Creators can launch campaigns for approval and raise credits from supporters.'
+                    : 'Supporters purchase credits to back the projects they believe in.'}
+                </p>
               </div>
 
               <div>
@@ -270,7 +288,9 @@ export default function RegisterPage() {
               <div className="mt-6">
                 <button
                   type="button"
-                  className="w-full flex items-center justify-center gap-3 bg-white border border-slate-200 py-2.5 px-4 rounded-lg text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors shadow-sm"
+                  onClick={triggerGoogleLogin}
+                  disabled={isUploading}
+                  className="w-full flex items-center justify-center gap-3 bg-white border border-slate-200 py-2.5 px-4 rounded-lg text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors shadow-sm disabled:opacity-70 disabled:cursor-not-allowed"
                 >
                   <svg className="h-5 w-5" aria-hidden="true" viewBox="0 0 24 24">
                     <path d="M12.0003 4.75C13.7703 4.75 15.3553 5.36002 16.6053 6.54998L20.0303 3.125C17.9502 1.19 15.2353 0 12.0003 0C7.31028 0 3.25527 2.69 1.28027 6.60998L5.27028 9.70498C6.21525 6.86002 8.87028 4.75 12.0003 4.75Z" fill="#EA4335" />
@@ -278,7 +298,7 @@ export default function RegisterPage() {
                     <path d="M5.26498 14.2949C5.02498 13.5699 4.88501 12.7999 4.88501 11.9999C4.88501 11.1999 5.01998 10.4299 5.26498 9.7049L1.275 6.60986C0.46 8.22986 0 10.0599 0 11.9999C0 13.9399 0.46 15.7699 1.28 17.3899L5.26498 14.2949Z" fill="#FBBC05" />
                     <path d="M12.0004 24.0001C15.2404 24.0001 17.9654 22.935 19.9454 21.095L16.0804 18.095C15.0054 18.82 13.6204 19.245 12.0004 19.245C8.8704 19.245 6.21537 17.135 5.26538 14.29L1.27539 17.385C3.25539 21.31 7.3104 24.0001 12.0004 24.0001Z" fill="#34A853" />
                   </svg>
-                  Sign in with Google
+                  Sign up with Google
                 </button>
               </div>
             </div>
@@ -300,7 +320,7 @@ export default function RegisterPage() {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end p-12 text-white">
               <h3 className="text-3xl font-bold mb-3 tracking-tight">Launch your dreams.</h3>
-              <p className="text-zinc-200 text-base leading-relaxed max-w-sm">
+              <p className="text-zinc-200 text-base leading-relaxed max-w-[24rem]">
                 Join thousands of creators and backers building the future together on Crowdfundly.
               </p>
             </div>

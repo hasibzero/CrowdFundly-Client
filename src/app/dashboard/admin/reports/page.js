@@ -36,7 +36,7 @@ export default function AdminReportsPage() {
 
   useEffect(() => { fetchData(); }, []);
 
-  const totalVolume = stats?.totalFunded ? stats.totalFunded.toFixed(2) : null;
+  const totalVolume = stats?.totalFunded ? stats.totalFunded.toLocaleString() : null;
   const activeCamps = stats?.activeCampaigns ? stats.activeCampaigns.toLocaleString() : null;
   const newUsers = stats?.supporters ? stats.supporters.toLocaleString() : null;
   const pendingReports = reports.filter(r => r.status === 'Pending').length;
@@ -68,7 +68,7 @@ export default function AdminReportsPage() {
                   <Banknote className="w-5 h-5 text-[#059669]" />
                 </div>
               </div>
-              <h2 className="text-[28px] font-bold text-[#0f172a] mb-3">${totalVolume}</h2>
+              <h2 className="text-[28px] font-bold text-[#0f172a] mb-3">{totalVolume} credits</h2>
             </div>
           )}
 
@@ -161,7 +161,7 @@ export default function AdminReportsPage() {
                 {withdrawals.map(withdrawal => (
                   <div key={withdrawal._id} className="border border-gray-100 p-4 rounded-lg flex justify-between items-center">
                     <div>
-                      <p className="text-[14px] font-bold text-[#0f172a]">${(withdrawal.credits || 0).toFixed(2)} USD</p>
+                      <p className="text-[14px] font-bold text-[#0f172a]">{(withdrawal.credits || 0).toLocaleString()} credits</p>
                       <p className="text-[12px] font-medium text-gray-500">{withdrawal.creatorEmail}</p>
                       <p className="text-[11px] text-gray-400 mt-1">
                         {withdrawal.requestDate ? new Date(withdrawal.requestDate).toLocaleDateString() : '—'} • {withdrawal.paymentMethod || 'Unknown'}

@@ -20,11 +20,16 @@ export const auth = betterAuth({
             credits: {
                 type: "number",
                 required: false,
-                defaultValue: 50
+                defaultValue: 0
             },
             photoURL: {
                 type: "string",
                 required: false
+            },
+            roleSelected: {
+                type: "boolean",
+                required: false,
+                defaultValue: false
             }
         }
     },
@@ -33,4 +38,17 @@ export const auth = betterAuth({
     advanced: {
         cookiePrefix: "crowdfundly",
     },
+    socialProviders: {
+        google: {
+            clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || process.env.GOOGLE_CLIENT_ID,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        }
+    },
+    account: {
+        accountLinking: {
+            enabled: true,
+            trustedProviders: ["google"],
+            requireLocalEmailVerified: false,
+        }
+    }
 });

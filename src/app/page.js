@@ -3,11 +3,100 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import axios from 'axios';
-import { ArrowRight, DollarSign, Rocket, Search } from 'lucide-react';
+import { ArrowRight, Coins, Rocket, Search, Quote, AtSign, Briefcase, Code2, Users } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Autoplay, Pagination, EffectFade } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/pagination';
+import 'swiper/css/effect-fade';
 import Navbar from '@/components/Navbar';
 import { API_URL } from '@/lib/api';
 
-const currency = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
+const fmt = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 });
+
+const HERO_SLIDES = [
+  {
+    image: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&q=80&w=2070',
+    eyebrow: 'Crowdfundly',
+    title: 'Back ideas that move communities forward.',
+    text: 'Discover approved projects, support creators with secure credit contributions, and follow the impact you help make.',
+    primary: { label: 'Explore campaigns', href: '/campaigns' },
+    secondary: { label: 'Create an account', href: '/register' },
+  },
+  {
+    image: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=2070',
+    eyebrow: 'Fund with confidence',
+    title: 'Every contribution runs on secure credits.',
+    text: 'Top up once, then back as many projects as you like. Transparent tiers, instant updates, and no hidden fees.',
+    primary: { label: 'Browse projects', href: '/campaigns' },
+    secondary: { label: 'How it works', href: '#how-it-works' },
+  },
+  {
+    image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&q=80&w=2070',
+    eyebrow: 'For creators',
+    title: 'Launch your campaign. Reach real backers.',
+    text: 'Tell your story, set a funding goal, and turn a community of supporters into momentum for your idea.',
+    primary: { label: 'Start a campaign', href: '/register' },
+    secondary: { label: 'Join as Developer', href: '/register' },
+  },
+];
+
+const TESTIMONIALS = [
+  {
+    quote: 'Crowdfundly made it effortless to rally support for our neighborhood garden. We hit our funding goal in eleven days.',
+    name: 'Maya Rodriguez',
+    role: 'Community Organizer',
+    image: 'https://randomuser.me/api/portraits/women/68.jpg',
+  },
+  {
+    quote: 'The credit system is genuinely frictionless. I topped up once and backed five projects the same afternoon.',
+    name: 'David Chen',
+    role: 'Early Backer',
+    image: 'https://randomuser.me/api/portraits/men/32.jpg',
+  },
+  {
+    quote: 'As a first-time creator, the guided campaign builder walked me through everything. Approval was fast and fair.',
+    name: 'Aisha Bello',
+    role: 'Product Designer',
+    image: 'https://randomuser.me/api/portraits/women/44.jpg',
+  },
+  {
+    quote: 'We funded our short film here after two other platforms fell through. The backer updates kept everyone engaged.',
+    name: 'Liam Carter',
+    role: 'Filmmaker',
+    image: 'https://randomuser.me/api/portraits/men/75.jpg',
+  },
+  {
+    quote: 'Transparent tiers and clear progress bars meant our supporters always knew exactly where we stood.',
+    name: 'Priya Nair',
+    role: 'Hardware Founder',
+    image: 'https://randomuser.me/api/portraits/women/65.jpg',
+  },
+  {
+    quote: 'I love seeing the impact of what I back. The updates from creators make every contribution feel personal.',
+    name: 'Sofia Almeida',
+    role: 'Monthly Supporter',
+    image: 'https://randomuser.me/api/portraits/women/90.jpg',
+  },
+];
+
+const SOCIALS = [
+  { Icon: Briefcase, label: 'LinkedIn', href: 'https://linkedin.com' },
+  { Icon: Users, label: 'Facebook', href: 'https://facebook.com' },
+  { Icon: Code2, label: 'GitHub', href: 'https://github.com' },
+  { Icon: AtSign, label: 'Twitter', href: 'https://twitter.com' },
+];
+
+const sectionReveal = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut', staggerChildren: 0.12 } },
+};
+
+const itemReveal = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } },
+};
 
 export default function Home() {
   const [campaigns, setCampaigns] = useState([]);
@@ -34,47 +123,111 @@ export default function Home() {
 
   return <div className="min-h-screen bg-[#F8FAFC] text-zinc-900">
     <Navbar />
-    <section className="relative flex min-h-[540px] items-end justify-center overflow-hidden bg-zinc-900 px-6 pb-20 pt-32 text-center">
-      <img src="https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&q=80&w=2070" className="absolute inset-0 h-full w-full object-cover opacity-55" alt="People collaborating" />
-      <div className="absolute inset-0 bg-gradient-to-t from-[#202738] via-[#202738]/60 to-[#202738]/20" />
-      <div className="relative z-10 max-w-3xl">
-        <p className="mb-4 text-sm font-bold uppercase tracking-[0.2em] text-emerald-200">Crowdfundly</p>
-        <h1 className="mb-5 font-serif text-4xl font-bold text-white md:text-6xl">Back ideas that move communities forward.</h1>
-        <p className="mb-9 text-base leading-relaxed text-zinc-200 md:text-lg">Discover approved projects, support creators with secure credit contributions, and follow the impact you help make.</p>
-        <div className="flex flex-col justify-center gap-3 sm:flex-row"><Link href="/campaigns" className="rounded-full bg-[#12643E] px-8 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#0e4f31]">Explore campaigns</Link><Link href="/register" className="rounded-full bg-white px-8 py-3 text-sm font-semibold text-[#12643E] transition-colors hover:bg-zinc-100">Create an account</Link></div>
-      </div>
+
+    {/* HERO SLIDER */}
+    <section className="relative">
+      <Swiper
+        modules={[Autoplay, Pagination, EffectFade]}
+        effect="fade"
+        fadeEffect={{ crossFade: true }}
+        loop
+        speed={900}
+        autoplay={{ delay: 5000, disableOnInteraction: false }}
+        pagination={{ clickable: true }}
+        className="h-[560px] w-full"
+        style={{
+          '--swiper-pagination-color': '#ffffff',
+          '--swiper-pagination-bullet-inactive-color': '#ffffff',
+          '--swiper-pagination-bullet-inactive-opacity': '0.45',
+          '--swiper-pagination-bottom': '28px',
+        }}
+      >
+        {HERO_SLIDES.map((slide, i) => (
+          <SwiperSlide key={i}>
+            <div className="relative flex h-full min-h-[560px] items-center justify-center overflow-hidden bg-zinc-900 px-6 text-center">
+              <img src={slide.image} className="absolute inset-0 h-full w-full object-cover opacity-55" alt="" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#202738] via-[#202738]/60 to-[#202738]/20" />
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 24 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, ease: 'easeOut', delay: 0.15 }}
+                className="relative z-10 max-w-3xl pt-16"
+              >
+                <p className="mb-4 text-sm font-bold uppercase tracking-[0.2em] text-emerald-200">{slide.eyebrow}</p>
+                <h1 className="mb-5 font-serif text-4xl font-bold text-white md:text-6xl">{slide.title}</h1>
+                <p className="mb-9 text-base leading-relaxed text-zinc-200 md:text-lg">{slide.text}</p>
+                <div className="flex flex-col justify-center gap-3 sm:flex-row">
+                  <Link href={slide.primary.href} className="rounded-full bg-[#12643E] px-8 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#0e4f31]">{slide.primary.label}</Link>
+                  <Link href={slide.secondary.href} className="rounded-full bg-white px-8 py-3 text-sm font-semibold text-[#12643E] transition-colors hover:bg-zinc-100">{slide.secondary.label}</Link>
+                </div>
+              </motion.div>
+            </div>
+          </SwiperSlide>
+        ))}
+      </Swiper>
     </section>
-    <section className="border-b border-zinc-100 bg-white py-14"><div className="mx-auto grid max-w-5xl grid-cols-1 gap-8 px-6 text-center md:grid-cols-3"><Metric value={currency.format(stats.totalFunded)} label="Total funded" /><Metric value={stats.activeCampaigns.toLocaleString()} label="Active campaigns" /><Metric value={stats.supporters.toLocaleString()} label="Supporters" /></div></section>
-    <section className="mx-auto max-w-6xl px-6 py-20">
-      <div className="mb-10 text-center">
+
+    {/* METRICS */}
+    <motion.section
+      className="border-b border-zinc-100 bg-white py-14"
+      variants={sectionReveal}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.3 }}
+    >
+      <div className="mx-auto grid max-w-5xl grid-cols-1 gap-8 px-6 text-center md:grid-cols-3">
+        <Metric value={fmt.format(stats.totalFunded)} label="Credits funded" />
+        <Metric value={stats.activeCampaigns.toLocaleString()} label="Active campaigns" />
+        <Metric value={stats.supporters.toLocaleString()} label="Supporters" />
+      </div>
+    </motion.section>
+
+    {/* HOW IT WORKS */}
+    <motion.section
+      id="how-it-works"
+      className="mx-auto max-w-6xl px-6 py-20"
+      variants={sectionReveal}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.2 }}
+    >
+      <motion.div variants={itemReveal} className="mb-10 text-center">
         <h2 className="text-3xl font-bold text-[#0f172a]">How Crowdfundly Works</h2>
         <p className="mt-2 text-sm text-gray-500">Three simple steps to bring ideas to life.</p>
-      </div>
+      </motion.div>
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-        <Step 
-          icon={<Search className="w-6 h-6 text-indigo-500" />} 
-          title="1. Discover" 
-          text="Explore thousands of verified campaigns across diverse categories that match your interests." 
+        <Step
+          icon={<Search className="w-6 h-6 text-indigo-500" />}
+          title="1. Discover"
+          text="Explore verified campaigns across diverse categories that match your interests."
           iconBg="bg-indigo-50"
         />
-        <Step 
-          icon={<DollarSign className="w-6 h-6 text-emerald-500" />} 
-          title="2. Contribute" 
-          text="Back projects securely. Choose reward tiers or simply donate to fuel their passion." 
+        <Step
+          icon={<Coins className="w-6 h-6 text-emerald-500" />}
+          title="2. Contribute"
+          text="Back projects securely with credits. Choose a reward tier or simply fuel their passion."
           iconBg="bg-emerald-50"
         />
-        <Step 
-          icon={<Rocket className="w-6 h-6 text-orange-400" />} 
-          title="3. Impact" 
-          text="Watch ideas become reality. Get updates directly from creators and see your impact grow." 
+        <Step
+          icon={<Rocket className="w-6 h-6 text-orange-400" />}
+          title="3. Impact"
+          text="Watch ideas become reality. Get updates directly from creators and see your impact grow."
           iconBg="bg-orange-50"
         />
       </div>
-    </section>
-    
-    <section className="border-y border-zinc-200/60 bg-[#EEF2F6] py-16">
+    </motion.section>
+
+    {/* TOP FUNDED CAMPAIGNS */}
+    <motion.section
+      className="border-y border-zinc-200/60 bg-[#EEF2F6] py-16"
+      variants={sectionReveal}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.15 }}
+    >
       <div className="mx-auto max-w-6xl px-6">
-        <div className="mb-8 flex items-end justify-between gap-4">
+        <motion.div variants={itemReveal} className="mb-8 flex items-end justify-between gap-4">
           <div>
             <h2 className="text-3xl font-bold text-[#0f172a]">Top Funded Campaigns</h2>
             <p className="mt-1 text-sm text-zinc-500">Projects currently leading the charge on Crowdfundly.</p>
@@ -82,27 +235,99 @@ export default function Home() {
           <Link href="/campaigns" className="flex items-center gap-1 text-sm font-semibold text-indigo-600 hover:text-indigo-800">
             View All <ArrowRight className="h-4 w-4" />
           </Link>
-        </div>
+        </motion.div>
         {loading ? (
           <div className="py-12 text-center text-sm text-zinc-500">Loading campaigns…</div>
         ) : campaigns.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-zinc-300 bg-white p-12 text-center text-sm text-zinc-500">No campaigns found.</div>
         ) : (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-            {campaigns.map((campaign) => <CampaignCard key={campaign._id} campaign={campaign} />)}
+            {campaigns.map((campaign, i) => (
+              <motion.div
+                key={campaign._id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.45, ease: 'easeOut', delay: i * 0.08 }}
+              >
+                <CampaignCard campaign={campaign} />
+              </motion.div>
+            ))}
           </div>
         )}
       </div>
-    </section>
+    </motion.section>
 
-    {/* Removed Hardcoded Community Voices Section as requested */}
+    {/* TESTIMONIALS SLIDER */}
+    <motion.section
+      className="bg-white py-20"
+      variants={sectionReveal}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.15 }}
+    >
+      <div className="mx-auto max-w-6xl px-6">
+        <motion.div variants={itemReveal} className="mb-10 text-center">
+          <span className="mb-3 inline-flex items-center gap-2 rounded-full bg-emerald-50 px-4 py-1.5 text-xs font-bold uppercase tracking-wide text-[#12643E]">
+            <Quote className="h-3.5 w-3.5" /> Community Voices
+          </span>
+          <h2 className="text-3xl font-bold text-[#0f172a]">Loved by creators and backers</h2>
+          <p className="mt-2 text-sm text-gray-500">Real stories from the people building and backing on Crowdfundly.</p>
+        </motion.div>
 
-    {/* Footer */}
+        <Swiper
+          modules={[Autoplay, Pagination]}
+          loop
+          spaceBetween={24}
+          autoplay={{ delay: 4500, disableOnInteraction: false }}
+          pagination={{ clickable: true }}
+          breakpoints={{
+            0: { slidesPerView: 1 },
+            640: { slidesPerView: 2 },
+            1024: { slidesPerView: 3 },
+          }}
+          className="!pb-14"
+          style={{ '--swiper-pagination-color': '#12643E', '--swiper-pagination-bottom': '0px' }}
+        >
+          {TESTIMONIALS.map((t, i) => (
+            <SwiperSlide key={i} className="!h-auto">
+              <TestimonialCard {...t} />
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      </div>
+    </motion.section>
+
+    {/* CALL TO ACTION */}
+    <motion.section
+      className="bg-[#F8FAFC] px-6 py-20"
+      variants={sectionReveal}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.3 }}
+    >
+      <div className="mx-auto max-w-5xl overflow-hidden rounded-3xl bg-gradient-to-br from-[#12643E] to-[#0b3f27] px-8 py-16 text-center shadow-xl">
+        <motion.h2 variants={itemReveal} className="font-serif text-3xl font-bold text-white md:text-4xl">
+          Ready to fund the next big idea?
+        </motion.h2>
+        <motion.p variants={itemReveal} className="mx-auto mt-4 max-w-[36rem] text-sm leading-relaxed text-emerald-100 md:text-base">
+          Join Crowdfundly today. Back a campaign in minutes, or launch your own and reach a community ready to support you.
+        </motion.p>
+        <motion.div variants={itemReveal} className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+          <Link href="/register" className="rounded-full bg-white px-8 py-3 text-sm font-semibold text-[#12643E] transition-colors hover:bg-emerald-50">Get started free</Link>
+          <Link href="/campaigns" className="rounded-full border border-white/40 px-8 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/10">Explore campaigns</Link>
+        </motion.div>
+      </div>
+    </motion.section>
+
+    {/* FOOTER */}
     <footer className="bg-[#f8fafc] border-t border-gray-200 pt-16 pb-8">
       <div className="mx-auto max-w-6xl px-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
           <div className="col-span-1">
-            <h3 className="text-xl font-bold text-[#12643E] mb-4">Crowdfundly</h3>
+            <div className="mb-4 flex items-center gap-2">
+              <Rocket className="h-6 w-6 text-[#12643E]" />
+              <h3 className="text-xl font-bold text-[#12643E]">Crowdfundly</h3>
+            </div>
             <p className="text-sm text-gray-600 leading-relaxed">
               Empowering creators and supporters to build a better future together through transparent, community-driven funding.
             </p>
@@ -112,15 +337,15 @@ export default function Home() {
             <ul className="space-y-3 text-sm text-gray-600">
               <li><Link href="/campaigns" className="hover:text-[#12643E]">All Campaigns</Link></li>
               <li><Link href="/campaigns" className="hover:text-[#12643E]">Technology</Link></li>
-              <li><Link href="/campaigns" className="hover:text-[#12643E]">Art & Design</Link></li>
-              <li><Link href="/campaigns" className="hover:text-[#12643E]">Community</Link></li>
+              <li><Link href="/campaigns" className="hover:text-[#12643E]">Art &amp; Design</Link></li>
+              <li><Link href="/register" className="hover:text-[#12643E]">Join as Developer</Link></li>
             </ul>
           </div>
           <div>
             <h4 className="font-bold text-gray-900 mb-4 text-sm uppercase tracking-wider">Resources</h4>
             <ul className="space-y-3 text-sm text-gray-600">
-              <li><Link href="#" className="hover:text-[#12643E]">How it Works</Link></li>
-              <li><Link href="#" className="hover:text-[#12643E]">Pricing</Link></li>
+              <li><Link href="#how-it-works" className="hover:text-[#12643E]">How it Works</Link></li>
+              <li><Link href="/dashboard/credits" className="hover:text-[#12643E]">Buy Credits</Link></li>
               <li><Link href="#" className="hover:text-[#12643E]">Help Center</Link></li>
               <li><Link href="#" className="hover:text-[#12643E]">Terms of Service</Link></li>
             </ul>
@@ -128,15 +353,18 @@ export default function Home() {
           <div>
             <h4 className="font-bold text-gray-900 mb-4 text-sm uppercase tracking-wider">Connect</h4>
             <ul className="space-y-3 text-sm text-gray-600">
-              <li><Link href="#" className="hover:text-[#12643E]">LinkedIn</Link></li>
-              <li><Link href="#" className="hover:text-[#12643E]">Facebook</Link></li>
-              <li><Link href="#" className="hover:text-[#12643E]">GitHub</Link></li>
-              <li><Link href="#" className="hover:text-[#12643E]">Twitter</Link></li>
+              {SOCIALS.map(({ Icon, label, href }) => (
+                <li key={label}>
+                  <a href={href} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 hover:text-[#12643E]">
+                    <Icon className="h-4 w-4" /> {label}
+                  </a>
+                </li>
+              ))}
             </ul>
           </div>
         </div>
         <div className="pt-8 border-t border-gray-200 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-500">
-          <p>© 2024 Crowdfundly. Built for creators.</p>
+          <p>© 2026 Crowdfundly. Built for creators and backers.</p>
           <div className="flex gap-6">
             <Link href="#" className="hover:text-gray-900">Privacy Policy</Link>
             <Link href="#" className="hover:text-gray-900">Cookie Policy</Link>
@@ -147,28 +375,39 @@ export default function Home() {
   </div>;
 }
 
-function Metric({ value, label }) { return <div><p className="font-serif text-4xl font-bold text-[#12643E]">{value}</p><p className="mt-1 text-xs font-medium uppercase tracking-wide text-zinc-500">{label}</p></div>; }
-function Step({ icon, title, text, iconBg }) { 
+function Metric({ value, label }) {
   return (
-    <div className="flex flex-col items-center rounded-2xl border border-gray-100 bg-white p-8 text-center shadow-[0_2px_15px_rgb(0,0,0,0.03)] hover:shadow-[0_4px_25px_rgb(0,0,0,0.06)] transition-shadow">
+    <motion.div variants={itemReveal}>
+      <p className="font-serif text-4xl font-bold text-[#12643E]">{value}</p>
+      <p className="mt-1 text-xs font-medium uppercase tracking-wide text-zinc-500">{label}</p>
+    </motion.div>
+  );
+}
+
+function Step({ icon, title, text, iconBg }) {
+  return (
+    <motion.div
+      variants={itemReveal}
+      className="flex flex-col items-center rounded-2xl border border-gray-100 bg-white p-8 text-center shadow-[0_2px_15px_rgb(0,0,0,0.03)] hover:shadow-[0_4px_25px_rgb(0,0,0,0.06)] transition-shadow"
+    >
       <div className={`mb-5 rounded-full p-4 ${iconBg}`}>{icon}</div>
       <h3 className="text-xl font-bold text-gray-900">{title}</h3>
       <p className="mt-3 text-[14px] leading-relaxed text-gray-500">{text}</p>
-    </div>
-  ); 
+    </motion.div>
+  );
 }
 
 function TestimonialCard({ quote, name, role, image }) {
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 p-8 shadow-[0_2px_15px_rgb(0,0,0,0.03)] flex flex-col justify-between">
+    <div className="flex h-full min-h-[240px] flex-col justify-between rounded-2xl border border-gray-100 bg-white p-8 shadow-[0_2px_15px_rgb(0,0,0,0.03)]">
       <div>
-        <div className="text-orange-400 font-serif text-5xl leading-none h-6 mb-4">"</div>
-        <p className="text-[15px] italic text-gray-600 leading-relaxed mb-8">
+        <Quote className="mb-4 h-7 w-7 text-orange-400" />
+        <p className="mb-8 text-[15px] italic leading-relaxed text-gray-600">
           {quote}
         </p>
       </div>
       <div className="flex items-center gap-3">
-        <img src={image} alt={name} className="w-10 h-10 rounded-full object-cover" />
+        <img src={image} alt={name} className="h-10 w-10 rounded-full object-cover" />
         <div>
           <h4 className="text-[13px] font-bold text-gray-900">{name}</h4>
           <p className="text-[12px] text-gray-500">{role}</p>
@@ -177,9 +416,10 @@ function TestimonialCard({ quote, name, role, image }) {
     </div>
   );
 }
+
 function CampaignCard({ campaign }) {
   const percent = campaign.targetAmount ? Math.min(Math.round(((campaign.raised || 0) / campaign.targetAmount) * 100), 100) : 0;
   const end = new Date(new Date(campaign.createdAt).getTime() + campaign.duration * 86400000);
   const days = Math.max(Math.ceil((end - new Date()) / 86400000), 0);
-  return <Link href={`/campaigns/${campaign._id}`} className="group overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm transition-shadow hover:shadow-md"><div className="h-44 bg-zinc-100">{campaign.coverImage ? <img src={campaign.coverImage} alt={campaign.title} className="h-full w-full object-cover" /> : <div className="flex h-full items-center justify-center text-sm text-zinc-400">No campaign image</div>}</div><div className="p-5"><span className="rounded-full bg-indigo-50 px-2.5 py-1 text-[11px] font-semibold text-indigo-700">{campaign.category}</span><h3 className="mt-3 truncate font-serif text-lg font-bold group-hover:text-[#12643E]">{campaign.title}</h3><p className="mt-2 line-clamp-2 min-h-10 text-sm text-zinc-500">{campaign.shortDescription || campaign.story}</p><div className="mt-5 flex justify-between text-sm"><span className="font-bold text-[#12643E]">{percent}% funded</span><span className="text-zinc-500">{days} days left</span></div><div className="mt-2 h-1.5 overflow-hidden rounded-full bg-zinc-100"><div className="h-full rounded-full bg-[#12643E]" style={{ width: `${percent}%` }} /></div><p className="mt-2 text-sm text-zinc-600"><strong>{currency.format(campaign.raised || 0)}</strong> of {currency.format(campaign.targetAmount || 0)}</p></div></Link>;
+  return <Link href={`/campaigns/${campaign._id}`} className="group block h-full overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm transition-shadow hover:shadow-md"><div className="h-44 bg-zinc-100">{campaign.coverImage ? <img src={campaign.coverImage} alt={campaign.title} className="h-full w-full object-cover" /> : <div className="flex h-full items-center justify-center text-sm text-zinc-400">No campaign image</div>}</div><div className="p-5"><span className="rounded-full bg-indigo-50 px-2.5 py-1 text-[11px] font-semibold text-indigo-700">{campaign.category}</span><h3 className="mt-3 truncate font-serif text-lg font-bold group-hover:text-[#12643E]">{campaign.title}</h3><p className="mt-2 line-clamp-2 min-h-10 text-sm text-zinc-500">{campaign.shortDescription || campaign.story}</p><div className="mt-5 flex justify-between text-sm"><span className="font-bold text-[#12643E]">{percent}% funded</span><span className="text-zinc-500">{days} days left</span></div><div className="mt-2 h-1.5 overflow-hidden rounded-full bg-zinc-100"><div className="h-full rounded-full bg-[#12643E]" style={{ width: `${percent}%` }} /></div><p className="mt-2 text-sm text-zinc-600"><strong>{fmt.format(campaign.raised || 0)}</strong> of {fmt.format(campaign.targetAmount || 0)} credits</p></div></Link>;
 }

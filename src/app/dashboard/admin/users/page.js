@@ -140,7 +140,7 @@ export default function AdminUsersPage() {
                       <th className="px-6 py-4 text-[12px] font-bold text-gray-500 uppercase tracking-widest">User</th>
                       <th className="px-6 py-4 text-[12px] font-bold text-gray-500 uppercase tracking-widest">Email</th>
                       <th className="px-6 py-4 text-[12px] font-bold text-gray-500 uppercase tracking-widest">Role</th>
-                      <th className="px-6 py-4 text-[12px] font-bold text-gray-500 uppercase tracking-widest">USD</th>
+                      <th className="px-6 py-4 text-[12px] font-bold text-gray-500 uppercase tracking-widest">Credits</th>
                       <th className="px-6 py-4 text-[12px] font-bold text-gray-500 uppercase tracking-widest">Joined</th>
                       <th className="px-6 py-4 text-[12px] font-bold text-gray-500 uppercase tracking-widest text-right">Actions</th>
                     </tr>
@@ -179,7 +179,7 @@ export default function AdminUsersPage() {
                           </div>
                         </td>
                         <td className="px-6 py-5 text-[14px] font-bold text-[#0f172a]">
-                          {(u.credits || 0).toLocaleString()} <span className="text-[11px] text-gray-400 font-normal">USD</span>
+                          {(u.credits || 0).toLocaleString()} <span className="text-[11px] text-gray-400 font-normal">Credits</span>
                         </td>
                         <td className="px-6 py-5 text-[13px] text-gray-500">
                           {u.createdAt ? new Date(u.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}
@@ -225,7 +225,7 @@ export default function AdminUsersPage() {
                         </select>
                         <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500 pointer-events-none" />
                       </div>
-                      <span className="text-[13px] font-bold text-[#0f172a]">{(u.credits || 0).toLocaleString()} <span className="text-[11px] text-gray-400 font-normal">USD</span></span>
+                      <span className="text-[13px] font-bold text-[#0f172a]">{(u.credits || 0).toLocaleString()} <span className="text-[11px] text-gray-400 font-normal">Credits</span></span>
                     </div>
                   </div>
                 ))}

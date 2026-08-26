@@ -307,7 +307,7 @@ export default function ExploreCampaignsPage() {
 
                         <div className="flex justify-between items-end mt-2">
                           <div className="text-[12px] text-gray-600 font-medium">
-                            <span className="font-bold text-gray-900">${(campaign.raised || 0).toLocaleString()}</span> raised
+                            <span className="font-bold text-gray-900">{(campaign.raised || 0).toLocaleString()}</span> credits raised
                           </div>
                           <div className="text-[12px] text-gray-600 font-medium">
                             {daysLeft} Days Left
@@ -367,7 +367,7 @@ export default function ExploreCampaignsPage() {
                   Crowdfundly
                 </span>
               </div>
-              <p className="text-[13px] text-gray-500 max-w-xs mt-16">
+              <p className="text-[13px] text-gray-500 max-w-[20rem] mt-16">
                 © 2024 Crowdfundly. All rights reserved.
               </p>
             </div>

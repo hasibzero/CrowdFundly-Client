@@ -77,13 +77,13 @@ export default function CampaignDetailPage() {
   const diff = end - new Date();
   const daysLeft = Math.max(Math.ceil(diff / (1000 * 60 * 60 * 24)), 0);
 
-  const formatCurrency = (val) => `$${(val || 0).toLocaleString()}`;
+  const formatCurrency = (val) => `${(val || 0).toLocaleString()} credits`;
 
   const handleContribute = async () => {
     const amount = Number(pledgeAmount);
     if (!user) return router.push('/login');
     if (user.role !== 'Supporter') return toast.error('Only supporter accounts can contribute to campaigns.');
-    if (!Number.isInteger(amount) || amount < 1) return toast.error('Enter a whole number in USD.');
+    if (!Number.isInteger(amount) || amount < 1) return toast.error('Enter a whole number of credits.');
     setIsContributing(true);
     try {
       await axios.post(`${API_URL}/api/contributions`, { campaignId: data._id, amount }, { headers: authHeaders() });
@@ -225,9 +225,9 @@ export default function CampaignDetailPage() {
                 </div>
 
                 <div className="mb-4">
-                  <label className="block text-[12px] font-bold text-gray-700 mb-2">Contribution Amount (USD)</label>
+                  <label className="block text-[12px] font-bold text-gray-700 mb-2">Contribution Amount (Credits)</label>
                   <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium">$</span>
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium text-[13px]">cr</span>
                     <input 
                       type="number"
                       value={pledgeAmount}
@@ -241,7 +241,7 @@ export default function CampaignDetailPage() {
                 <button onClick={handleContribute} disabled={isContributing} className="w-full bg-[#12c48b] hover:bg-[#10a877] disabled:cursor-not-allowed disabled:opacity-60 text-white py-3.5 rounded-lg text-[15px] font-bold transition-colors shadow-sm mb-2">
                   {isContributing ? 'Recording contribution…' : 'Contribute now'}
                 </button>
-                <Link href="/dashboard/credits" className="mb-4 block text-center text-xs font-semibold text-[#12643E] hover:underline">Need to add funds? Add USD securely.</Link>
+                <Link href="/dashboard/credits" className="mb-4 block text-center text-xs font-semibold text-[#12643E] hover:underline">Need more credits? Buy credits securely.</Link>
 
                 <div className="flex items-center justify-center text-gray-400 mb-6">
                   <Lock className="w-3 h-3 mr-1.5" />
@@ -278,7 +278,7 @@ export default function CampaignDetailPage() {
                       
                       <div className="flex justify-between items-start mb-3">
                         <h4 className="text-[15px] font-bold text-[#0f172a]">{tier.title}</h4>
-                        <span className="text-[18px] font-extrabold text-[#059669]">${tier.amount}</span>
+                        <span className="text-[18px] font-extrabold text-[#059669]">{tier.amount} cr</span>
                       </div>
                       
                       <p className="text-[13px] text-gray-600 mb-4 leading-relaxed">
@@ -411,10 +411,10 @@ export default function CampaignDetailPage() {
                   Crowdfundly
                 </span>
               </div>
-              <p className="text-[13px] text-gray-500 max-w-xs mt-4">
+              <p className="text-[13px] text-gray-500 max-w-[20rem] mt-4">
                 Empowering creators to bring their visions to life through community support.
               </p>
-              <p className="text-[13px] text-gray-500 max-w-xs mt-8">
+              <p className="text-[13px] text-gray-500 max-w-[20rem] mt-8">
                 © 2024 Crowdfundly. All rights reserved.
               </p>
             </div>

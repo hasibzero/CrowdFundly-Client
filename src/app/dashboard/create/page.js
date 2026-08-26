@@ -326,7 +326,7 @@ export default function CreateCampaignPage() {
                 className="space-y-6"
               >
                 <div>
-                  <label className="block text-[13px] text-gray-700 mb-1.5">Target Amount (USD)</label>
+                  <label className="block text-[13px] text-gray-700 mb-1.5">Target Amount (Credits)</label>
                   <input 
                     type="number" 
                     name="targetAmount"
@@ -364,7 +364,7 @@ export default function CreateCampaignPage() {
                       />
                     </div>
                     <div>
-                      <label className="block text-[13px] text-gray-700 mb-1.5">Tier Minimum Amount (USD)</label>
+                      <label className="block text-[13px] text-gray-700 mb-1.5">Tier Minimum Amount (Credits)</label>
                       <input 
                         type="number" 
                         name="rewardAmount"

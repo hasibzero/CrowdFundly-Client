@@ -65,7 +65,7 @@ export default function ContributionsPage() {
           <div>
             <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Total Contributed</p>
             <p className="text-[24px] font-bold text-[#0f172a] leading-none">
-              {loading ? '—' : stats.totalContributed?.toLocaleString()} <span className="text-[18px] font-medium text-gray-700">USD</span>
+              {loading ? '—' : stats.totalContributed?.toLocaleString()} <span className="text-[18px] font-medium text-gray-700">Credits</span>
             </p>
           </div>
         </div>
@@ -99,7 +99,7 @@ export default function ContributionsPage() {
                   <tr>
                     <th className="px-6 py-4 text-[13px] font-bold text-[#64748b]">Campaign ID</th>
                     <th className="px-6 py-4 text-[13px] font-bold text-[#64748b]">Date</th>
-                    <th className="px-6 py-4 text-[13px] font-bold text-[#64748b]">Amount (USD)</th>
+                    <th className="px-6 py-4 text-[13px] font-bold text-[#64748b]">Amount (Credits)</th>
                     <th className="px-6 py-4 text-[13px] font-bold text-[#64748b]">Method</th>
                     <th className="px-6 py-4 text-[13px] font-bold text-[#64748b]">Status</th>
                   </tr>
@@ -119,7 +119,7 @@ export default function ContributionsPage() {
                         {c.date ? new Date(c.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}
                       </td>
                       <td className="px-6 py-5 text-[15px] font-bold text-[#0f172a]">{(c.amount || 0).toLocaleString()}</td>
-                      <td className="px-6 py-5 text-[14px] text-[#475569]">{c.paymentMethod || 'USD'}</td>
+                      <td className="px-6 py-5 text-[14px] text-[#475569]">{c.paymentMethod || 'Credits'}</td>
                       <td className="px-6 py-5">{getStatusBadge(c.status)}</td>
                     </tr>
                   ))}
@@ -142,7 +142,7 @@ export default function ContributionsPage() {
                   </div>
                   <div className="flex justify-between text-[13px] text-gray-500 mt-2">
                     <span>{c.date ? new Date(c.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}</span>
-                    <span className="font-bold text-[#0f172a]">{(c.amount || 0).toLocaleString()} USD</span>
+                    <span className="font-bold text-[#0f172a]">{(c.amount || 0).toLocaleString()} credits</span>
                   </div>
                 </div>
               ))}

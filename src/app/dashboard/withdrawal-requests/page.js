@@ -18,8 +18,11 @@ export default function WithdrawalRequestsPage() {
 
   useEffect(() => {
     if (!user) return;
+    // JWT (email/password) users send a Bearer token; Google (better-auth) users
+    // authenticate via the session cookie (sent automatically by axios), so we
+    // must NOT send "Bearer null" for them.
     const token = localStorage.getItem('crowdfundly_token');
-    const headers = { Authorization: `Bearer ${token}` };
+    const headers = token ? { Authorization: `Bearer ${token}` } : {};
 
     const fetchData = async () => {
       try {
@@ -76,9 +79,9 @@ export default function WithdrawalRequestsPage() {
       {/* Stats */}
       <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         {[
-          { label: 'Available Balance', value: `$${credits.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`, icon: Wallet, bg: 'bg-[#e6f7ef]', color: 'text-[#2ea673]' },
-          { label: 'Pending Withdrawals', value: `$${pendingAmount.toFixed(2)}`, icon: Clock, bg: 'bg-[#fff7ed]', color: 'text-[#ea580c]' },
-          { label: 'Total Processed', value: `$${completedAmount.toFixed(2)}`, icon: CheckCircle2, bg: 'bg-[#f3f0ff]', color: 'text-[#6d28d9]' },
+          { label: 'Available Balance', value: `${credits.toLocaleString()} credits`, icon: Wallet, bg: 'bg-[#e6f7ef]', color: 'text-[#2ea673]' },
+          { label: 'Pending Withdrawals', value: `${pendingAmount.toLocaleString()} credits`, icon: Clock, bg: 'bg-[#fff7ed]', color: 'text-[#ea580c]' },
+          { label: 'Total Processed', value: `${completedAmount.toLocaleString()} credits`, icon: CheckCircle2, bg: 'bg-[#f3f0ff]', color: 'text-[#6d28d9]' },
         ].map((card) => (
           <div key={card.label} className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm flex flex-col justify-between h-32">
             <div className="flex justify-between items-center">
@@ -125,7 +128,7 @@ export default function WithdrawalRequestsPage() {
                 <thead className="bg-[#f8f9fc]">
                   <tr>
                     <th className="px-6 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-widest">Date</th>
-                    <th className="px-6 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-widest">Amount (USD)</th>
+                    <th className="px-6 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-widest">Amount (Credits)</th>
                     <th className="px-6 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-widest">Payment Method</th>
                     <th className="px-6 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-widest text-right">Status</th>
                   </tr>
@@ -136,7 +139,7 @@ export default function WithdrawalRequestsPage() {
                       <td className="px-6 py-4 text-[13px] font-medium text-gray-600">
                         {req.requestDate ? new Date(req.requestDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}
                       </td>
-                      <td className="px-6 py-4 text-[14px] font-bold text-[#0f172a]">${(req.credits || 0).toFixed(2)}</td>
+                      <td className="px-6 py-4 text-[14px] font-bold text-[#0f172a]">{(req.credits || 0).toLocaleString()} credits</td>
                       <td className="px-6 py-4">
                         <div className="flex items-center text-[14px] text-[#334155]">
                           {getSystemIcon(req.paymentMethod)}

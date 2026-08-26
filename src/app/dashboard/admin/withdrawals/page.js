@@ -76,9 +76,9 @@ export default function AdminWithdrawalsPage() {
         {/* Metric Cards */}
         <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
           {[
-            { label: 'Total Pending Payouts', value: `$${pendingTotal.toFixed(2)}`, icon: MoreHorizontal, badge: 'Requires Action', badgeStyle: 'bg-[#ffe4e6] text-[#e11d48]' },
+            { label: 'Total Pending Payouts', value: `${pendingTotal.toLocaleString()} credits`, icon: MoreHorizontal, badge: 'Requires Action', badgeStyle: 'bg-[#ffe4e6] text-[#e11d48]' },
             { label: 'Pending Requests', value: pending.length, icon: FileText, badge: null },
-            { label: 'Processed Today', value: `$${processedTotal.toFixed(2)}`, icon: CheckCircle2, badge: 'Completed', badgeStyle: 'bg-[#d1fae5] text-[#059669]' },
+            { label: 'Processed Today', value: `${processedTotal.toLocaleString()} credits`, icon: CheckCircle2, badge: 'Completed', badgeStyle: 'bg-[#d1fae5] text-[#059669]' },
           ].map((card) => (
             <div key={card.label} className="bg-white rounded-xl p-6 shadow-[0_2px_15px_rgb(0,0,0,0.04)] border border-gray-50 flex flex-col justify-between h-36">
               <div className="flex justify-between items-start">
@@ -110,7 +110,7 @@ export default function AdminWithdrawalsPage() {
                   <thead className="bg-[#fcfdfd]">
                     <tr className="border-b border-gray-100">
                       <th className="px-6 py-5 text-[11px] font-bold text-gray-500 uppercase tracking-widest">Creator</th>
-                      <th className="px-6 py-5 text-[11px] font-bold text-gray-500 uppercase tracking-widest">Amount ($)</th>
+                      <th className="px-6 py-5 text-[11px] font-bold text-gray-500 uppercase tracking-widest">Amount (Credits)</th>
                       <th className="px-6 py-5 text-[11px] font-bold text-gray-500 uppercase tracking-widest">Payment Method</th>
                       <th className="px-6 py-5 text-[11px] font-bold text-gray-500 uppercase tracking-widest">Request Date</th>
                       <th className="px-6 py-5 text-[11px] font-bold text-gray-500 uppercase tracking-widest">Status</th>
@@ -128,7 +128,7 @@ export default function AdminWithdrawalsPage() {
                             <p className="text-[13px] font-bold text-[#0f172a] leading-tight max-w-[140px] truncate">{req.creatorEmail}</p>
                           </div>
                         </td>
-                        <td className="px-6 py-5 text-[14px] font-bold text-[#0f172a]">${(req.credits || 0).toFixed(2)}</td>
+                        <td className="px-6 py-5 text-[14px] font-bold text-[#0f172a]">{(req.credits || 0).toLocaleString()} credits</td>
                         <td className="px-6 py-5">
                           <span className="px-3 py-1.5 rounded-full text-[10px] font-bold bg-[#eef2ff] text-[#4f46e5]">
                             {req.paymentMethod || 'N/A'}

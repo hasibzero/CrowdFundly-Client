@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
-import { UserCircle, LogOut, Rocket, Menu, X } from 'lucide-react';
+import { UserCircle, LogOut, Rocket, Menu, X, Coins } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
 export default function Navbar() {
@@ -41,12 +41,20 @@ export default function Navbar() {
               Start a Project
             </Link>
           )}
-          <Link 
-            href="#" 
+          <Link
+            href="#"
             className="text-[14px] font-semibold text-gray-600 hover:text-gray-900 transition-colors py-5"
           >
             About Us
           </Link>
+          {!user && !loading && (
+            <Link
+              href="/register"
+              className="text-[14px] font-semibold text-gray-600 hover:text-gray-900 transition-colors py-5"
+            >
+              Join as Developer
+            </Link>
+          )}
           {user && !loading && (
             <Link 
               href="/dashboard" 
@@ -73,6 +81,10 @@ export default function Navbar() {
               </>
             ) : (
               <div className="flex items-center gap-2 text-gray-700 ml-2">
+                <span className="flex items-center gap-1.5 bg-[#12643E]/10 text-[#12643E] px-3 py-1 rounded-full text-[13px] font-bold" title="Available credits">
+                  <Coins className="w-4 h-4" />
+                  {(user.credits ?? 0).toLocaleString()}
+                </span>
                 <span className="text-[14px] font-bold mr-2 text-gray-800 hidden lg:block">{user.name}</span>
                 <Link href="/dashboard" className="transition-opacity hover:opacity-80" title="Dashboard">
                   <img 
@@ -117,13 +129,22 @@ export default function Navbar() {
               Start a Project
             </Link>
           )}
-          <Link 
-            href="#" 
+          <Link
+            href="#"
             onClick={() => setMobileMenuOpen(false)}
             className="py-3 text-[15px] font-semibold text-gray-700 border-b border-gray-50"
           >
             About Us
           </Link>
+          {!user && !loading && (
+            <Link
+              href="/register"
+              onClick={() => setMobileMenuOpen(false)}
+              className="py-3 text-[15px] font-semibold text-gray-700 border-b border-gray-50"
+            >
+              Join as Developer
+            </Link>
+          )}
           {user && !loading && (
             <Link 
               href="/dashboard" 
@@ -154,6 +175,13 @@ export default function Navbar() {
             </div>
           )}
           
+          {/* Mobile available credits (if logged in) */}
+          {!loading && user && (
+            <div className="flex items-center justify-center gap-1.5 mt-4 bg-[#12643E]/10 text-[#12643E] px-3 py-2 rounded-lg text-[14px] font-bold">
+              <Coins className="w-4 h-4" /> {(user.credits ?? 0).toLocaleString()} credits available
+            </div>
+          )}
+
           {/* Mobile Auth Links (if logged in) */}
           {!loading && user && (
             <div className="flex items-center justify-between mt-4 bg-gray-50 p-3 rounded-lg border border-gray-100">

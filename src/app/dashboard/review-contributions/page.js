@@ -93,7 +93,7 @@ export default function ReviewContributionsPage() {
                     >
                       <td className="p-4 text-[14px] font-medium text-gray-900">{c.supporterEmail}</td>
                       <td className="p-4 text-[14px] font-medium text-gray-600 truncate max-w-[200px]">{c.campaignTitle || 'Unknown Campaign'}</td>
-                      <td className="p-4 text-[14px] font-bold text-[#12643E]">{c.amount} USD</td>
+                      <td className="p-4 text-[14px] font-bold text-[#12643E]">{c.amount} credits</td>
                       <td className="p-4 text-[13px] text-gray-500">{new Date(c.date).toLocaleDateString()}</td>
                       <td className="p-4 pr-6 flex justify-end items-center space-x-2">
                         {actionLoading === c._id ? (

@@ -16,7 +16,7 @@ export default function Sidebar({ mobileMenuOpen, setMobileMenuOpen }) {
     { name: 'Home', href: '/dashboard', icon: Home },
     { name: 'Explore Campaigns', href: '/dashboard/campaigns', icon: Compass },
     { name: 'My Contributions', href: '/dashboard/contributions', icon: Heart },
-    { name: 'Add USD', href: '/dashboard/credits', icon: CreditCard },
+    { name: 'Buy Credits', href: '/dashboard/credits', icon: CreditCard },
     { name: 'Payment History', href: '/dashboard/history', icon: History },
   ];
 

@@ -85,7 +85,7 @@ export default function MyCampaignsPage() {
           </div>
         ) : campaigns.length === 0 ? (
           <div className="py-20 flex flex-col items-center justify-center text-center">
-            <p className="text-sm text-gray-500 max-w-sm mb-4">You haven't launched any campaigns yet.</p>
+            <p className="text-sm text-gray-500 max-w-[24rem] mb-4">You haven't launched any campaigns yet.</p>
             <Link href="/dashboard/create" className="bg-[#12643E] text-white px-5 py-2 rounded-full font-bold text-sm hover:bg-[#0e4f31] transition-colors">
               Create Your First Campaign
             </Link>
@@ -124,7 +124,7 @@ export default function MyCampaignsPage() {
                         <td className="px-6 py-5">{getStatusBadge(c.status)}</td>
                         <td className="px-6 py-5">
                           <div className="mb-2 text-[13px]">
-                            <span className="font-bold text-[#0f172a]">{(c.raised || 0).toLocaleString()} USD</span>
+                            <span className="font-bold text-[#0f172a]">{(c.raised || 0).toLocaleString()} credits</span>
                             <span className="text-gray-400 font-medium"> / {(c.targetAmount || 0).toLocaleString()}</span>
                           </div>
                           <div className="w-32 h-1.5 bg-[#eef2f6] rounded-full overflow-hidden">
@@ -169,7 +169,7 @@ export default function MyCampaignsPage() {
                     </div>
 
                     <div className="mb-2 text-[13px]">
-                      <span className="font-bold text-[#0f172a]">{(c.raised || 0).toLocaleString()} USD</span>
+                      <span className="font-bold text-[#0f172a]">{(c.raised || 0).toLocaleString()} credits</span>
                       <span className="text-gray-400 font-medium"> / {(c.targetAmount || 0).toLocaleString()} goal</span>
                     </div>
                     <div className="w-full h-1.5 bg-[#eef2f6] rounded-full overflow-hidden mb-3">

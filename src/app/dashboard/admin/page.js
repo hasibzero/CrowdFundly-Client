@@ -89,7 +89,7 @@ export default function AdminDashboardPage() {
           {[
             { label: 'Total Supporters', value: loading ? '—' : supporters.toLocaleString(), icon: Users, iconBg: 'bg-[#d1fae5]', iconColor: 'text-[#059669]', badge: 'Live', badgeBg: 'bg-[#e6f7ef] text-[#059669]' },
             { label: 'Total Creators', value: loading ? '—' : creators.toLocaleString(), icon: Lightbulb, iconBg: 'bg-[#ede9fe]', iconColor: 'text-[#7c3aed]', badge: 'Live', badgeBg: 'bg-[#e6f7ef] text-[#059669]' },
-            { label: 'Platform USD (CR)', value: loading ? '—' : totalUSD.toLocaleString(), icon: Wallet, iconBg: 'bg-[#ffedd5]', iconColor: 'text-[#ea580c]', badge: 'Live', badgeBg: 'bg-[#fef3c7] text-[#d97706]' },
+            { label: 'Platform Credits', value: loading ? '—' : totalUSD.toLocaleString(), icon: Wallet, iconBg: 'bg-[#ffedd5]', iconColor: 'text-[#ea580c]', badge: 'Live', badgeBg: 'bg-[#fef3c7] text-[#d97706]' },
             { label: 'Pending Campaigns', value: loading ? '—' : (stats?.pendingCampaigns ?? 0), icon: Banknote, iconBg: 'bg-[#e6f7ef]', iconColor: 'text-[#12643E]', badge: 'Action', badgeBg: 'bg-[#fee2e2] text-[#dc2626]' },
           ].map((card) => (
             <div key={card.label} className="bg-white rounded-xl p-6 border border-gray-100 shadow-[0_2px_10px_rgb(0,0,0,0.02)]">

@@ -12,18 +12,33 @@ export default function DashboardLayout({ children }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();
 
+  // Google (better-auth) users must complete the one-time role choice before
+  // entering the dashboard. Email/password users (JWT present) and Admins skip it.
+  const needsRoleSelection =
+    !!user &&
+    user.role !== 'Admin' &&
+    !user.roleSelected &&
+    typeof window !== 'undefined' &&
+    !localStorage.getItem('crowdfundly_token');
+
   useEffect(() => {
     if (!loading && !user) {
       router.push('/login');
     }
   }, [user, loading, router]);
 
+  useEffect(() => {
+    if (!loading && needsRoleSelection) {
+      router.replace('/select-role');
+    }
+  }, [loading, needsRoleSelection, router]);
+
   // Close mobile menu on route change
   useEffect(() => {
     setMobileMenuOpen(false);
   }, [pathname]);
 
-  if (loading || !user) {
+  if (loading || !user || needsRoleSelection) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#f8f9fc] ">
         <div className="flex flex-col items-center space-y-4">
@@ -40,9 +55,9 @@ export default function DashboardLayout({ children }) {
       <div className="md:hidden bg-white border-b border-gray-200 p-4 flex justify-between items-center sticky top-0 z-40 shadow-sm">
         <div className="flex items-center space-x-2">
           <div className="w-8 h-8 bg-[#0f766e] rounded-lg flex items-center justify-center text-white font-bold text-xs shadow-sm">
-            FF
+            CF
           </div>
-          <span className="font-bold text-[#0f766e]">FundForward</span>
+          <span className="font-bold text-[#0f766e]">Crowdfundly</span>
         </div>
         <button 
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}

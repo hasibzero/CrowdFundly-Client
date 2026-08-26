@@ -6,13 +6,14 @@ import Link from 'next/link';
 import toast from 'react-hot-toast';
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
 import Navbar from '@/components/Navbar';
+import { authClient } from '@/lib/auth-client';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
-  const { login, user, loading } = useAuth();
+  const { login, loginWithGoogleToken, user, loading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
@@ -36,6 +37,18 @@ export default function LoginPage() {
       toast.success("Successfully logged in!", { id: toastId });
     } else {
       toast.error("Login failed. Please check your credentials.", { id: toastId });
+      setIsLoggingIn(false);
+    }
+  };
+  const triggerGoogleLogin = async () => {
+    setIsLoggingIn(true);
+    try {
+      await authClient.signIn.social({
+        provider: 'google',
+        callbackURL: '/select-role',
+      });
+    } catch (err) {
+      toast.error('Failed to initialize Google login');
       setIsLoggingIn(false);
     }
   };
@@ -139,7 +152,9 @@ export default function LoginPage() {
             <div className="mt-6">
               <button
                 type="button"
-                className="w-full flex items-center justify-center gap-3 bg-white border border-slate-200 py-2.5 px-4 rounded-lg text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors shadow-sm"
+                onClick={triggerGoogleLogin}
+                disabled={isLoggingIn}
+                className="w-full flex items-center justify-center gap-3 bg-white border border-slate-200 py-2.5 px-4 rounded-lg text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors shadow-sm disabled:opacity-70 disabled:cursor-not-allowed"
               >
                 <svg className="h-5 w-5" aria-hidden="true" viewBox="0 0 24 24">
                   <path d="M12.0003 4.75C13.7703 4.75 15.3553 5.36002 16.6053 6.54998L20.0303 3.125C17.9502 1.19 15.2353 0 12.0003 0C7.31028 0 3.25527 2.69 1.28027 6.60998L5.27028 9.70498C6.21525 6.86002 8.87028 4.75 12.0003 4.75Z" fill="#EA4335" />

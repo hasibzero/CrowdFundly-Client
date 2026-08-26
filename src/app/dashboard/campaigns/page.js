@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { Search, ChevronDown, CheckCircle2, ArrowRight, Hourglass } from 'lucide-react';
 import Link from 'next/link';
 import axios from 'axios';
-import { API_URL } from '@/lib/api';
+import { API_URL, authHeaders } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
 
 export default function ExploreCampaignsPage() {
@@ -46,6 +46,16 @@ export default function ExploreCampaignsPage() {
     };
     fetchCampaigns();
   }, []);
+
+  const [balance, setBalance] = useState(user?.credits ?? 0);
+
+  useEffect(() => {
+    if (user) {
+      axios.get(`${API_URL}/api/users/me`, { headers: authHeaders() })
+        .then((res) => setBalance(res.data.credits || 0))
+        .catch(() => {});
+    }
+  }, [user]);
 
   // Client-side filtering & sorting
   const filtered = useMemo(() => {
@@ -99,7 +109,7 @@ export default function ExploreCampaignsPage() {
           />
         </div>
         <div className="bg-[#a7f3d0] text-[#047857] px-5 py-3.5 rounded-xl font-bold text-sm shadow-sm whitespace-nowrap flex-shrink-0 text-center">
-          {user?.credits?.toLocaleString() ?? 0} USD
+          {balance.toLocaleString()} Credits
         </div>
       </div>
 
@@ -210,7 +220,7 @@ export default function ExploreCampaignsPage() {
                 {/* Funding Stats */}
                 <div className="mt-auto">
                   <div className="flex items-baseline mb-2">
-                    <span className="text-[22px] font-bold text-[#059669] tracking-tight">{raised.toLocaleString()} USD</span>
+                    <span className="text-[22px] font-bold text-[#059669] tracking-tight">{raised.toLocaleString()} credits</span>
                     <span className="text-xs text-gray-400 font-medium ml-2">raised of {target.toLocaleString()}</span>
                     <span className="text-[13px] font-bold text-gray-900 ml-auto">{percent}%</span>
                   </div>
@@ -221,12 +231,12 @@ export default function ExploreCampaignsPage() {
                   </div>
 
                   {/* Action Button */}
-                  <Link 
+                  <Link
                     href={`/campaigns/${camp._id}`}
-                    className="w-full py-3 px-4 border border-[#3b2de6] text-[#3b2de6] hover:bg-indigo-50 rounded-lg flex items-center justify-center text-sm font-bold transition-colors group-hover:bg-[#3b2de6] group-hover:text-white"
+                    className="group/btn w-full py-3 px-4 border border-[#3b2de6] text-[#3b2de6] rounded-lg flex items-center justify-center text-sm font-bold transition-all duration-300 ease-out hover:bg-[#3b2de6] hover:text-white hover:shadow-lg hover:shadow-[#3b2de6]/25 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3b2de6]/50"
                   >
                     View Details
-                    <ArrowRight className="w-4 h-4 ml-1.5" />
+                    <ArrowRight className="w-4 h-4 ml-1.5 transition-transform duration-300 ease-out group-hover/btn:translate-x-1" />
                   </Link>
                 </div>
               </div>
