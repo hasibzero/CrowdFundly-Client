@@ -1,7 +1,7 @@
 "use client";
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
-import { Home, Compass, Heart, CreditCard, History, PlusCircle, Layers, Wallet, Settings, LogOut, LayoutGrid, Users, BarChart, ClipboardList, Globe } from 'lucide-react';
+import { Home, Compass, Heart, CreditCard, History, PlusCircle, Layers, Wallet, Settings, LogOut, LayoutGrid, Users, BarChart, ClipboardList, Globe, Rocket } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
 export default function Sidebar({ mobileMenuOpen, setMobileMenuOpen }) {
@@ -26,7 +26,7 @@ export default function Sidebar({ mobileMenuOpen, setMobileMenuOpen }) {
     { name: 'Add New Campaign', href: '/dashboard/create', icon: PlusCircle },
     { name: 'My Campaigns', href: '/dashboard/my-campaigns', icon: Layers },
     { name: 'Withdrawals', href: '/dashboard/withdrawals', icon: Wallet },
-    { name: 'Withdrawal Requests', href: '/dashboard/withdrawal-requests', icon: History },
+    { name: 'Payment History', href: '/dashboard/withdrawal-requests', icon: History },
   ];
 
   const adminNavItems = [
@@ -53,8 +53,20 @@ export default function Sidebar({ mobileMenuOpen, setMobileMenuOpen }) {
         mobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
       }`}>
         
+        {/* Brand / Logo */}
+        <Link
+          href="/dashboard"
+          onClick={() => setMobileMenuOpen && setMobileMenuOpen(false)}
+          className="flex items-center gap-2 px-6 pt-6 pb-2"
+        >
+          <div className="w-9 h-9 bg-[#12643E] rounded-lg flex items-center justify-center text-white shadow-sm">
+            <Rocket className="w-5 h-5" />
+          </div>
+          <span className="text-[18px] font-extrabold text-[#12643E] tracking-tight">Crowdfundly</span>
+        </Link>
+
         {/* Profile Header */}
-        <div className="flex flex-col items-center pt-8 pb-6 mb-2 border-b border-gray-200/50">
+        <div className="flex flex-col items-center pt-4 pb-6 mb-2 border-b border-gray-200/50">
           <div className="w-20 h-20 rounded-full p-1 bg-white mb-3 shadow-sm border border-gray-100">
             <img 
               src={user?.photoURL || user?.avatar || "https://ui-avatars.com/api/?name=" + encodeURIComponent(user?.name || "User") + "&background=12643E&color=fff"} 

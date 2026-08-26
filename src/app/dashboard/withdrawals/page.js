@@ -30,11 +30,15 @@ export default function WithdrawalsPage() {
     visible: { opacity: 1, y: 0 }
   };
 
-  const payoutUSD = credits ? (parseInt(credits, 10) / 20).toFixed(2) : '0.00';
-  const isInsufficient = credits && (parseInt(credits, 10) < 100 || parseInt(credits, 10) > availableUSD);
+  const enteredCredits = credits ? parseInt(credits, 10) : 0;
+  const payoutUSD = enteredCredits ? (enteredCredits / 20).toFixed(2) : '0.00';
+  const belowMinimum = Boolean(credits) && enteredCredits < 200;
+  // "Insufficient credit" = requesting more credits than the available balance.
+  const isInsufficient = enteredCredits > availableUSD;
+  const canSubmit = enteredCredits >= 200 && !isInsufficient && Boolean(paymentMethod) && Boolean(paymentDetails.trim());
 
   const submitWithdrawal = async () => {
-    if (isInsufficient || !paymentMethod || !paymentDetails.trim()) return;
+    if (!canSubmit) return;
     setIsSubmitting(true);
     try {
       await axios.post(`${API_URL}/api/withdrawals`, { creditsToWithdraw: Number(credits), paymentMethod, paymentDetails }, { headers: authHeaders() });
@@ -87,7 +91,7 @@ export default function WithdrawalsPage() {
           </div>
           <h3 className="text-[18px] font-bold text-[#0f172a] mb-2">Ready to cash out?</h3>
           <p className="text-[12px] text-gray-500 mb-6 px-2">
-            Minimum withdrawal is 100 credits. 20 credits = $1.
+            Minimum withdrawal is 200 credits. 20 credits = $1.
           </p>
           <button onClick={() => document.getElementById('withdrawal-amount')?.focus()} className="w-full bg-[#12643E] hover:bg-[#0e4f31] text-white py-2.5 rounded-lg font-bold text-[14px] transition-colors shadow-sm">
             Start Withdrawal
@@ -112,7 +116,7 @@ export default function WithdrawalsPage() {
               <label className="block text-[12px] font-bold text-[#0f172a] mb-1.5">Credits to Withdraw</label>
               <div className="relative">
                 <input 
-                  id="withdrawal-amount" type="number" min="100" max={availableUSD}
+                  id="withdrawal-amount" type="number" min="200" max={availableUSD}
                   value={credits}
                   onChange={(e) => setUSD(e.target.value)}
                   placeholder="e.g. 500" 
@@ -125,6 +129,30 @@ export default function WithdrawalsPage() {
               {credits && (
                 <p className="text-[11px] text-gray-500 mt-1.5">You&apos;ll receive ≈ <span className="font-bold text-[#12643E]">${payoutUSD}</span> · 20 credits = $1</p>
               )}
+              {isInsufficient && (
+                <p className="text-[11px] font-bold text-red-500 mt-1.5">Insufficient credit — you only have {availableUSD.toLocaleString()} credits available.</p>
+              )}
+              {belowMinimum && !isInsufficient && (
+                <p className="text-[11px] font-bold text-red-500 mt-1.5">Enter at least 200 credits to withdraw.</p>
+              )}
+            </div>
+
+            {/* Read-only payout amount in USD */}
+            <div>
+              <label className="block text-[12px] font-bold text-[#0f172a] mb-1.5">Withdraw Amount ($)</label>
+              <div className="relative">
+                <input
+                  type="text"
+                  value={`$${payoutUSD}`}
+                  readOnly
+                  tabIndex={-1}
+                  aria-label="Withdraw amount in US dollars"
+                  className="w-full pl-4 pr-16 py-3 rounded-md border border-gray-200 bg-[#f8fafc] text-[14px] font-bold text-[#12643E] cursor-not-allowed focus:outline-none"
+                />
+                <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-[12px] text-gray-500 font-bold">
+                  USD
+                </span>
+              </div>
             </div>
 
 
@@ -136,6 +164,9 @@ export default function WithdrawalsPage() {
                 <option value="bank">Bank Transfer</option>
                 <option value="paypal">PayPal</option>
                 <option value="stripe">Stripe Connect</option>
+                <option value="bkash">Bkash</option>
+                <option value="rocket">Rocket</option>
+                <option value="nagad">Nagad</option>
               </select>
             </div>
 
@@ -149,22 +180,22 @@ export default function WithdrawalsPage() {
             </div>
 
             <div className="pt-2">
-              <button 
-                onClick={submitWithdrawal} disabled={isSubmitting || isInsufficient || !credits || !paymentMethod || !paymentDetails.trim()}
-                className={`w-full py-3.5 rounded-md font-bold text-[14px] flex items-center justify-center transition-colors ${
-                  isSubmitting || isInsufficient || !credits || !paymentMethod || !paymentDetails.trim()
-                    ? 'bg-[#eef2f6] text-gray-400 cursor-not-allowed' 
-                    : 'bg-[#12643E] hover:bg-[#0e4f31] text-white shadow-sm'
-                }`}
-              >
-                <Lock className="w-4 h-4 mr-2" />
-                {isSubmitting ? 'Submitting request…' : 'Withdraw Funds'}
-              </button>
-              
-              {isInsufficient && (
-                <p className="text-[12px] text-red-500 mt-2 text-center font-medium">
-                  Enter at least 100 credits and no more than your available balance.
-                </p>
+              {isInsufficient ? (
+                <div className="w-full py-3.5 rounded-md bg-red-50 border border-red-100 flex items-center justify-center text-[14px] font-bold text-red-500">
+                  Insufficient credit
+                </div>
+              ) : (
+                <button
+                  onClick={submitWithdrawal} disabled={isSubmitting || !canSubmit}
+                  className={`w-full py-3.5 rounded-md font-bold text-[14px] flex items-center justify-center transition-colors ${
+                    isSubmitting || !canSubmit
+                      ? 'bg-[#eef2f6] text-gray-400 cursor-not-allowed'
+                      : 'bg-[#12643E] hover:bg-[#0e4f31] text-white shadow-sm'
+                  }`}
+                >
+                  <Lock className="w-4 h-4 mr-2" />
+                  {isSubmitting ? 'Submitting request…' : 'Withdraw Funds'}
+                </button>
               )}
             </div>
           </div>

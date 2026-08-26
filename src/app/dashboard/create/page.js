@@ -25,7 +25,8 @@ export default function CreateCampaignPage() {
     shortDescription: '',
     story: '',
     targetAmount: '',
-    duration: '',
+    deadline: '',
+    minimumContribution: '',
     coverImage: '',
     teamName: '',
     teamRole: '',
@@ -57,8 +58,14 @@ export default function CreateCampaignPage() {
   };
 
   const handleSubmitCampaign = async () => {
-    if (!formData.title || !formData.category || !formData.targetAmount || !formData.duration) {
+    if (!formData.title || !formData.category || !formData.targetAmount || !formData.deadline) {
       toast.error('Please fill in all required fields.');
+      return;
+    }
+    const deadlineDate = new Date(formData.deadline);
+    const durationDays = Math.ceil((deadlineDate.getTime() - Date.now()) / 86400000);
+    if (!Number.isFinite(durationDays) || durationDays < 1) {
+      toast.error('Choose a deadline at least one day in the future.');
       return;
     }
 
@@ -70,7 +77,9 @@ export default function CreateCampaignPage() {
       await axios.post(`${API_URL}/api/campaigns`, {
         ...formData,
         targetAmount: Number(formData.targetAmount),
-        duration: Number(formData.duration),
+        duration: durationDays,
+        deadline: deadlineDate.toISOString(),
+        minimumContribution: Number(formData.minimumContribution) || 1,
         creatorEmail: user?.email,
         creatorName: user?.name,
         creatorAvatar: user?.photoURL,
@@ -223,6 +232,10 @@ export default function CreateCampaignPage() {
                       <option value="Technology">Technology</option>
                       <option value="Environment">Environment</option>
                       <option value="Design">Design</option>
+                      <option value="Art & Design">Art & Design</option>
+                      <option value="Community">Community</option>
+                      <option value="Health & Wellness">Health & Wellness</option>
+                      <option value="Games">Games</option>
                     </select>
                   </div>
                   <div>
@@ -337,16 +350,30 @@ export default function CreateCampaignPage() {
                   />
                 </div>
                 
-                <div>
-                  <label className="block text-[13px] text-gray-700 mb-1.5">Campaign Duration (Days)</label>
-                  <input 
-                    type="number" 
-                    name="duration"
-                    value={formData.duration || ''}
-                    onChange={handleChange}
-                    placeholder="e.g., 30" 
-                    className="w-full px-4 py-2.5 rounded-md border border-gray-200 focus:outline-none focus:border-[#0f766e] focus:ring-1 focus:ring-[#0f766e] text-[14px] text-gray-900 placeholder-gray-400"
-                  />
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[13px] text-gray-700 mb-1.5">Campaign Deadline</label>
+                    <input
+                      type="date"
+                      name="deadline"
+                      value={formData.deadline || ''}
+                      min={new Date(Date.now() + 86400000).toISOString().split('T')[0]}
+                      onChange={handleChange}
+                      className="w-full px-4 py-2.5 rounded-md border border-gray-200 focus:outline-none focus:border-[#0f766e] focus:ring-1 focus:ring-[#0f766e] text-[14px] text-gray-900 placeholder-gray-400"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[13px] text-gray-700 mb-1.5">Minimum Contribution (Credits)</label>
+                    <input
+                      type="number"
+                      name="minimumContribution"
+                      min="1"
+                      value={formData.minimumContribution || ''}
+                      onChange={handleChange}
+                      placeholder="e.g., 10"
+                      className="w-full px-4 py-2.5 rounded-md border border-gray-200 focus:outline-none focus:border-[#0f766e] focus:ring-1 focus:ring-[#0f766e] text-[14px] text-gray-900 placeholder-gray-400"
+                    />
+                  </div>
                 </div>
 
                 <div className="pt-4 border-t border-gray-100">

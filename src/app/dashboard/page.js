@@ -2,18 +2,27 @@
 import { useAuth } from '@/context/AuthContext';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { HeartHandshake, Hourglass, WalletCards, ArrowRight, TrendingUp, CheckCircle2, Loader2, LayoutDashboard, Users, Clock } from 'lucide-react';
+import { HeartHandshake, Hourglass, WalletCards, ArrowRight, TrendingUp, CheckCircle2, XCircle, Loader2, LayoutDashboard, Users, Clock, Banknote, Eye } from 'lucide-react';
 import Link from 'next/link';
 import axios from 'axios';
 import { API_URL } from '@/lib/api';
 
 const API = API_URL;
 
+// Real per-status styling for contribution rows (no more hardcoded green "Completed")
+const CONTRIBUTION_STATUS = {
+  Completed: { cls: 'bg-[#d1fae5] text-[#059669] border-[#a7f3d0]', Icon: CheckCircle2 },
+  Pending: { cls: 'bg-amber-100 text-amber-700 border-amber-200', Icon: Clock },
+  Rejected: { cls: 'bg-red-100 text-red-700 border-red-200', Icon: XCircle },
+  Refunded: { cls: 'bg-red-100 text-red-700 border-red-200', Icon: XCircle },
+};
+
 export default function DashboardPage() {
   const { user } = useAuth();
   const [stats, setStats] = useState(null);
   const [contributions, setContributions] = useState([]);
   const [myCampaigns, setMyCampaigns] = useState([]);
+  const [pendingContributions, setPendingContributions] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -31,11 +40,16 @@ export default function DashboardPage() {
         if (user.role === 'Supporter') {
           const contRes = await axios.get(`${API}/api/contributions`, { headers });
           const contribs = Array.isArray(contRes.data) ? contRes.data : contRes.data.contributions || [];
-          setContributions(contribs.slice(0, 5));
+          // Show only approved (Completed) contributions on home
+          setContributions(contribs.filter(c => c.status === 'Completed').slice(0, 5));
         }
         if (user.role === 'Creator') {
-          const campRes = await axios.get(`${API}/api/creator/campaigns`, { headers });
+          const [campRes, reviewRes] = await Promise.all([
+            axios.get(`${API}/api/creator/campaigns`, { headers }),
+            axios.get(`${API}/api/contributions/review`, { headers }).catch(() => ({ data: [] })),
+          ]);
           setMyCampaigns(campRes.data.slice(0, 5));
+          setPendingContributions(reviewRes.data.slice(0, 5));
         }
       } catch (err) {
         console.error('Dashboard fetch error:', err);
@@ -70,7 +84,7 @@ export default function DashboardPage() {
           {[
             { label: 'Total Campaigns', value: stats?.totalCampaigns ?? 0, icon: LayoutDashboard, color: 'bg-indigo-50 text-indigo-600' },
             { label: 'Total Users', value: stats?.totalUsers ?? 0, icon: Users, color: 'bg-emerald-50 text-emerald-600' },
-            { label: 'Pending Campaigns', value: stats?.pendingCampaigns ?? 0, icon: Clock, color: 'bg-amber-50 text-amber-600' },
+            { label: 'Payments Processed', value: `${(stats?.totalPayments ?? 0).toLocaleString()} credits`, icon: Banknote, color: 'bg-teal-50 text-teal-600' },
             { label: 'Pending Withdrawals', value: stats?.totalWithdrawals ?? 0, icon: WalletCards, color: 'bg-purple-50 text-purple-600' },
           ].map((card) => (
             <div key={card.label} className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 flex items-center gap-4">
@@ -116,7 +130,7 @@ export default function DashboardPage() {
           {[
             { label: 'My Campaigns', value: stats?.totalCampaigns ?? 0, icon: LayoutDashboard, color: 'bg-indigo-50 text-indigo-600' },
             { label: 'Total Raised', value: `${(stats?.totalRaised ?? 0).toLocaleString()} credits`, icon: TrendingUp, color: 'bg-emerald-50 text-emerald-600' },
-            { label: 'Approved', value: stats?.approvedCampaigns ?? 0, icon: CheckCircle2, color: 'bg-green-50 text-green-600' },
+            { label: 'Active Campaigns', value: stats?.activeCampaigns ?? 0, icon: CheckCircle2, color: 'bg-green-50 text-green-600' },
             { label: 'Pending Review', value: stats?.pendingCampaigns ?? 0, icon: Clock, color: 'bg-amber-50 text-amber-600' },
           ].map((card) => (
             <div key={card.label} className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 flex items-center gap-4">
@@ -177,6 +191,49 @@ export default function DashboardPage() {
             </div>
           )}
         </motion.div>
+
+        {/* Contributions To Review */}
+        <motion.div variants={itemVariants} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mt-8">
+          <div className="px-6 py-5 border-b border-gray-100 flex justify-between items-center">
+            <h3 className="text-[18px] font-bold text-[#0f172a]">Contributions To Review</h3>
+            <Link href="/dashboard/review-contributions" className="text-sm font-bold text-[#4f46e5] hover:text-indigo-700 flex items-center transition-colors">
+              View All <ArrowRight className="w-4 h-4 ml-1" />
+            </Link>
+          </div>
+          {pendingContributions.length === 0 ? (
+            <div className="py-16 text-center text-gray-400 text-sm">No pending contributions to review. You&apos;re all caught up!</div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm text-left">
+                <thead className="bg-gray-50 border-b border-gray-100 text-[11px] text-gray-500 uppercase tracking-widest font-bold">
+                  <tr>
+                    <th className="px-6 py-4">Supporter</th>
+                    <th className="px-6 py-4">Campaign</th>
+                    <th className="px-6 py-4">Amount</th>
+                    <th className="px-6 py-4 text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {pendingContributions.map((c) => (
+                    <tr key={c._id} className="hover:bg-gray-50/50 transition-colors">
+                      <td className="px-6 py-4">
+                        <div className="font-medium text-gray-900 text-[13px]">{c.supporterName || c.supporterEmail}</div>
+                        {c.supporterName && <div className="text-[11px] text-gray-400">{c.supporterEmail}</div>}
+                      </td>
+                      <td className="px-6 py-4 text-[13px] text-gray-600 font-medium truncate max-w-[200px]">{c.campaignTitle || 'Unknown Campaign'}</td>
+                      <td className="px-6 py-4 text-[13px] font-bold text-[#12643E]">{c.amount} credits</td>
+                      <td className="px-6 py-4 text-right">
+                        <Link href="/dashboard/review-contributions" className="inline-flex items-center bg-gray-50 text-gray-600 hover:bg-gray-100 px-3 py-1.5 rounded-md font-bold text-xs transition-colors">
+                          <Eye className="w-3.5 h-3.5 mr-1" /> Review
+                        </Link>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </motion.div>
       </motion.section>
     );
   }
@@ -189,7 +246,7 @@ export default function DashboardPage() {
         <p className="text-[15px] text-gray-500">Here is an overview of your recent impact and active contributions.</p>
       </motion.div>
 
-      <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+      <motion.div variants={itemVariants} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
         <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200/60 relative overflow-hidden group hover:shadow-md transition-shadow">
           <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50 rounded-bl-full -mr-10 -mt-10 transition-transform group-hover:scale-110"></div>
           <div className="absolute top-6 right-6 w-10 h-10 rounded-lg bg-[#d1fae5] flex items-center justify-center text-[#0f766e] z-10">
@@ -201,6 +258,16 @@ export default function DashboardPage() {
             <TrendingUp className="w-3.5 h-3.5 mr-1" />
             <span>{stats?.projectsSupported ?? 0} projects supported</span>
           </div>
+        </div>
+
+        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200/60 relative overflow-hidden group hover:shadow-md transition-shadow">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-orange-50 rounded-bl-full -mr-10 -mt-10 transition-transform group-hover:scale-110"></div>
+          <div className="absolute top-6 right-6 w-10 h-10 rounded-lg bg-[#ffedd5] flex items-center justify-center text-[#ea580c] z-10">
+            <Clock className="w-5 h-5" />
+          </div>
+          <p className="text-[11px] text-gray-500 uppercase tracking-widest font-bold mb-4 relative z-10">Pending Review</p>
+          <p className="text-[40px] font-bold text-[#0f172a] leading-none mb-3 relative z-10 tracking-tight">{stats?.pendingContributions ?? 0}</p>
+          <p className="text-xs text-gray-500 relative z-10 font-medium">Awaiting creator approval</p>
         </div>
 
         <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200/60 relative overflow-hidden group hover:shadow-md transition-shadow">
@@ -227,17 +294,17 @@ export default function DashboardPage() {
         </div>
       </motion.div>
 
-      {/* Recent Contributions Table */}
+      {/* Approved Contributions Table */}
       <motion.div variants={itemVariants} className="bg-white rounded-xl shadow-sm border border-gray-200/60 overflow-hidden">
         <div className="px-6 py-5 border-b border-gray-100 flex justify-between items-center">
-          <h3 className="text-[18px] font-bold text-[#0f172a] tracking-tight">Recent Contributions</h3>
+          <h3 className="text-[18px] font-bold text-[#0f172a] tracking-tight">Approved Contributions</h3>
           <Link href="/dashboard/contributions" className="text-sm font-bold text-[#4f46e5] hover:text-indigo-700 flex items-center transition-colors">
             View All <ArrowRight className="w-4 h-4 ml-1" />
           </Link>
         </div>
         {contributions.length === 0 ? (
           <div className="py-16 text-center text-gray-400 text-sm">
-            No contributions yet. <Link href="/campaigns" className="text-indigo-600 font-bold">Explore campaigns!</Link>
+            No approved contributions yet. <Link href="/campaigns" className="text-indigo-600 font-bold">Explore campaigns!</Link>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -245,27 +312,31 @@ export default function DashboardPage() {
               <thead className="text-[11px] text-gray-500 font-bold uppercase tracking-widest bg-gray-50/50 border-b border-gray-100">
                 <tr>
                   <th className="px-6 py-4 font-bold">Campaign</th>
+                  <th className="px-6 py-4 font-bold">Creator</th>
                   <th className="px-6 py-4 font-bold">Amount (Credits)</th>
-                  <th className="px-6 py-4 font-bold">Date</th>
                   <th className="px-6 py-4 font-bold text-right">Status</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {contributions.map((item, idx) => (
-                  <tr key={item._id || idx} className="hover:bg-gray-50/50 transition-colors group">
-                    <td className="px-6 py-4">
-                      <span className="font-bold text-gray-800 text-[13px]">{item.campaignTitle || `Campaign #${item.campaignId?.toString().slice(-6)}`}</span>
-                    </td>
-                    <td className="px-6 py-4 font-bold text-[#0f172a] text-[13px]">{(item.amount || 0).toLocaleString()} credits</td>
-                    <td className="px-6 py-4 text-gray-500 text-[13px]">{new Date(item.date).toLocaleDateString()}</td>
-                    <td className="px-6 py-4 text-right">
-                      <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold bg-[#d1fae5] text-[#059669] border border-[#a7f3d0]">
-                        <CheckCircle2 className="w-3 h-3 mr-1" />
-                        {item.status || 'Completed'}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
+                {contributions.map((item, idx) => {
+                  const st = CONTRIBUTION_STATUS[item.status] || CONTRIBUTION_STATUS.Completed;
+                  const StatusIcon = st.Icon;
+                  return (
+                    <tr key={item._id || idx} className="hover:bg-gray-50/50 transition-colors group">
+                      <td className="px-6 py-4">
+                        <span className="font-bold text-gray-800 text-[13px]">{item.campaignTitle || `Campaign #${item.campaignId?.toString().slice(-6)}`}</span>
+                      </td>
+                      <td className="px-6 py-4 text-gray-600 text-[13px] font-medium">{item.creatorName || item.creatorEmail || '—'}</td>
+                      <td className="px-6 py-4 font-bold text-[#0f172a] text-[13px]">{(item.amount || 0).toLocaleString()} credits</td>
+                      <td className="px-6 py-4 text-right">
+                        <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold border ${st.cls}`}>
+                          <StatusIcon className="w-3 h-3 mr-1" />
+                          {item.status || 'Completed'}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

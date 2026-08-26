@@ -1,15 +1,19 @@
 "use client";
 import Sidebar from '@/components/Sidebar';
+import Footer from '@/components/Footer';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Coins } from 'lucide-react';
 import NotificationBell from '@/components/NotificationBell';
+import axios from 'axios';
+import { API_URL, authHeaders } from '@/lib/api';
 
 export default function DashboardLayout({ children }) {
   const { user, loading } = useAuth();
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [credits, setCredits] = useState(0);
   const pathname = usePathname();
 
   // Google (better-auth) users must complete the one-time role choice before
@@ -37,6 +41,14 @@ export default function DashboardLayout({ children }) {
   useEffect(() => {
     setMobileMenuOpen(false);
   }, [pathname]);
+
+  // Keep the header credit balance fresh across dashboard navigation
+  useEffect(() => {
+    if (!user) return;
+    axios.get(`${API_URL}/api/users/me`, { headers: authHeaders() })
+      .then((res) => setCredits(res.data?.credits || 0))
+      .catch(() => {});
+  }, [user, pathname]);
 
   if (loading || !user || needsRoleSelection) {
     return (
@@ -70,12 +82,20 @@ export default function DashboardLayout({ children }) {
       <Sidebar mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} />
       
       <main className="flex-1 md:ml-64 flex flex-col min-h-screen transition-all duration-300 w-full overflow-x-hidden relative">
-        <div className="absolute top-4 right-4 md:top-8 md:right-8 z-30">
+        <div className="absolute top-4 right-4 md:top-8 md:right-8 z-30 flex items-center gap-3">
+          {user?.role !== 'Admin' && (
+            <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-full pl-3 pr-4 py-1.5 shadow-sm" title="Available credits">
+              <Coins className="w-4 h-4 text-[#12643E]" />
+              <span className="text-[13px] font-bold text-[#0f172a]">{credits.toLocaleString()}</span>
+              <span className="text-[11px] text-gray-500 font-medium hidden sm:inline">credits</span>
+            </div>
+          )}
           <NotificationBell />
         </div>
         <div className="p-4 sm:p-6 md:p-8 lg:p-12 max-w-[1400px] mx-auto w-full flex-1">
           {children}
         </div>
+        <Footer />
       </main>
     </div>
   );

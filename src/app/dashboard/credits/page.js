@@ -7,7 +7,7 @@ import toast from 'react-hot-toast';
 import { API_URL, authHeaders } from '@/lib/api';
 
 export default function PurchaseCreditPage() {
-  const [selectedPackage, setSelectedPackage] = useState(1000);
+  const [selectedPackage, setSelectedPackage] = useState(300);
   const [customAmount, setCustomAmount] = useState('');
   const [balance, setBalance] = useState(0);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
@@ -60,34 +60,39 @@ export default function PurchaseCreditPage() {
 
   const packages = [
     {
-      credits: 500,
-      price: 50.00,
+      credits: 100,
+      price: 10.00,
       icon: <DollarSign className="w-5 h-5 text-white" />,
       popular: false
     },
     {
-      credits: 1000,
-      price: 100.00,
+      credits: 300,
+      price: 25.00,
       icon: <Banknote className="w-5 h-5 text-white" />,
       popular: true
     },
     {
-      credits: 2500,
-      price: 250.00,
+      credits: 800,
+      price: 60.00,
       icon: <Gem className="w-5 h-5 text-white" />,
       popular: false
     },
     {
-      credits: 5000,
-      price: 500.00,
+      credits: 1500,
+      price: 110.00,
       icon: <Star className="w-5 h-5 text-white" />,
       popular: false
     }
   ];
 
-  // Determine current active amount and price
+  // Determine current active amount and price. Package tiers use promotional
+  // bulk pricing (100/$10, 300/$25, 800/$60, 1500/$110); custom amounts fall
+  // back to the base rate of 10 credits = $1.
   const activeCredits = customAmount ? parseInt(customAmount) : selectedPackage;
-  const activePrice = activeCredits ? (activeCredits / 10).toFixed(2) : '0.00';
+  const matchedPackage = packages.find((p) => p.credits === activeCredits);
+  const activePrice = matchedPackage
+    ? matchedPackage.price.toFixed(2)
+    : (activeCredits ? (activeCredits / 10).toFixed(2) : '0.00');
 
   const handlePackageSelect = (credits) => {
     setSelectedPackage(credits);
@@ -100,7 +105,7 @@ export default function PurchaseCreditPage() {
     if (val) {
       setSelectedPackage(null); // Deselect packages if typing custom
     } else {
-      setSelectedPackage(1000); // Default back to popular if cleared
+      setSelectedPackage(300); // Default back to popular if cleared
     }
   };
 

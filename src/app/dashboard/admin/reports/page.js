@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Bell, Banknote, Megaphone, UserPlus, AlertTriangle, MessageSquare, Filter, Flag } from 'lucide-react';
+import { Bell, Banknote, Megaphone, UserPlus, AlertTriangle, MessageSquare, Filter, Flag, Ban, Trash2, Check, Loader2, User } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
@@ -14,6 +14,7 @@ export default function AdminReportsPage() {
   const [stats, setStats] = useState(null);
   const [withdrawals, setWithdrawals] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState(null); // report id being acted on
 
   const fetchData = async () => {
     const token = localStorage.getItem('crowdfundly_token');
@@ -35,6 +36,56 @@ export default function AdminReportsPage() {
   };
 
   useEffect(() => { fetchData(); }, []);
+
+  const handleSuspend = async (report) => {
+    if (!report.campaignId) return toast.error('No campaign is linked to this report.');
+    if (!confirm('Suspend this campaign? It will be hidden from the public site until re-approved.')) return;
+    setActionLoading(report._id);
+    try {
+      const token = localStorage.getItem('crowdfundly_token');
+      const headers = { Authorization: `Bearer ${token}` };
+      await axios.patch(`${API}/api/campaigns/${report.campaignId}/status`, { status: 'Suspended' }, { headers });
+      await axios.patch(`${API}/api/reports/${report._id}/status`, { status: 'Reviewed' }, { headers });
+      toast.success('Campaign suspended.');
+      fetchData();
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to suspend campaign.');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleDeleteCampaign = async (report) => {
+    if (!report.campaignId) return toast.error('No campaign is linked to this report.');
+    if (!confirm('Delete this campaign permanently? All supporters will be refunded.')) return;
+    setActionLoading(report._id);
+    try {
+      const token = localStorage.getItem('crowdfundly_token');
+      const headers = { Authorization: `Bearer ${token}` };
+      await axios.delete(`${API}/api/campaigns/${report.campaignId}`, { headers });
+      await axios.patch(`${API}/api/reports/${report._id}/status`, { status: 'Reviewed' }, { headers });
+      toast.success('Campaign deleted and supporters refunded.');
+      fetchData();
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to delete campaign.');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleDismiss = async (report) => {
+    setActionLoading(report._id);
+    try {
+      const token = localStorage.getItem('crowdfundly_token');
+      await axios.patch(`${API}/api/reports/${report._id}/status`, { status: 'Reviewed' }, { headers: { Authorization: `Bearer ${token}` } });
+      toast.success('Report dismissed.');
+      fetchData();
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to update report.');
+    } finally {
+      setActionLoading(null);
+    }
+  };
 
   const totalVolume = stats?.totalFunded ? stats.totalFunded.toLocaleString() : null;
   const activeCamps = stats?.activeCampaigns ? stats.activeCampaigns.toLocaleString() : null;
@@ -123,20 +174,56 @@ export default function AdminReportsPage() {
                         {report.createdAt ? new Date(report.createdAt).toLocaleDateString() : '—'}
                       </span>
                     </div>
-                    <p className="text-[13px] text-[#0f172a] font-medium mb-3">
+
+                    <p className="text-[13px] font-bold text-[#0f172a] mb-1">
+                      {report.campaignTitle || 'Unknown Campaign'}
+                    </p>
+                    <p className="text-[13px] text-gray-600 mb-3">
                       {report.description || 'No description provided by the reporter.'}
                     </p>
+
                     <div className="flex justify-between items-center">
-                      <span className="bg-[#eef2f6] text-[#475569] px-2 py-1 rounded text-[11px] font-bold">
-                        Camp ID: {report.campaignId ? report.campaignId.toString().slice(-6) : 'Unknown'}
+                      <span className="flex items-center text-[12px] text-gray-500">
+                        <User className="w-3.5 h-3.5 mr-1" /> Reported by {report.reporterName || report.reporterEmail || 'Unknown'}
                       </span>
                       <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-widest ${
-                        report.status === 'Pending' ? 'bg-amber-100 text-amber-700' : 
+                        report.status === 'Pending' ? 'bg-amber-100 text-amber-700' :
                         report.status === 'Reviewed' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
                       }`}>
                         {report.status}
                       </span>
                     </div>
+
+                    {report.status === 'Pending' && (
+                      <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-100">
+                        {actionLoading === report._id ? (
+                          <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
+                        ) : (
+                          <>
+                            <button
+                              onClick={() => handleSuspend(report)}
+                              disabled={!report.campaignId}
+                              className="flex items-center bg-amber-50 text-amber-700 hover:bg-amber-100 px-3 py-1.5 rounded-md text-[12px] font-bold transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                            >
+                              <Ban className="w-3.5 h-3.5 mr-1" /> Suspend
+                            </button>
+                            <button
+                              onClick={() => handleDeleteCampaign(report)}
+                              disabled={!report.campaignId}
+                              className="flex items-center bg-red-50 text-red-600 hover:bg-red-100 px-3 py-1.5 rounded-md text-[12px] font-bold transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                            >
+                              <Trash2 className="w-3.5 h-3.5 mr-1" /> Delete
+                            </button>
+                            <button
+                              onClick={() => handleDismiss(report)}
+                              className="flex items-center text-gray-500 hover:text-gray-800 px-3 py-1.5 rounded-md text-[12px] font-bold transition-colors ml-auto"
+                            >
+                              <Check className="w-3.5 h-3.5 mr-1" /> Dismiss
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

@@ -26,10 +26,14 @@ export default function EditCampaignPage() {
     shortDescription: '',
     story: '',
     targetAmount: '',
-    duration: '',
+    deadline: '',
+    minimumContribution: '',
     coverImage: '',
     teamName: '',
-    teamRole: ''
+    teamRole: '',
+    rewardTitle: '',
+    rewardAmount: '',
+    rewardDescription: ''
   });
 
   const handleChange = (e) => {
@@ -43,6 +47,13 @@ export default function EditCampaignPage() {
         const token = localStorage.getItem('crowdfundly_token');
         const res = await axios.get(`${API_URL}/api/creator/campaigns/${id}`, { headers: { Authorization: `Bearer ${token}` } });
         const c = res.data;
+        const deadlineDate = c.deadline
+          ? new Date(c.deadline)
+          : (c.createdAt && c.duration ? new Date(new Date(c.createdAt).getTime() + c.duration * 86400000) : null);
+        const deadlineInput = deadlineDate && !Number.isNaN(deadlineDate.getTime())
+          ? deadlineDate.toISOString().split('T')[0]
+          : '';
+        const firstReward = Array.isArray(c.rewards) && c.rewards.length > 0 ? c.rewards[0] : null;
         setFormData({
           title: c.title || '',
           category: c.category || '',
@@ -51,10 +62,14 @@ export default function EditCampaignPage() {
           shortDescription: c.shortDescription || '',
           story: c.story || '',
           targetAmount: c.targetAmount || '',
-          duration: c.duration || '',
+          deadline: deadlineInput,
+          minimumContribution: c.minimumContribution || '',
           coverImage: c.coverImage || '',
           teamName: c.team?.[0]?.name || '',
-          teamRole: c.team?.[0]?.role || ''
+          teamRole: c.team?.[0]?.role || '',
+          rewardTitle: firstReward?.title || '',
+          rewardAmount: firstReward?.amount || '',
+          rewardDescription: firstReward?.description || ''
         });
       } catch (e) {
         toast.error('Failed to load campaign');
@@ -82,8 +97,14 @@ export default function EditCampaignPage() {
   };
 
   const handleSubmitCampaign = async () => {
-    if (!formData.title || !formData.category || !formData.targetAmount || !formData.duration) {
+    if (!formData.title || !formData.category || !formData.targetAmount || !formData.deadline) {
       toast.error('Please fill in all required fields.');
+      return;
+    }
+    const deadlineDate = new Date(formData.deadline);
+    const durationDays = Math.ceil((deadlineDate.getTime() - Date.now()) / 86400000);
+    if (!Number.isFinite(durationDays) || durationDays < 1) {
+      toast.error('Choose a deadline at least one day in the future.');
       return;
     }
 
@@ -95,30 +116,24 @@ export default function EditCampaignPage() {
       await axios.put(`${API_URL}/api/campaigns/${id}`, {
         ...formData,
         targetAmount: Number(formData.targetAmount),
-        duration: Number(formData.duration),
+        duration: durationDays,
+        deadline: deadlineDate.toISOString(),
+        minimumContribution: Number(formData.minimumContribution) || 1,
         creatorEmail: user?.email,
         creatorName: user?.name,
         creatorAvatar: user?.photoURL,
         team: formData.teamName ? [{ name: formData.teamName, role: formData.teamRole, initials: formData.teamName.substring(0, 2).toUpperCase() }] : [],
-        rewards: [
+        rewards: formData.rewardTitle ? [
           {
-            title: "Supporter",
-            amount: 25,
-            description: "Show your support for sustainable agriculture! Get exclusive behind-the-scenes updates.",
-            items: ["Exclusive Updates", "Digital Backer Wall"],
-            estimatedDelivery: "Aug 2024",
-            backers: 0
-          },
-          {
-            title: "Early Bird",
-            amount: 249,
-            description: "Get the complete system at a significant discount off retail price. Everything you need.",
-            items: ["1x Smart Farm", "Starter Seed Pod Kit", "Nutrient Solution", "App Access"],
-            estimatedDelivery: "Nov 2024",
+            title: formData.rewardTitle,
+            amount: Number(formData.rewardAmount) || 25,
+            description: formData.rewardDescription,
+            items: [],
+            estimatedDelivery: "TBD",
             backers: 0,
             popular: true
           }
-        ]
+        ] : []
       }, {
         headers: {
           Authorization: `Bearer ${token}`
@@ -360,26 +375,79 @@ export default function EditCampaignPage() {
               >
                 <div>
                   <label className="block text-[13px] text-gray-700 mb-1.5">Target Amount (Credits)</label>
-                  <input 
-                    type="number" 
+                  <input
+                    type="number"
                     name="targetAmount"
                     value={formData.targetAmount || ''}
                     onChange={handleChange}
-                    placeholder="e.g., 50000" 
+                    placeholder="e.g., 50000"
                     className="w-full px-4 py-2.5 rounded-md border border-gray-200 focus:outline-none focus:border-[#0f766e] focus:ring-1 focus:ring-[#0f766e] text-[14px] text-gray-900 placeholder-gray-400"
                   />
                 </div>
-                
-                <div>
-                  <label className="block text-[13px] text-gray-700 mb-1.5">Campaign Duration (Days)</label>
-                  <input 
-                    type="number" 
-                    name="duration"
-                    value={formData.duration || ''}
-                    onChange={handleChange}
-                    placeholder="e.g., 30" 
-                    className="w-full px-4 py-2.5 rounded-md border border-gray-200 focus:outline-none focus:border-[#0f766e] focus:ring-1 focus:ring-[#0f766e] text-[14px] text-gray-900 placeholder-gray-400"
-                  />
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[13px] text-gray-700 mb-1.5">Campaign Deadline</label>
+                    <input
+                      type="date"
+                      name="deadline"
+                      value={formData.deadline || ''}
+                      min={new Date(Date.now() + 86400000).toISOString().split('T')[0]}
+                      onChange={handleChange}
+                      className="w-full px-4 py-2.5 rounded-md border border-gray-200 focus:outline-none focus:border-[#0f766e] focus:ring-1 focus:ring-[#0f766e] text-[14px] text-gray-900 placeholder-gray-400"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[13px] text-gray-700 mb-1.5">Minimum Contribution (Credits)</label>
+                    <input
+                      type="number"
+                      name="minimumContribution"
+                      min="1"
+                      value={formData.minimumContribution || ''}
+                      onChange={handleChange}
+                      placeholder="e.g., 10"
+                      className="w-full px-4 py-2.5 rounded-md border border-gray-200 focus:outline-none focus:border-[#0f766e] focus:ring-1 focus:ring-[#0f766e] text-[14px] text-gray-900 placeholder-gray-400"
+                    />
+                  </div>
+                </div>
+
+                <div className="pt-4 border-t border-gray-100">
+                  <h4 className="text-[14px] font-bold text-gray-900 mb-4">Add a Support Tier (Optional)</h4>
+                  <div className="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                      <label className="block text-[13px] text-gray-700 mb-1.5">Tier Title</label>
+                      <input
+                        type="text"
+                        name="rewardTitle"
+                        value={formData.rewardTitle || ''}
+                        onChange={handleChange}
+                        placeholder="e.g., Early Bird Access"
+                        className="w-full px-4 py-2.5 rounded-md border border-gray-200 focus:outline-none focus:border-[#0f766e] focus:ring-1 focus:ring-[#0f766e] text-[14px] text-gray-900 placeholder-gray-400"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[13px] text-gray-700 mb-1.5">Tier Minimum Amount (Credits)</label>
+                      <input
+                        type="number"
+                        name="rewardAmount"
+                        value={formData.rewardAmount || ''}
+                        onChange={handleChange}
+                        placeholder="e.g., 50"
+                        className="w-full px-4 py-2.5 rounded-md border border-gray-200 focus:outline-none focus:border-[#0f766e] focus:ring-1 focus:ring-[#0f766e] text-[14px] text-gray-900 placeholder-gray-400"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-[13px] text-gray-700 mb-1.5">Tier Description</label>
+                    <textarea
+                      name="rewardDescription"
+                      value={formData.rewardDescription || ''}
+                      onChange={handleChange}
+                      rows="2"
+                      placeholder="What backers get for this tier..."
+                      className="w-full px-4 py-3 rounded-md border border-gray-200 focus:outline-none focus:border-[#0f766e] focus:ring-1 focus:ring-[#0f766e] text-[14px] text-gray-900 placeholder-gray-400 resize-none"
+                    ></textarea>
+                  </div>
                 </div>
               </motion.div>
             )}

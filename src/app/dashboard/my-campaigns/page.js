@@ -24,7 +24,12 @@ export default function MyCampaignsPage() {
       const res = await axios.get(`${API}/api/creator/campaigns`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setCampaigns(res.data);
+      const sorted = [...res.data].sort((a, b) => {
+        const da = a.deadline ? new Date(a.deadline).getTime() : (a.createdAt ? new Date(a.createdAt).getTime() + (a.duration || 0) * 86400000 : 0);
+        const db = b.deadline ? new Date(b.deadline).getTime() : (b.createdAt ? new Date(b.createdAt).getTime() + (b.duration || 0) * 86400000 : 0);
+        return db - da;
+      });
+      setCampaigns(sorted);
     } catch (err) {
       console.error('Failed to fetch campaigns:', err);
       toast.error('Failed to load campaigns');
@@ -56,9 +61,15 @@ export default function MyCampaignsPage() {
     return <span className={`px-3 py-1 text-xs font-bold rounded-full ${styles[status] || 'bg-gray-100 text-gray-700'}`}>{status}</span>;
   };
 
-  const getDeadline = (createdAt, duration) => {
-    if (!createdAt || !duration) return '—';
-    const end = new Date(new Date(createdAt).getTime() + duration * 24 * 60 * 60 * 1000);
+  const effectiveDeadline = (c) => {
+    if (c.deadline) return new Date(c.deadline);
+    if (c.createdAt && c.duration) return new Date(new Date(c.createdAt).getTime() + c.duration * 24 * 60 * 60 * 1000);
+    return null;
+  };
+
+  const getDeadline = (c) => {
+    const end = effectiveDeadline(c);
+    if (!end || Number.isNaN(end.getTime())) return '—';
     return end.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   };
 
@@ -120,7 +131,7 @@ export default function MyCampaignsPage() {
                             </div>
                           </div>
                         </td>
-                        <td className="px-6 py-5 text-[13px] font-bold text-gray-700">{getDeadline(c.createdAt, c.duration)}</td>
+                        <td className="px-6 py-5 text-[13px] font-bold text-gray-700">{getDeadline(c)}</td>
                         <td className="px-6 py-5">{getStatusBadge(c.status)}</td>
                         <td className="px-6 py-5">
                           <div className="mb-2 text-[13px]">
@@ -177,7 +188,7 @@ export default function MyCampaignsPage() {
                     </div>
 
                     <div className="flex items-center justify-between text-[12px] text-gray-500">
-                      <span>Deadline: {getDeadline(c.createdAt, c.duration)}</span>
+                      <span>Deadline: {getDeadline(c)}</span>
                       <div className="flex items-center space-x-1 text-gray-400">
                         <Link href={`/campaigns/${c._id}`} className="p-2 hover:bg-gray-100 hover:text-gray-700 rounded-md transition-colors" title="View">
                           <Eye className="w-4 h-4" />

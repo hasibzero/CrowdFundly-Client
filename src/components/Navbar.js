@@ -47,17 +47,19 @@ export default function Navbar() {
           >
             About Us
           </Link>
-          {!user && !loading && (
-            <Link
-              href="/register"
+          {!user && (
+            <a
+              href="https://github.com/hasibzero/CrowdFundly-Client"
+              target="_blank"
+              rel="noopener noreferrer"
               className="text-[14px] font-semibold text-gray-600 hover:text-gray-900 transition-colors py-5"
             >
               Join as Developer
-            </Link>
+            </a>
           )}
           {user && !loading && (
-            <Link 
-              href="/dashboard" 
+            <Link
+              href="/dashboard"
               className="text-[14px] font-semibold text-gray-600 hover:text-gray-900 transition-colors py-5"
             >
               Dashboard
@@ -136,18 +138,20 @@ export default function Navbar() {
           >
             About Us
           </Link>
-          {!user && !loading && (
-            <Link
-              href="/register"
+          {!user && (
+            <a
+              href="https://github.com/hasibzero/CrowdFundly-Client"
+              target="_blank"
+              rel="noopener noreferrer"
               onClick={() => setMobileMenuOpen(false)}
               className="py-3 text-[15px] font-semibold text-gray-700 border-b border-gray-50"
             >
               Join as Developer
-            </Link>
+            </a>
           )}
           {user && !loading && (
-            <Link 
-              href="/dashboard" 
+            <Link
+              href="/dashboard"
               onClick={() => setMobileMenuOpen(false)}
               className="py-3 text-[15px] font-semibold text-[#12643E] border-b border-gray-50"
             >
