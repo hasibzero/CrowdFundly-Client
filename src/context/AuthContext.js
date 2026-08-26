@@ -44,6 +44,20 @@ export const AuthProvider = ({ children }) => {
       try {
         const { data: sessionData } = await authClient.getSession();
         if (sessionData && sessionData.user) {
+          // Upgrade Better Auth session to a JWT for seamless cross-origin backend API calls
+          let token = localStorage.getItem('crowdfundly_token');
+          if (!token) {
+            try {
+              const jwtRes = await axios.get('/api/auth/jwt');
+              if (jwtRes.data && jwtRes.data.token) {
+                token = jwtRes.data.token;
+                localStorage.setItem('crowdfundly_token', token);
+              }
+            } catch (e) {
+              console.error("Failed to sync Better Auth session to JWT", e);
+            }
+          }
+
           const userObj = {
             _id: sessionData.user.id,
             name: sessionData.user.name,
@@ -54,6 +68,10 @@ export const AuthProvider = ({ children }) => {
             roleSelected: sessionData.user.roleSelected ?? false,
           };
           setUser(userObj);
+          
+          if (token) {
+            localStorage.setItem('crowdfundly_user', JSON.stringify(userObj));
+          }
         }
       } catch (err) {
         console.error("Better Auth session check failed", err);
