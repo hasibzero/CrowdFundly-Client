@@ -17,6 +17,7 @@ export default function RegisterPage() {
   const [photoURL, setPhotoURL] = useState('');
   const [role, setRole] = useState('Supporter');
   const [isUploading, setIsUploading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const { register, loginWithGoogleToken, user, loading } = useAuth();
   const router = useRouter();
 
@@ -44,15 +45,25 @@ export default function RegisterPage() {
     }
   };
   const triggerGoogleLogin = async () => {
-    setIsUploading(true);
+    setIsGoogleLoading(true);
     try {
-      await authClient.signIn.social({
+      // better-auth resolves with { error } on failure and redirects the browser
+      // on success. Handle both paths: surface the actual error (not a generic
+      // message) and never leave the form permanently disabled if no redirect happens.
+      const res = await authClient.signIn.social({
         provider: 'google',
         callbackURL: '/select-role',
       });
+      if (res?.error) {
+        console.error('Google sign-in error:', res.error);
+        toast.error(res.error.message || 'Failed to initialize Google login');
+        setIsGoogleLoading(false);
+      }
+      // On success better-auth redirects the browser, so nothing else to do here.
     } catch (err) {
-      toast.error('Failed to initialize Google login');
-      setIsUploading(false);
+      console.error('Google sign-in threw:', err);
+      toast.error(err?.message || 'Failed to initialize Google login');
+      setIsGoogleLoading(false);
     }
   };
 
@@ -289,7 +300,7 @@ export default function RegisterPage() {
                 <button
                   type="button"
                   onClick={triggerGoogleLogin}
-                  disabled={isUploading}
+                  disabled={isUploading || isGoogleLoading}
                   className="w-full flex items-center justify-center gap-3 bg-white border border-slate-200 py-2.5 px-4 rounded-lg text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors shadow-sm disabled:opacity-70 disabled:cursor-not-allowed"
                 >
                   <svg className="h-5 w-5" aria-hidden="true" viewBox="0 0 24 24">
@@ -298,7 +309,7 @@ export default function RegisterPage() {
                     <path d="M5.26498 14.2949C5.02498 13.5699 4.88501 12.7999 4.88501 11.9999C4.88501 11.1999 5.01998 10.4299 5.26498 9.7049L1.275 6.60986C0.46 8.22986 0 10.0599 0 11.9999C0 13.9399 0.46 15.7699 1.28 17.3899L5.26498 14.2949Z" fill="#FBBC05" />
                     <path d="M12.0004 24.0001C15.2404 24.0001 17.9654 22.935 19.9454 21.095L16.0804 18.095C15.0054 18.82 13.6204 19.245 12.0004 19.245C8.8704 19.245 6.21537 17.135 5.26538 14.29L1.27539 17.385C3.25539 21.31 7.3104 24.0001 12.0004 24.0001Z" fill="#34A853" />
                   </svg>
-                  Sign up with Google
+                  {isGoogleLoading ? 'Connecting…' : 'Sign up with Google'}
                 </button>
               </div>
             </div>
