@@ -27,7 +27,7 @@ export default function CampaignDetailPage() {
   const [isReporting, setIsReporting] = useState(false);
   const [mounted, setMounted] = useState(false);
 
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
@@ -88,6 +88,9 @@ export default function CampaignDetailPage() {
     try {
       await axios.post(`${API_URL}/api/contributions`, { campaignId: data._id, amount }, { headers: authHeaders() });
       setCampaign((current) => ({ ...current, raised: (current.raised || 0) + amount, backers: (current.backers || 0) + 1 }));
+      // Credits are debited immediately server-side, so refresh the auth user to
+      // update the navbar balance right away instead of waiting for a reload.
+      await refreshUser();
       toast.success('Your contribution was recorded. Thank you!');
     } catch (error) {
       toast.error(error.response?.data?.message || 'Unable to complete your contribution.');
