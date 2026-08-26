@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-export default function proxy(request) {
+export function proxy(request) {
   // Only check for our custom crowdfundly_token or better-auth token
   const legacyToken = request.cookies.get('crowdfundly_token')?.value;
   const betterAuthToken = request.cookies.get('crowdfundly.session_token')?.value;
