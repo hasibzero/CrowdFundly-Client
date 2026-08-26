@@ -1,8 +1,10 @@
 "use client";
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Loader2, CheckCircle2, XCircle } from 'lucide-react';
+import { Loader2, CheckCircle2, XCircle, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react';
+import toast from 'react-hot-toast';
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
@@ -10,6 +12,10 @@ export default function ReviewContributionsPage() {
   const [contributions, setContributions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(null);
+  // Modal open flag + retained data. Data is kept during the close animation
+  // (not nulled) so the panel doesn't flash empty or crash while fading out.
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalData, setModalData] = useState(null); // { contribution, status }
 
   const fetchContributions = async () => {
     try {
@@ -29,20 +35,33 @@ export default function ReviewContributionsPage() {
     fetchContributions();
   }, []);
 
-  const handleAction = async (id, status) => {
-    if (!confirm(`Are you sure you want to ${status === 'Completed' ? 'approve' : 'reject'} this contribution?`)) return;
-    
+  const openConfirm = (contribution, status) => {
+    setModalData({ contribution, status });
+    setModalOpen(true);
+  };
+
+  const closeConfirm = () => {
+    if (actionLoading) return; // don't allow closing mid-request
+    setModalOpen(false);
+  };
+
+  const performAction = async () => {
+    if (!modalData || actionLoading) return;
+    const { contribution, status } = modalData;
+    const id = contribution._id;
+
     setActionLoading(id);
     try {
       const token = localStorage.getItem('crowdfundly_token');
       await axios.patch(`${API}/api/contributions/${id}/status`, { status }, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      // Remove from list or refetch
-      setContributions(contributions.filter(c => c._id !== id));
+      setContributions((prev) => prev.filter((c) => c._id !== id));
+      toast.success(status === 'Completed' ? 'Contribution approved.' : 'Contribution rejected.');
+      setModalOpen(false);
     } catch (error) {
       console.error('Failed to update status', error);
-      alert('Error updating status');
+      toast.error(error.response?.data?.message || 'Failed to update contribution.');
     } finally {
       setActionLoading(null);
     }
@@ -55,6 +74,9 @@ export default function ReviewContributionsPage() {
       </div>
     );
   }
+
+  const isApprove = modalData?.status === 'Completed';
+  const modalBusy = !!modalData && actionLoading === modalData.contribution._id;
 
   return (
     <div className="w-full">
@@ -84,7 +106,7 @@ export default function ReviewContributionsPage() {
               <tbody>
                 <AnimatePresence>
                   {contributions.map((c) => (
-                    <motion.tr 
+                    <motion.tr
                       key={c._id}
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
@@ -100,14 +122,14 @@ export default function ReviewContributionsPage() {
                           <Loader2 className="w-5 h-5 animate-spin text-gray-400" />
                         ) : (
                           <>
-                            <button 
-                              onClick={() => handleAction(c._id, 'Completed')}
+                            <button
+                              onClick={() => openConfirm(c, 'Completed')}
                               className="bg-emerald-50 text-emerald-600 hover:bg-emerald-100 px-3 py-1.5 rounded-md font-bold text-xs flex items-center transition-colors"
                             >
                               <CheckCircle2 className="w-3.5 h-3.5 mr-1" /> Approve
                             </button>
-                            <button 
-                              onClick={() => handleAction(c._id, 'Rejected')}
+                            <button
+                              onClick={() => openConfirm(c, 'Rejected')}
                               className="bg-red-50 text-red-600 hover:bg-red-100 px-3 py-1.5 rounded-md font-bold text-xs flex items-center transition-colors"
                             >
                               <XCircle className="w-3.5 h-3.5 mr-1" /> Reject
@@ -123,6 +145,103 @@ export default function ReviewContributionsPage() {
           </div>
         )}
       </div>
+
+      {/* Approve / Reject confirmation modal — Headless UI (same pattern as the report modal) */}
+      <Dialog open={modalOpen} onClose={closeConfirm} className="relative z-[9999999]">
+        <DialogBackdrop
+          transition
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in"
+        />
+
+        <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
+          <div className="flex min-h-full w-full items-center justify-center p-4">
+            <DialogPanel
+              transition
+              className="w-[95vw] sm:w-[448px] transform overflow-hidden rounded-2xl bg-white text-gray-900 text-left align-middle shadow-2xl transition-all data-[closed]:translate-y-4 data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in data-[closed]:scale-95"
+            >
+              <button
+                type="button"
+                onClick={closeConfirm}
+                disabled={modalBusy}
+                className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors disabled:opacity-40"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              <div className="p-6 sm:p-8">
+                <div className="flex items-center gap-3 mb-5">
+                  <div
+                    className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
+                      isApprove ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-600'
+                    }`}
+                  >
+                    {isApprove ? <CheckCircle2 className="w-5 h-5" /> : <XCircle className="w-5 h-5" />}
+                  </div>
+                  <div>
+                    <DialogTitle as="h3" className="text-xl font-bold text-gray-900">
+                      {isApprove ? 'Approve this contribution?' : 'Reject this contribution?'}
+                    </DialogTitle>
+                    <p className="text-xs text-gray-500 mt-0.5">This action can&apos;t be undone.</p>
+                  </div>
+                </div>
+
+                <p className="text-sm text-gray-600 leading-relaxed mb-5">
+                  {isApprove ? (
+                    <>
+                      This adds <span className="font-semibold text-gray-800">{modalData?.contribution.amount} credits</span> to
+                      {' '}&ldquo;{modalData?.contribution.campaignTitle || 'this campaign'}&rdquo; and credits your account.
+                    </>
+                  ) : (
+                    <>
+                      This refunds <span className="font-semibold text-gray-800">{modalData?.contribution.amount} credits</span> back to
+                      {' '}{modalData?.contribution.supporterEmail}.
+                    </>
+                  )}
+                </p>
+
+                {/* Details */}
+                <div className="rounded-xl bg-gray-50 border border-gray-100 p-4 text-sm space-y-2.5">
+                  <div className="flex justify-between gap-4">
+                    <span className="text-gray-500">Supporter</span>
+                    <span className="font-medium text-gray-800 truncate">{modalData?.contribution.supporterEmail}</span>
+                  </div>
+                  <div className="flex justify-between gap-4">
+                    <span className="text-gray-500">Campaign</span>
+                    <span className="font-medium text-gray-800 truncate">{modalData?.contribution.campaignTitle || 'Unknown Campaign'}</span>
+                  </div>
+                  <div className="flex justify-between gap-4">
+                    <span className="text-gray-500">Amount</span>
+                    <span className="font-bold text-[#12643E]">{modalData?.contribution.amount} credits</span>
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="mt-6 flex justify-end gap-3">
+                  <button
+                    type="button"
+                    onClick={closeConfirm}
+                    disabled={modalBusy}
+                    className="px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-600 hover:bg-gray-100 transition-colors disabled:opacity-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={performAction}
+                    disabled={modalBusy}
+                    className={`px-5 py-2.5 rounded-lg text-sm font-semibold text-white shadow-sm transition-colors flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed ${
+                      isApprove ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-red-600 hover:bg-red-700'
+                    }`}
+                  >
+                    {modalBusy && <Loader2 className="w-4 h-4 animate-spin" />}
+                    {modalBusy ? 'Processing…' : isApprove ? 'Approve' : 'Reject'}
+                  </button>
+                </div>
+              </div>
+            </DialogPanel>
+          </div>
+        </div>
+      </Dialog>
     </div>
   );
 }
