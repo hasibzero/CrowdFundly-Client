@@ -54,7 +54,7 @@ export const AuthProvider = ({ children }) => {
                 localStorage.setItem('crowdfundly_token', token);
               }
             } catch (e) {
-              console.error("Failed to sync Better Auth session to JWT", e);
+              console.error("Failed to sync Better Auth session to JWT", e.response?.data || e);
             }
           }
 
